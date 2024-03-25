@@ -1,16 +1,24 @@
 import { cookies } from "next/headers";
-import { Countdown } from "../_actions/submitCountdown";
-import CountdownCard from "../_components/Countdown";
+import CountdownCard from "@/app/_components/Countdown";
+import { prisma } from "@/app/prisma";
 
-export default function CountdownPage() {
+export default async function CountdownsPage() {
   const cookieStore = cookies();
-  const countdowns: Countdown[] = JSON.parse(cookieStore.get("countdowns")?.value || "[]");
+  const countdownIds: string[] = cookieStore.get("countdowns")?.value.split(",") || [];
+  const countdowns = await prisma.countdown.findMany({
+    where: {
+      id: {
+        in: countdownIds,
+      },
+    },
+  });
+
   return (
-    <div className="flex flex-col gap-8 pt-8 w-fit mx-auto">
+    <div className="flex flex-col h-screen w-full max-w-2xl gap-8 pt-8 mx-auto">
       {countdowns
-        .sort((a, b) => a.date - b.date)
+        .sort((a, b) => Number(a.date) - Number(b.date))
         .map((countdown) => (
-          <CountdownCard key={countdown.code} {...countdown} />
+          <CountdownCard key={countdown.id} {...countdown} />
         ))}
     </div>
   );

@@ -3,12 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHash } from "crypto";
-
-export type Countdown = {
-  name: string;
-  code: string;
-  date: number;
-};
+import { prisma } from "@/app/prisma";
 
 const COOKIE_OPTIONS = {
   maxAge: 60 * 60 * 24 * 365,
@@ -67,27 +62,34 @@ async function submitCountdown(formData: FormData) {
     return { error: "Invalid date", location: "date" };
   }
 
-  const countdown: Countdown = {
-    name: name,
-    code: createHash("sha256")
-      .update(name + parsedDate.toISOString())
-      .digest("hex")
-      .slice(0, 8),
-    date: parsedDate.getTime(),
-  };
+  const hash = createHash("sha256")
+    .update(name + parsedDate.toISOString())
+    .digest("hex")
+    .slice(0, 8);
+
+  const existingCountdown = await prisma.countdown.findFirst({ where: { id: hash } });
+  if (existingCountdown) {
+    return { error: "Countdown already exists", location: "name" };
+  }
+
+  await prisma.countdown.create({
+    data: {
+      id: hash,
+      name: name,
+      date: parsedDate.getTime(),
+    },
+  });
 
   const cookieStore = cookies();
   const countdowns = cookieStore.get("countdowns")?.value;
 
   if (!countdowns) {
-    cookieStore.set("countdowns", JSON.stringify([countdown]), COOKIE_OPTIONS);
+    cookieStore.set("countdowns", hash, COOKIE_OPTIONS);
   } else {
-    const parsed: Countdown[] | null = countdowns ? JSON.parse(countdowns) : null;
-    const alreadyExists = parsed?.some((c) => c.code === countdown.code);
-    if (alreadyExists) {
+    if (countdowns.includes(hash)) {
       return { error: "Countdown already exists", location: "name" };
     }
-    cookieStore.set("countdowns", JSON.stringify([...parsed!, countdown]), COOKIE_OPTIONS);
+    cookieStore.set("countdowns", `${countdowns},${hash}`, COOKIE_OPTIONS);
   }
 
   redirect(`/countdowns`);

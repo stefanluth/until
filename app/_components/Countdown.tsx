@@ -1,12 +1,12 @@
 "use client";
 
+import { Countdown } from "@prisma/client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-
-import { Countdown } from "@/app/_actions/submitCountdown";
 
 export default function CountdownCard(countdown: Countdown) {
   const [now, setNow] = useState(new Date().getTime());
-  const diff = countdown.date - now;
+  const diff = Number(countdown.date) - now;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -25,7 +25,7 @@ export default function CountdownCard(countdown: Countdown) {
     <CountdownCardContainer>
       <CountdownCardHeader name={countdown.name} />
       <CountdownCardBody d={days} h={hours % 24} m={minutes % 60} s={seconds % 60} />
-      <CountdownCardFooter />
+      <CountdownCardFooter id={countdown.id} />
     </CountdownCardContainer>
   );
 }
@@ -80,12 +80,30 @@ function CountdownCardBody({ d, h, m, s }: { d: number; h: number; m: number; s:
   }
 }
 
-function CountdownCardFooter() {
+function CountdownCardFooter({ id }: { id: string }) {
   return (
-    <div className="flex gap-4 justify-end px-4 pb-4 opacity-75">
-      <button className="text-white underline">Open</button>
-      <button className="text-white underline">Share</button>
-      <button className="text-white underline">Delete</button>
+    <div className="flex gap-4 justify-end px-4 pb-4 opacity-90">
+      <Link className="text-white hover:underline hover:text-gray-200" href={id}>
+        Open
+      </Link>
+      <ShareButton id={id} />
+      <button className="text-white hover:underline">Delete</button>
     </div>
+  );
+}
+
+function ShareButton({ id }: { id: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      className="text-white hover:underline w-14 hover:text-gray-200"
+      onClick={() => {
+        navigator.clipboard.writeText(`${location.origin}/${id}`);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      }}
+    >
+      {copied ? "Copied!" : "Share"}
+    </button>
   );
 }
