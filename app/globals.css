@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border-collapse: collapse;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -11,19 +18,32 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-start-rgb: 209, 161, 197;
+    --background-end-rgb: 116, 105, 182;
   }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
     rgb(var(--background-start-rgb));
+}
+
+input,
+select {
+  @apply bg-white;
+  @apply text-zinc-900;
+  @apply p-2;
+  @apply border;
+  @apply border-gray-300;
+  @apply rounded-md;
+
+  &:focus {
+    @apply outline-none;
+    @apply ring-1;
+    @apply ring-[--background-start-rgb];
+    @apply border-[--background-end-rgb];
+  }
 }
 
 @layer utilities {
