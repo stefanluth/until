@@ -1,4 +1,4 @@
-import CountdownInput from "./_components/CountdownInput";
+import CountdownInput from '@/app/_components/CountdownInput';
 
 export default function Home() {
   return (

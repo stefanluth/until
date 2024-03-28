@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { useFormState } from "react-dom";
+import React, { useEffect, useState } from 'react';
+import { useFormState } from 'react-dom';
 
-import { submitCountdownAction } from "@/app/_actions/submitCountdown";
+import { submitCountdownAction } from '@/app/_actions/submitCountdown';
 
 export default function CountdownInput() {
   const [useDate, setUseDate] = useState(false);
-  const [state, formAction] = useFormState(submitCountdownAction, { error: "", location: "" });
-  const [date, setDate] = useState("");
-  const [isoDate, setIsoDate] = useState("");
+  const [state, formAction] = useFormState(submitCountdownAction, { error: '', location: '' });
+  const [date, setDate] = useState('');
+  const [isoDate, setIsoDate] = useState('');
 
   useEffect(() => {
     if (!date) return;
@@ -22,15 +22,9 @@ export default function CountdownInput() {
       <div className="">
         <div className="flex">
           <label htmlFor="name">Name of the event</label>
-          {state.location === "name" && <ErrorInfo error={state.error} />}
+          {state.location === 'name' && <ErrorInfo error={state.error} />}
         </div>
-        <input
-          className="block w-full mt-1"
-          type="text"
-          id="name"
-          name="name"
-          placeholder="e.g. Family Reunion"
-        />
+        <input className="block w-full mt-1" type="text" id="name" name="name" placeholder="e.g. Family Reunion" />
       </div>
       <div className="">
         <div className="flex">
@@ -45,26 +39,22 @@ export default function CountdownInput() {
             <div>Duration</div>
             <div
               className={`w-10 h-5 rounded-full transition-colors ease-linear duration-300 ${
-                useDate ? "bg-purple-700" : "bg-gray-300"
+                useDate ? 'bg-purple-700' : 'bg-gray-300'
               }`}
             >
               <div
                 className={`bg-white w-5 h-5 rounded-full shadow-md transform duration-300 ${
-                  useDate ? "translate-x-5" : ""
+                  useDate ? 'translate-x-5' : ''
                 }`}
               />
             </div>
             <div>Date</div>
           </label>
-          {(state.location === "date" || state.location === "duration") && <ErrorInfo error={state.error} />}
+          {(state.location === 'date' || state.location === 'duration') && <ErrorInfo error={state.error} />}
         </div>
         {useDate ? (
           <>
-            <input
-              className="block w-full mt-1"
-              type="datetime-local"
-              onChange={(e) => setDate(e.target.value)}
-            />
+            <input className="block w-full mt-1" type="datetime-local" onChange={(e) => setDate(e.target.value)} />
             <input hidden type="text" name="date" defaultValue={isoDate} />
           </>
         ) : (

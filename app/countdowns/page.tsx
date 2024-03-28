@@ -1,10 +1,11 @@
-import { cookies } from "next/headers";
-import CountdownCard from "@/app/_components/Countdown";
-import { prisma } from "@/app/prisma";
+import { cookies } from 'next/headers';
+
+import CountdownCard from '@/app/_components/Countdown';
+import { prisma } from '@/app/prisma';
 
 export default async function CountdownsPage() {
   const cookieStore = cookies();
-  const countdownIds: string[] = cookieStore.get("countdowns")?.value.split(",") || [];
+  const countdownIds: string[] = cookieStore.get('countdowns')?.value.split(',') || [];
   const countdowns = await prisma.countdown.findMany({
     where: {
       id: {

@@ -1,10 +1,13 @@
-"use client";
+'use client';
 
-import { Countdown } from "@prisma/client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { DeleteButton } from "./DeleteButton";
+import { useEffect, useState } from 'react';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { Countdown } from '@prisma/client';
+
+import { DeleteButton } from './DeleteButton';
 
 export default function CountdownCard(countdown: Countdown) {
   const [now, setNow] = useState(new Date().getTime());
@@ -109,7 +112,7 @@ function ShareButton({ id }: { id: string }) {
         setTimeout(() => setCopied(false), 1500);
       }}
     >
-      {copied ? "Copied!" : "Share"}
+      {copied ? 'Copied!' : 'Share'}
     </button>
   );
 }
