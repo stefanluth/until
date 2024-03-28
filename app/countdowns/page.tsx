@@ -13,8 +13,12 @@ export default async function CountdownsPage() {
     },
   });
 
+  if (!countdowns || countdowns.length === 0) {
+    return <div className="text-center">No countdowns found.</div>;
+  }
+
   return (
-    <div className="flex flex-col h-screen w-full max-w-2xl gap-8 pt-8 mx-auto">
+    <div className="flex flex-col max-w-2xl gap-8 mx-auto">
       {countdowns
         .sort((a, b) => Number(a.date) - Number(b.date))
         .map((countdown) => (

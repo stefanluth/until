@@ -2,7 +2,9 @@
 
 import { Countdown } from "@prisma/client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { DeleteButton } from "./DeleteButton";
 
 export default function CountdownCard(countdown: Countdown) {
   const [now, setNow] = useState(new Date().getTime());
@@ -81,13 +83,17 @@ function CountdownCardBody({ d, h, m, s }: { d: number; h: number; m: number; s:
 }
 
 function CountdownCardFooter({ id }: { id: string }) {
+  const path = usePathname();
+
   return (
     <div className="flex gap-4 justify-end px-4 pb-4 opacity-90">
-      <Link className="text-white hover:underline hover:text-gray-200" href={id}>
-        Open
-      </Link>
+      {!path.endsWith(`/${id}`) && (
+        <Link className="text-white hover:underline hover:text-gray-200" href={id}>
+          Open
+        </Link>
+      )}
       <ShareButton id={id} />
-      <button className="text-white hover:underline">Delete</button>
+      <DeleteButton id={id} />
     </div>
   );
 }
