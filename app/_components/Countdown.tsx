@@ -37,7 +37,7 @@ export default function CountdownCard(countdown: Countdown) {
 
 function CountdownCardContainer({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col justify-between w-full h-72 min-w-[22rem] max-w-2xl rounded-2xl backdrop-brightness-105">
+    <div className="flex flex-col justify-between w-full h-72 min-w-96 max-w-2xl rounded-2xl backdrop-brightness-105">
       {children}
     </div>
   );
