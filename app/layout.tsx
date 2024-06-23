@@ -20,9 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} h-full min-h-screen w-screen`}>
         <NavBar />
-        <main className="h-[calc(100vh-4rem)] w-screen pt-8">{children}</main>
+        <main className="py-8">{children}</main>
       </body>
     </html>
   );
