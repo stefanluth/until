@@ -1,5 +1,3 @@
-'use client';
-
 import { removeCountdown } from '@/app/_actions/removeCountdown';
 
 export function DeleteButton({ id }: { id: string }) {
