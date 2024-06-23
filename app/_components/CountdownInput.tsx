@@ -20,7 +20,7 @@ export default function CountdownInput() {
 
   return (
     <form className="flex flex-col gap-4" action={formAction}>
-      <div className="">
+      <div>
         <div className="flex">
           <label htmlFor="name">Name of the event</label>
           {state.location === 'name' && <ErrorInfo error={state.error} />}
@@ -36,7 +36,7 @@ export default function CountdownInput() {
           required
         />
       </div>
-      <div className="">
+      <div>
         <div className="flex">
           <input
             className="hidden"
