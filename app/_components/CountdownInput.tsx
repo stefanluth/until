@@ -25,7 +25,16 @@ export default function CountdownInput() {
           <label htmlFor="name">Name of the event</label>
           {state.location === 'name' && <ErrorInfo error={state.error} />}
         </div>
-        <input className="block w-full mt-1" type="text" id="name" name="name" placeholder="e.g. Family Reunion" />
+        <input
+          className="block w-full mt-1"
+          type="text"
+          id="name"
+          name="name"
+          placeholder="e.g. Family Reunion"
+          autoComplete="on"
+          maxLength={48}
+          required
+        />
       </div>
       <div className="">
         <div className="flex">
@@ -55,11 +64,25 @@ export default function CountdownInput() {
         </div>
         {useDate ? (
           <>
-            <input className="block w-full mt-1" type="datetime-local" onChange={(e) => setDate(e.target.value)} />
+            <input
+              className="block w-full mt-1"
+              type="datetime-local"
+              onChange={(e) => setDate(e.target.value)}
+              min={new Date().toISOString().split('.')[0]}
+              max="2099-12-31T23:59"
+              required
+            />
             <input hidden type="text" name="date" defaultValue={isoDate} />
           </>
         ) : (
-          <input className="block w-full mt-1" type="text" name="duration" placeholder="e.g. 1d 2h 3m" />
+          <input
+            className="block w-full mt-1"
+            type="text"
+            name="duration"
+            placeholder="e.g. 1d 2h 3m"
+            pattern="(\d+d)?\s*(\d+h)?\s*(\d+m)?\s*(\d+s)?"
+            required
+          />
         )}
       </div>
       <SubmitButton />
