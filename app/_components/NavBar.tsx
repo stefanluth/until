@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 export function NavBar() {
   const pathname = usePathname();
   return (
-    <nav className="flex h-16 gap-8 pr-8 justify-end items-center">
+    <nav className="flex h-16 gap-8 px-8 lg:px-48 justify-end items-center">
       {pathname !== '/' && (
         <Link className="text-white hover:underline hover:text-gray-200" href="/">
           Create
