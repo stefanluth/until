@@ -2,11 +2,7 @@
 
 import { cookies } from 'next/headers';
 
-const COOKIE_OPTIONS = {
-  maxAge: 60 * 60 * 24 * 365,
-  path: '/',
-  sameSite: 'lax',
-} as const;
+import { COOKIE_OPTIONS } from '@/app/utils/cookies';
 
 export async function removeCountdown(formData: FormData) {
   const countdownId = formData.get('id');

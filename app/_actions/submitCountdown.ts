@@ -6,12 +6,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { prisma } from '@/app/prisma';
-
-const COOKIE_OPTIONS = {
-  maxAge: 60 * 60 * 24 * 365,
-  path: '/',
-  sameSite: 'lax',
-} as const;
+import { COOKIE_OPTIONS } from '@/app/utils/cookies';
 
 async function submitCountdown(formData: FormData) {
   const name = formData.get('name') as string;
