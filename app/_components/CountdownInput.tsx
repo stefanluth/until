@@ -72,7 +72,7 @@ function SubmitButton() {
 
   return (
     <button
-      className={`bg-purple-700 text-white py-2 px-4 rounded-md ${pending ? 'cursor-not-allowed bg-purple-400' : 'cursor-pointer'}`}
+      className={`text-white py-2 px-4 rounded-md ${pending ? 'cursor-not-allowed bg-purple-400' : 'bg-purple-700'}`}
       type="submit"
       disabled={pending}
     >
