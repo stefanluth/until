@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -11,7 +11,8 @@ import { DeleteButton } from './DeleteButton';
 
 export default function CountdownCard(countdown: Countdown) {
   const [now, setNow] = useState(new Date().getTime());
-  const diff = Number(countdown.date) - now;
+  const countdownTime = useMemo(() => Number(countdown.date), [countdown.date]);
+  const diff = countdownTime - now;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -28,7 +29,7 @@ export default function CountdownCard(countdown: Countdown) {
 
   return (
     <CountdownCardContainer>
-      <CountdownCardHeader name={countdown.name} />
+      <CountdownCardHeader name={countdown.name} date={new Date(countdownTime)} />
       <CountdownCardBody d={days} h={hours % 24} m={minutes % 60} s={seconds % 60} />
       <CountdownCardFooter id={countdown.id} />
     </CountdownCardContainer>
@@ -43,10 +44,21 @@ function CountdownCardContainer({ children }: { children: React.ReactNode }) {
   );
 }
 
-function CountdownCardHeader({ name }: { name: string }) {
+function CountdownCardHeader({ name, date }: { name: string; date: Date }) {
+  const timeString = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const dateString = date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
-    <div className="flex w-full h-24 border-b overflow-y-scroll">
-      <h1 className="text-4xl w-full max-w-full max-h-full self-center text-center px-4">{name}</h1>
+    <div className="flex flex-col w-full h-24 gap-2 text-center justify-center border-b overflow-y-scroll">
+      <h1 className="text-4xl">{name}</h1>
+      <h3>
+        {dateString} | {timeString}
+      </h3>
     </div>
   );
 }
