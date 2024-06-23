@@ -20,8 +20,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
       <body className={`${inter.className} h-full min-h-screen w-screen`}>
-        <NavBar />
+        <header>
+          <NavBar />
+        </header>
         <main className="py-8">{children}</main>
       </body>
     </html>
