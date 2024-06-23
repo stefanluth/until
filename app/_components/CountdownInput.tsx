@@ -68,7 +68,7 @@ export default function CountdownInput() {
               className="block w-full mt-1"
               type="datetime-local"
               onChange={(e) => setDate(e.target.value)}
-              min={new Date().toISOString().split('.')[0]}
+              min={new Date().toISOString().split('T')[0] + 'T00:00'}
               max="2099-12-31T23:59"
               required
             />
