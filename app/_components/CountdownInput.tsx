@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useFormState } from 'react-dom';
+import { useFormState, useFormStatus } from 'react-dom';
 
 import { submitCountdownAction } from '@/app/_actions/submitCountdown';
 
 export default function CountdownInput() {
   const [useDate, setUseDate] = useState(false);
-  const [state, formAction] = useFormState(submitCountdownAction, { error: '', location: '' });
   const [date, setDate] = useState('');
   const [isoDate, setIsoDate] = useState('');
+
+  const [state, formAction] = useFormState(submitCountdownAction, { error: '', location: '' });
 
   useEffect(() => {
     if (!date) return;
@@ -61,10 +62,22 @@ export default function CountdownInput() {
           <input className="block w-full mt-1" type="text" name="duration" placeholder="e.g. 1d 2h 3m" />
         )}
       </div>
-      <button className="bg-purple-700 text-white py-2 px-4 rounded-md" type="submit">
-        Create
-      </button>
+      <SubmitButton />
     </form>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      className={`bg-purple-700 text-white py-2 px-4 rounded-md ${pending ? 'cursor-not-allowed bg-purple-400' : 'cursor-pointer'}`}
+      type="submit"
+      disabled={pending}
+    >
+      {pending ? 'Creating...' : 'Create'}
+    </button>
   );
 }
 
