@@ -65,14 +65,16 @@ async function submitCountdown(formData: FormData) {
     .digest('hex')
     .slice(0, 8);
 
-  const existingCountdown = await prisma.countdown.findFirst({ where: { id: hash } });
+  const countdownId = `${encodeURIComponent(name)}-${hash}`;
+
+  const existingCountdown = await prisma.countdown.findFirst({ where: { id: countdownId } });
   if (existingCountdown) {
     return { error: 'Countdown already exists', location: 'name' };
   }
 
   await prisma.countdown.create({
     data: {
-      id: hash,
+      id: countdownId,
       name: name,
       date: parsedDate.getTime(),
     },
@@ -82,12 +84,12 @@ async function submitCountdown(formData: FormData) {
   const countdowns = cookieStore.get('countdowns')?.value;
 
   if (!countdowns) {
-    cookieStore.set('countdowns', hash, COOKIE_OPTIONS);
+    cookieStore.set('countdowns', countdownId, COOKIE_OPTIONS);
   } else {
-    if (countdowns.includes(hash)) {
+    if (countdowns.includes(countdownId)) {
       return { error: 'Countdown already exists', location: 'name' };
     }
-    cookieStore.set('countdowns', `${countdowns},${hash}`, COOKIE_OPTIONS);
+    cookieStore.set('countdowns', `${countdowns},${countdownId}`, COOKIE_OPTIONS);
   }
 
   redirect(`/countdowns`);
