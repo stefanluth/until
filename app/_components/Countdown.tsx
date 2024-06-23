@@ -56,7 +56,7 @@ function CountdownCardHeader({ name, date }: { name: string; date: Date }) {
   return (
     <div className="flex flex-col w-full h-24 gap-2 text-center justify-center border-b overflow-y-scroll">
       <h1 className="text-4xl">{name}</h1>
-      <h3>
+      <h3 suppressHydrationWarning>
         {dateString} | {timeString}
       </h3>
     </div>
