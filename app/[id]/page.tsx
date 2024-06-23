@@ -19,7 +19,7 @@ export default async function CountdownPage({ params }: { params: { id: string }
   }
 
   return (
-    <div className="flex flex-col max-w-2xl mx-auto">
+    <div className="flex flex-col w-full max-w-2xl mx-auto">
       <CountdownCard {...countdown} />
     </div>
   );

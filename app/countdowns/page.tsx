@@ -19,7 +19,7 @@ export default async function CountdownsPage() {
   }
 
   return (
-    <div className="flex flex-col max-w-2xl gap-8 mx-auto">
+    <div className="flex flex-col w-full max-w-2xl gap-8 mx-auto">
       {countdowns
         .sort((a, b) => Number(a.date) - Number(b.date))
         .map((countdown) => (
