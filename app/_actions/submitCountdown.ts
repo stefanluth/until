@@ -53,6 +53,7 @@ async function submitCountdown(formData: FormData) {
     parsedDate.setDate(parsedDate.getDate() + days);
     parsedDate.setHours(parsedDate.getHours() + hours);
     parsedDate.setMinutes(parsedDate.getMinutes() + minutes);
+    parsedDate.setSeconds(parsedDate.getSeconds() + seconds);
   }
 
   if (!parsedDate) {
