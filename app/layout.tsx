@@ -32,11 +32,11 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} h-full min-h-screen w-full flex flex-col`}>
         <ConsentProvider>
-          <div className="group flex flex-1 flex-col">
-            <header className="flex flex-col">
+          <div className="group relative flex flex-1 flex-col">
+            <header className="absolute inset-x-0 top-0 z-10 flex flex-col">
               <NavBar />
             </header>
-            <main className="flex flex-col flex-1 py-8">{children}</main>
+            <main className="flex flex-1 flex-col py-20">{children}</main>
             <Footer />
           </div>
         </ConsentProvider>
