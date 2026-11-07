@@ -1,15 +1,23 @@
 export const CONSENT_COOKIE = 'consent';
 export const COUNTDOWN_LIST_COOKIE = 'countdowns';
 
-const useSecureCookies =
-  process.env.COOKIE_SECURE === 'true' ||
-  (process.env.COOKIE_SECURE !== 'false' && process.env.NODE_ENV === 'production');
+type CookieEnvironment = {
+  COOKIE_SECURE?: string;
+  NODE_ENV?: string;
+};
+
+export function isSecureCookie(environment: CookieEnvironment): boolean {
+  return (
+    environment.COOKIE_SECURE === 'true' ||
+    (environment.COOKIE_SECURE !== 'false' && environment.NODE_ENV === 'production')
+  );
+}
 
 export const COOKIE_OPTIONS = {
   maxAge: 60 * 60 * 24 * 365,
   path: '/',
   sameSite: 'lax',
-  secure: useSecureCookies,
+  secure: isSecureCookie(process.env),
 } as const;
 
 export function isConsentGranted(value: string | undefined): boolean {

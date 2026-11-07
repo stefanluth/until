@@ -25,6 +25,12 @@ describe('readCountdownIds', () => {
     assert.deepEqual(readCountdownIds(''), []);
     assert.deepEqual(readCountdownIds(','), []);
   });
+
+  it('preserves duplicates and drops whitespace or overlong entries', () => {
+    assert.deepEqual(readCountdownIds('a-12345678,a-12345678'), ['a-12345678', 'a-12345678']);
+    assert.deepEqual(readCountdownIds(' a-12345678'), []);
+    assert.deepEqual(readCountdownIds(`a-12345678,${'b'.repeat(513)}`), ['a-12345678']);
+  });
 });
 
 describe('hasCountdownId', () => {
@@ -40,6 +46,15 @@ describe('addCountdownId', () => {
     assert.deepEqual(addCountdownId(['a-12345678'], 'b-12345678'), ['a-12345678', 'b-12345678']);
     assert.deepEqual(addCountdownId(['a-12345678'], 'a-12345678'), ['a-12345678']);
   });
+
+  it('keeps insertion order and handles an empty list', () => {
+    assert.deepEqual(addCountdownId([], 'a-12345678'), ['a-12345678']);
+    assert.deepEqual(addCountdownId(['b-12345678', 'a-12345678'], 'c-12345678'), [
+      'b-12345678',
+      'a-12345678',
+      'c-12345678',
+    ]);
+  });
 });
 
 describe('removeCountdownId', () => {
@@ -49,6 +64,11 @@ describe('removeCountdownId', () => {
       'c-12345678',
     ]);
   });
+
+  it('removes every duplicate and leaves the list unchanged when absent', () => {
+    assert.deepEqual(removeCountdownId(['a-12345678', 'b-12345678', 'a-12345678'], 'a-12345678'), ['b-12345678']);
+    assert.deepEqual(removeCountdownId(['a-12345678'], 'b-12345678'), ['a-12345678']);
+  });
 });
 
 describe('getCountdownList', () => {
@@ -56,6 +76,10 @@ describe('getCountdownList', () => {
     const store = createCookieStore({ [COUNTDOWN_LIST_COOKIE]: 'a-12345678' });
 
     assert.deepEqual(getCountdownList(store), ['a-12345678']);
+  });
+
+  it('returns an empty list when the cookie is missing', () => {
+    assert.deepEqual(getCountdownList(createCookieStore()), []);
   });
 });
 
@@ -68,15 +92,17 @@ describe('setCountdownList', () => {
     assert.deepEqual(store.calls, [
       { type: 'set', name: COUNTDOWN_LIST_COOKIE, value: 'a-12345678,b-12345678', options: COOKIE_OPTIONS },
     ]);
+    assert.deepEqual(getCountdownList(store), ['a-12345678', 'b-12345678']);
   });
 
   it('deletes the cookie when the list becomes empty', () => {
-    const store = createCookieStore();
+    const store = createCookieStore({ [COUNTDOWN_LIST_COOKIE]: 'a-12345678' });
 
     setCountdownList(store, []);
 
     assert.deepEqual(store.calls, [
       { type: 'delete', options: { name: COUNTDOWN_LIST_COOKIE, path: COOKIE_OPTIONS.path } },
     ]);
+    assert.equal(store.get(COUNTDOWN_LIST_COOKIE), undefined);
   });
 });

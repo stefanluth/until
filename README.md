@@ -24,13 +24,18 @@ npm run build
 ```
 
 Example-based tests live in `tests/unit`; property-based tests (using
-[fast-check](https://fast-check.dev)) live in `tests/properties`.
+[fast-check](https://fast-check.dev)) live in `tests/properties`. Server-action
+guard and cookie integration tests live in `tests/integration` and use
+[Vitest](https://vitest.dev) to mock Next.js request modules.
 
 ```bash
 npm run test:unit
 npm run test:property
+npm run test:integration
 npm run test:coverage
 ```
+
+`npm test` runs the unit, property, and integration suites.
 
 ## Docker
 
