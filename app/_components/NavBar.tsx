@@ -38,7 +38,7 @@ export function NavBar() {
 
   return (
     <nav
-      className={`flex h-16 sm:h-20 gap-6 sm:gap-8 px-8 lg:px-48 justify-end items-center ${
+      className={`flex h-16 sm:h-20 gap-6 sm:gap-8 pl-8 lg:pl-48 justify-end items-center scrollbar-compensate [--compensated-padding:2rem] lg:[--compensated-padding:12rem] ${
         countdownId ? 'nav-reveal' : ''
       }`}
     >

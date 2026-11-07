@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="flex justify-end h-10 sm:h-12 pb-3 pt-2 pr-4 w-full text-base sm:text-lg tracking-wide">
+    <footer className="flex justify-end h-10 sm:h-12 pb-3 pt-2 w-full text-base sm:text-lg tracking-wide scrollbar-compensate [--compensated-padding:1rem]">
       <Link className="flex gap-2 items-center" href="https://github.com/stefanluth/until">
         Made with ❤️ on
         <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg">

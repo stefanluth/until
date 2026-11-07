@@ -41,6 +41,10 @@ body {
   overflow-x: hidden;
 }
 
+.scrollbar-compensate {
+  padding-right: max(0px, calc(var(--compensated-padding) - (100vw - 100%)));
+}
+
 body:has([data-consent-gate]) {
   overflow: hidden;
 }
