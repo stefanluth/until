@@ -1,10 +1,17 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+
+import { cache } from 'react';
+
+import { notFound } from 'next/navigation';
 
 import CountdownCard from '@/app/_components/Countdown';
-import { prisma } from '@/app/prisma';
+import { findCountdownById } from '@/app/db';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const countdown = await prisma.countdown.findFirst({ where: { id: params.id } });
+const getCountdown = cache(findCountdownById);
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const countdown = await getCountdown(id);
 
   return {
     title: countdown?.name ? `${countdown.name} - Countdown` : 'Until',
@@ -12,15 +19,17 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function CountdownPage({ params }: { params: { id: string } }) {
-  const countdown = await prisma.countdown.findFirst({ where: { id: params.id } });
+export default async function CountdownPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const countdown = await getCountdown(id);
+
   if (!countdown) {
-    return <div>Countdown not found</div>;
+    notFound();
   }
 
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto">
-      <CountdownCard {...countdown} />
+    <div className="flex flex-1 flex-col">
+      <CountdownCard {...countdown} variant="detail" />
     </div>
   );
 }

@@ -1,22 +1,64 @@
 'use client';
 
+import { House, Plus } from 'lucide-react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { isValidCountdownId } from '@/app/utils/validation';
+
+import { CountdownCardActions } from './CountdownCardActions';
+
+const LINKS = [
+  { href: '/', label: 'Create a countdown', Icon: Plus },
+  { href: '/countdowns', label: 'Show all countdowns', Icon: House },
+];
+
+const RESERVED_PATHS = new Set(['', 'countdowns', '_not-found']);
+const COUNTDOWN_PATH_RE = /^[A-Za-z0-9!'()*\-._~%]+-[0-9a-f]{8}$/;
+
+function getCountdownId(pathname: string): string | null {
+  const segments = pathname.split('/').filter(Boolean);
+
+  if (segments.length !== 1 || RESERVED_PATHS.has(segments[0])) {
+    return null;
+  }
+
+  try {
+    const id = encodeURIComponent(decodeURIComponent(segments[0]));
+    return isValidCountdownId(id) && COUNTDOWN_PATH_RE.test(id) ? id : null;
+  } catch {
+    return null;
+  }
+}
+
 export function NavBar() {
   const pathname = usePathname();
+  const countdownId = getCountdownId(pathname);
+
   return (
-    <nav className="flex h-16 gap-8 px-8 lg:px-48 justify-end items-center">
-      {pathname !== '/' && (
-        <Link className="text-white hover:underline hover:text-gray-200" href="/">
-          Create
-        </Link>
+    <nav
+      className={`flex h-16 sm:h-20 gap-6 sm:gap-8 px-8 lg:px-48 justify-end items-center ${
+        countdownId ? 'nav-reveal' : ''
+      }`}
+    >
+      {countdownId && (
+        <>
+          <CountdownCardActions id={countdownId} showOpen={false} />
+          <span className="h-6 w-px bg-white/40" aria-hidden />
+        </>
       )}
-      {pathname !== '/countdowns' && (
-        <Link className="text-white hover:underline hover:text-gray-200" href="/countdowns">
-          Show all
+      {LINKS.filter((link) => link.href !== pathname).map(({ href, label, Icon }) => (
+        <Link
+          key={href}
+          className="inline-flex items-center text-white hover:text-gray-200"
+          href={href}
+          title={label}
+          aria-label={label}
+        >
+          <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
         </Link>
-      )}
+      ))}
     </nav>
   );
 }

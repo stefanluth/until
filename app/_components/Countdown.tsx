@@ -2,37 +2,51 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { Countdown } from '@prisma/client';
+import type { Countdown, CountdownVariant } from '@/app/types';
+import { splitRemaining } from '@/app/utils/duration';
 
+import { CountdownCardActions } from './CountdownCardActions';
 import { CountdownCardBody } from './CountdownCardBody';
-import { CountdownCardFooter } from './CountdownCardFooter';
 import { CountdownCardHeader } from './CountdownCardHeader';
 
-export default function CountdownCard(countdown: Countdown) {
-  const [now, setNow] = useState(new Date().getTime());
-  const countdownTime = useMemo(() => Number(countdown.date), [countdown.date]);
-  const diff = countdownTime - now;
+export default function CountdownCard({ variant = 'card', ...countdown }: Countdown & { variant?: CountdownVariant }) {
+  const [now, setNow] = useState(() => Date.now());
+  const countdownTime = useMemo(() => countdown.date.getTime(), [countdown.date]);
 
   useEffect(() => {
-    if (diff <= 0) return;
+    if (countdownTime <= Date.now()) return;
 
     const interval = setInterval(() => {
-      setNow(new Date().getTime());
+      setNow(Date.now());
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [countdownTime]);
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor(diff / (1000 * 60));
-  const seconds = Math.floor(diff / 1000);
+  const remaining = splitRemaining(countdownTime - now);
+  const isDetail = variant === 'detail';
 
   return (
-    <div className="flex flex-col justify-between w-full h-72 max-w-2xl rounded-2xl backdrop-brightness-105">
-      <CountdownCardHeader name={countdown.name} date={new Date(countdownTime)} />
-      <CountdownCardBody d={days} h={hours % 24} m={minutes % 60} s={seconds % 60} />
-      <CountdownCardFooter id={countdown.id} />
+    <div
+      className={
+        isDetail
+          ? 'flex flex-1 flex-col items-center justify-center w-full max-w-6xl px-4 mx-auto text-center'
+          : 'flex flex-col w-full min-h-80 max-w-2xl rounded-2xl backdrop-brightness-105'
+      }
+    >
+      <CountdownCardHeader
+        name={countdown.name}
+        date={countdown.date}
+        variant={variant}
+        actions={isDetail ? undefined : <CountdownCardActions id={countdown.id} />}
+      />
+      <CountdownCardBody
+        d={remaining.days}
+        h={remaining.hours}
+        m={remaining.minutes}
+        s={remaining.seconds}
+        variant={variant}
+      />
     </div>
   );
 }

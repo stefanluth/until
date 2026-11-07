@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS countdowns (
+  id   TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  "date" TIMESTAMPTZ NOT NULL
+);

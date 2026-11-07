@@ -1,100 +1,69 @@
 'use server';
 
-import { createHash } from 'crypto';
-
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { prisma } from '@/app/prisma';
-import { COOKIE_OPTIONS } from '@/app/utils/cookies';
+import { createCountdown } from '@/app/db';
+import { addCountdownId, getCountdownList, setCountdownList } from '@/app/utils/countdownList';
+import { createCountdownId } from '@/app/utils/countdownId';
+import { CONSENT_COOKIE, isConsentGranted } from '@/app/utils/cookies';
+import { parseWhen } from '@/app/utils/parseWhen';
+import { consumeRateLimit, getRateLimitKey } from '@/app/utils/rateLimit';
+import { parseClientDate, validateCountdownName, validateCountdownWhen } from '@/app/utils/validation';
 
-async function submitCountdown(formData: FormData) {
-  const name = formData.get('name') as string;
-  const date = formData.get('date') as string | null;
-  const duration = formData.get('duration') as string | null;
+export type CountdownFormState = {
+  error: string;
+  location: 'consent' | 'form' | 'name' | 'when' | '';
+};
 
-  let parsedDate: Date | null = null;
+export async function submitCountdownAction(
+  _previousState: CountdownFormState,
+  formData: FormData,
+): Promise<CountdownFormState> {
+  const cookieStore = await cookies();
 
-  if (!name) {
-    return { error: 'Name is required', location: 'name' };
+  if (!isConsentGranted(cookieStore.get(CONSENT_COOKIE)?.value)) {
+    return { error: 'Please accept the cookie notice before creating a countdown.', location: 'consent' };
   }
 
-  if (!date && !duration) {
-    return { error: 'Date or duration is required', location: 'date' };
+  if (!consumeRateLimit(getRateLimitKey(await headers()))) {
+    return { error: 'Too many countdowns created. Please try again later.', location: 'form' };
   }
 
-  if (date && duration) {
-    return { error: 'Date and duration are mutually exclusive', location: 'date' };
+  const nameResult = validateCountdownName(formData.get('name'));
+  if (!nameResult.ok) {
+    return nameResult;
   }
 
-  if (date) {
-    if (isNaN(Date.parse(date))) {
-      return { error: 'Invalid date', location: 'date' };
-    }
-
-    parsedDate = new Date(date);
-  } else if (duration) {
-    const durationRegex = /^(\d+d)?\s*(\d+h)?\s*(\d+m)?\s*(\d+s)?$/;
-    if (!durationRegex.test(duration)) {
-      return { error: 'Invalid duration', location: 'duration' };
-    }
-
-    const durationParts = duration.match(durationRegex);
-    if (!durationParts) {
-      return { error: 'Invalid duration', location: 'duration' };
-    }
-
-    const days = parseInt(durationParts[1]?.replace('d', '') || '0');
-    const hours = parseInt(durationParts[2]?.replace('h', '') || '0');
-    const minutes = parseInt(durationParts[3]?.replace('m', '') || '0');
-    const seconds = parseInt(durationParts[3]?.replace('s', '') || '0');
-
-    parsedDate = new Date();
-    parsedDate.setDate(parsedDate.getDate() + days);
-    parsedDate.setHours(parsedDate.getHours() + hours);
-    parsedDate.setMinutes(parsedDate.getMinutes() + minutes);
-    parsedDate.setSeconds(parsedDate.getSeconds() + seconds);
+  const whenResult = validateCountdownWhen(formData.get('when'));
+  if (!whenResult.ok) {
+    return whenResult;
   }
 
-  if (!parsedDate) {
-    return { error: 'Invalid date', location: 'date' };
+  const clientDate = parseClientDate(formData.get('date'));
+  const parsedWhen = parseWhen(whenResult.value);
+
+  if (!parsedWhen) {
+    return {
+      error: 'Enter a duration like 1d 2h 3m or a date like 25-12-2026 18:00',
+      location: 'when',
+    };
   }
 
-  const hash = createHash('sha256')
-    .update(name + parsedDate.toISOString())
-    .digest('hex')
-    .slice(0, 8);
+  const date = clientDate ?? parsedWhen;
+  const countdownId = createCountdownId(nameResult.value, date);
+  const countdownIds = getCountdownList(cookieStore);
+  const created = await createCountdown({
+    id: countdownId,
+    name: nameResult.value,
+    date,
+  });
 
-  const countdownId = `${encodeURIComponent(name)}-${hash}`;
-
-  const existingCountdown = await prisma.countdown.findFirst({ where: { id: countdownId } });
-  if (existingCountdown) {
+  if (!created || countdownIds.includes(countdownId)) {
     return { error: 'Countdown already exists', location: 'name' };
   }
 
-  await prisma.countdown.create({
-    data: {
-      id: countdownId,
-      name: name,
-      date: parsedDate.getTime(),
-    },
-  });
-
-  const cookieStore = cookies();
-  const countdowns = cookieStore.get('countdowns')?.value;
-
-  if (!countdowns) {
-    cookieStore.set('countdowns', countdownId, COOKIE_OPTIONS);
-  } else {
-    if (countdowns.includes(countdownId)) {
-      return { error: 'Countdown already exists', location: 'name' };
-    }
-    cookieStore.set('countdowns', `${countdowns},${countdownId}`, COOKIE_OPTIONS);
-  }
+  setCountdownList(cookieStore, addCountdownId(countdownIds, countdownId));
 
   redirect(`/countdowns`);
-}
-
-export async function submitCountdownAction(prevState: any, formData: FormData) {
-  return await submitCountdown(formData);
 }

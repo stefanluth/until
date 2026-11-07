@@ -1,18 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  border-collapse: collapse;
+@theme {
+  --color-brand: var(--color-purple-700);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  accent-color: var(--color-brand);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,27 +37,64 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  font-variant-numeric: tabular-nums;
+  overflow-x: hidden;
+}
+
+body:has([data-consent-gate]) {
+  overflow: hidden;
+}
+
+::selection {
+  background-color: var(--color-brand);
+  color: white;
+}
+
+::placeholder {
+  color: var(--color-gray-400);
+}
+
+:where(a, button):focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (hover: hover) {
+  .nav-reveal {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+
+  .group:hover .nav-reveal,
+  .nav-reveal:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 input,
 select {
-  @apply bg-white;
-  @apply text-zinc-900;
-  @apply p-2;
-  @apply border;
-  @apply border-gray-300;
-  @apply rounded-md;
+  @apply bg-white text-zinc-900 p-2 border border-gray-300 rounded-md;
+
+  &:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-zinc-900);
+    box-shadow: 0 0 0 1000px white inset;
+  }
 
   &:focus {
-    @apply outline-none;
-    @apply ring-1;
-    @apply ring-[--background-start-rgb];
-    @apply border-[--background-end-rgb];
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+    @apply outline-none ring-1 ring-[rgb(var(--background-start-rgb))] border-[rgb(var(--background-end-rgb))];
   }
 }
