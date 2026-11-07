@@ -5,7 +5,7 @@ import { splitRemaining } from '../app/utils/duration.ts';
 
 describe('splitRemaining', () => {
   it('splits days, hours, minutes, and seconds', () => {
-    const milliseconds = ((((1 * 24 + 2) * 60 + 3) * 60 + 4) * 1000);
+    const milliseconds = (((1 * 24 + 2) * 60 + 3) * 60 + 4) * 1000;
 
     assert.deepEqual(splitRemaining(milliseconds), { days: 1, hours: 2, minutes: 3, seconds: 4 });
   });

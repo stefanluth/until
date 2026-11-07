@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { COOKIE_OPTIONS, COUNTDOWN_LIST_COOKIE, isConsentGranted } from '../app/utils/cookies.ts';
 import {
   addCountdownId,
   getCountdownList,
@@ -9,7 +10,6 @@ import {
   removeCountdownId,
   setCountdownList,
 } from '../app/utils/countdownList.ts';
-import { COUNTDOWN_LIST_COOKIE, COOKIE_OPTIONS, isConsentGranted } from '../app/utils/cookies.ts';
 
 describe('readCountdownIds', () => {
   it('keeps valid IDs and drops malformed entries', () => {

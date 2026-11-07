@@ -12,6 +12,8 @@
     "build:turbo": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "node --test",
     "typecheck": "tsc --noEmit"
   },

@@ -3,8 +3,8 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { addCountdownId, getCountdownList, setCountdownList } from '@/utils/countdownList';
 import { CONSENT_COOKIE, isConsentGranted } from '@/utils/cookies';
+import { addCountdownId, getCountdownList, setCountdownList } from '@/utils/countdownList';
 import { isValidCountdownId } from '@/utils/validation';
 
 export async function addCountdown(countdownId: string) {
