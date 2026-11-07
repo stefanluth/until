@@ -6,7 +6,7 @@ import {
   parseClientDate,
   validateCountdownName,
   validateCountdownWhen,
-} from '../app/_utils/validation.ts';
+} from '../../app/_utils/validation.ts';
 
 describe('validateCountdownName', () => {
   it('trims valid names', () => {

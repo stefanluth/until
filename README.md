@@ -23,6 +23,15 @@ npm test
 npm run build
 ```
 
+Example-based tests live in `tests/unit`; property-based tests (using
+[fast-check](https://fast-check.dev)) live in `tests/properties`.
+
+```bash
+npm run test:unit
+npm run test:property
+npm run test:coverage
+```
+
 ## Docker
 
 The repository includes a multi-stage `Dockerfile` and two Compose stacks: a development

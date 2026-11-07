@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { COOKIE_OPTIONS, COUNTDOWN_LIST_COOKIE, isConsentGranted } from '../app/_utils/cookies.ts';
+import { COOKIE_OPTIONS, COUNTDOWN_LIST_COOKIE } from '../../app/_utils/cookies.ts';
 import {
   addCountdownId,
   getCountdownList,
@@ -9,7 +9,8 @@ import {
   readCountdownIds,
   removeCountdownId,
   setCountdownList,
-} from '../app/_utils/countdownList.ts';
+} from '../../app/_utils/countdownList.ts';
+import { createCookieStore } from '../support/cookies.ts';
 
 describe('readCountdownIds', () => {
   it('keeps valid IDs and drops malformed entries', () => {
@@ -52,41 +53,30 @@ describe('removeCountdownId', () => {
 
 describe('getCountdownList', () => {
   it('reads the ID list from the countdown cookie', () => {
-    const store = { get: (name: string) => (name === COUNTDOWN_LIST_COOKIE ? { value: 'a-12345678' } : undefined) };
+    const store = createCookieStore({ [COUNTDOWN_LIST_COOKIE]: 'a-12345678' });
+
     assert.deepEqual(getCountdownList(store), ['a-12345678']);
   });
 });
 
 describe('setCountdownList', () => {
   it('writes the joined list with the shared cookie options', () => {
-    const calls: unknown[][] = [];
-    const store = {
-      set: (...args: unknown[]) => calls.push(['set', ...args]),
-      delete: (...args: unknown[]) => calls.push(['delete', ...args]),
-    };
+    const store = createCookieStore();
 
     setCountdownList(store, ['a-12345678', 'b-12345678']);
 
-    assert.deepEqual(calls, [['set', COUNTDOWN_LIST_COOKIE, 'a-12345678,b-12345678', COOKIE_OPTIONS]]);
+    assert.deepEqual(store.calls, [
+      { type: 'set', name: COUNTDOWN_LIST_COOKIE, value: 'a-12345678,b-12345678', options: COOKIE_OPTIONS },
+    ]);
   });
 
   it('deletes the cookie when the list becomes empty', () => {
-    const calls: unknown[][] = [];
-    const store = {
-      set: (...args: unknown[]) => calls.push(['set', ...args]),
-      delete: (...args: unknown[]) => calls.push(['delete', ...args]),
-    };
+    const store = createCookieStore();
 
     setCountdownList(store, []);
 
-    assert.deepEqual(calls, [['delete', { name: COUNTDOWN_LIST_COOKIE, path: COOKIE_OPTIONS.path }]]);
-  });
-});
-
-describe('isConsentGranted', () => {
-  it('accepts only the true marker', () => {
-    assert.equal(isConsentGranted('true'), true);
-    assert.equal(isConsentGranted('false'), false);
-    assert.equal(isConsentGranted(undefined), false);
+    assert.deepEqual(store.calls, [
+      { type: 'delete', options: { name: COUNTDOWN_LIST_COOKIE, path: COOKIE_OPTIONS.path } },
+    ]);
   });
 });

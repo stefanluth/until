@@ -35,6 +35,10 @@ function parseCalendarDate(value: string): Date | null {
   if (parts.year < 1 || parts.year > 9999) return null;
 
   const date = new Date(parts.year, parts.month - 1, parts.day, parts.hours, parts.minutes, parts.seconds);
+  if (parts.year < 100) {
+    date.setFullYear(parts.year);
+  }
+
   return hasMatchingParts(date, parts) ? date : null;
 }
 

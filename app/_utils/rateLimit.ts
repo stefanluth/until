@@ -8,8 +8,12 @@ type RateLimitState = {
   globalBucket: number[];
 };
 
+export type RateLimiter = {
+  consume(key: string, now?: number): boolean;
+};
+
 const globalForRateLimit = globalThis as unknown as {
-  rateLimitState: RateLimitState | undefined;
+  rateLimitLimiter: RateLimiter | undefined;
 };
 
 export function getRateLimitKey(headers: { get(name: string): string | null }): string {
@@ -23,34 +27,42 @@ export function getRateLimitKey(headers: { get(name: string): string | null }): 
   return address.slice(0, 128);
 }
 
-export function consumeRateLimit(key: string, now = Date.now()): boolean {
-  const state = getState();
-
-  if (state.buckets.size >= MAX_TRACKED_KEYS) {
-    pruneBuckets(state, now);
-  }
-
-  const keyBucket = pruneTimestamps(state.buckets.get(key) ?? [], now);
-  const globalBucket = pruneTimestamps(state.globalBucket, now);
-  const blocked = keyBucket.length >= PER_KEY_LIMIT || globalBucket.length >= GLOBAL_LIMIT;
-
-  state.globalBucket = globalBucket;
-  state.buckets.set(key, keyBucket);
-
-  if (blocked) {
-    return false;
-  }
-
-  keyBucket.push(now);
-  globalBucket.push(now);
-  return true;
-}
-
-function getState(): RateLimitState {
-  return (globalForRateLimit.rateLimitState ??= {
+export function createRateLimiter(): RateLimiter {
+  const state: RateLimitState = {
     buckets: new Map(),
     globalBucket: [],
-  });
+  };
+
+  return {
+    consume(key: string, now = Date.now()): boolean {
+      if (state.buckets.size >= MAX_TRACKED_KEYS) {
+        pruneBuckets(state, now);
+      }
+
+      const keyBucket = pruneTimestamps(state.buckets.get(key) ?? [], now);
+      const globalBucket = pruneTimestamps(state.globalBucket, now);
+      const blocked = keyBucket.length >= PER_KEY_LIMIT || globalBucket.length >= GLOBAL_LIMIT;
+
+      state.globalBucket = globalBucket;
+      state.buckets.set(key, keyBucket);
+
+      if (blocked) {
+        return false;
+      }
+
+      keyBucket.push(now);
+      globalBucket.push(now);
+      return true;
+    },
+  };
+}
+
+export function consumeRateLimit(key: string, now = Date.now()): boolean {
+  return getDefaultRateLimiter().consume(key, now);
+}
+
+function getDefaultRateLimiter(): RateLimiter {
+  return (globalForRateLimit.rateLimitLimiter ??= createRateLimiter());
 }
 
 function pruneBuckets(state: RateLimitState, now: number) {

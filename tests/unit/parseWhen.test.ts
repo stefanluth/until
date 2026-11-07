@@ -1,9 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { parseWhen } from '../app/_utils/parseWhen.ts';
-
-const NOW = new Date('2026-01-01T00:00:00.000Z');
+import { parseWhen } from '../../app/_utils/parseWhen.ts';
+import { NOW } from '../support/dates.ts';
 
 describe('parseWhen', () => {
   it('parses durations', () => {
@@ -21,6 +20,17 @@ describe('parseWhen', () => {
     assert.equal(result.getMonth(), 11);
     assert.equal(result.getDate(), 25);
     assert.equal(result.getHours(), 18);
+    assert.equal(result.getMinutes(), 30);
+  });
+
+  it('parses years below 100', () => {
+    const result = parseWhen('01-01-0050 12:30', NOW);
+
+    assert.ok(result);
+    assert.equal(result.getFullYear(), 50);
+    assert.equal(result.getMonth(), 0);
+    assert.equal(result.getDate(), 1);
+    assert.equal(result.getHours(), 12);
     assert.equal(result.getMinutes(), 30);
   });
 
