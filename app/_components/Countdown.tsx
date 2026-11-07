@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+import { splitRemaining } from '@/_utils/duration';
 import type { Countdown, CountdownVariant } from '@/types';
-import { splitRemaining } from '@/utils/duration';
 
 import { CountdownCardActions } from './CountdownCardActions';
 import { CountdownCardBody } from './CountdownCardBody';

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { consumeRateLimit, getRateLimitKey } from '../app/utils/rateLimit.ts';
+import { consumeRateLimit, getRateLimitKey } from '../app/_utils/rateLimit.ts';
 
 const START = 1_700_000_000_000;
 const WINDOW_MS = 10 * 60 * 1000;

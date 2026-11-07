@@ -1,7 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
-import { CONSENT_COOKIE, COOKIE_OPTIONS } from '../utils/cookies';
+import { CONSENT_COOKIE, COOKIE_OPTIONS } from '../_utils/cookies';
 
 export async function CookieNotice() {
   const consent = (await cookies()).get(CONSENT_COOKIE);

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { splitRemaining } from '../app/utils/duration.ts';
+import { splitRemaining } from '../app/_utils/duration.ts';
 
 describe('splitRemaining', () => {
   it('splits days, hours, minutes, and seconds', () => {

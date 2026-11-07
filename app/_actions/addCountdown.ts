@@ -3,9 +3,9 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { CONSENT_COOKIE, isConsentGranted } from '@/utils/cookies';
-import { addCountdownId, getCountdownList, setCountdownList } from '@/utils/countdownList';
-import { isValidCountdownId } from '@/utils/validation';
+import { CONSENT_COOKIE, isConsentGranted } from '@/_utils/cookies';
+import { addCountdownId, getCountdownList, setCountdownList } from '@/_utils/countdownList';
+import { isValidCountdownId } from '@/_utils/validation';
 
 export async function addCountdown(countdownId: string) {
   if (!isValidCountdownId(countdownId)) {

@@ -5,8 +5,8 @@ import { ExternalLink } from 'lucide-react';
 
 import Link from 'next/link';
 
-import { COUNTDOWN_LIST_COOKIE } from '@/utils/cookies';
-import { hasCountdownId } from '@/utils/countdownList';
+import { COUNTDOWN_LIST_COOKIE } from '@/_utils/cookies';
+import { hasCountdownId } from '@/_utils/countdownList';
 
 import { AddButton } from './AddButton';
 import { RemoveButton } from './RemoveButton';

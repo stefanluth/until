@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 
 import { CookieNotice } from '@/_components/CookieNotice';
 import CountdownInput from '@/_components/CountdownInput';
-import { CONSENT_COOKIE } from '@/utils/cookies';
+import { CONSENT_COOKIE } from '@/_utils/cookies';
 
 export default async function Home() {
   const accepted = (await cookies()).get(CONSENT_COOKIE)?.value === 'true';

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { createCountdownId } from '../app/utils/countdownId.ts';
+import { createCountdownId } from '../app/_utils/countdownId.ts';
 
 const DATE = new Date('2026-01-01T00:00:00.000Z');
 

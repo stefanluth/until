@@ -4,8 +4,8 @@ import { type FormEvent, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { type CountdownFormState, submitCountdownAction } from '@/_actions/submitCountdown';
-import { parseWhen } from '@/utils/parseWhen';
-import { MAX_COUNTDOWN_NAME_LENGTH } from '@/utils/validation';
+import { parseWhen } from '@/_utils/parseWhen';
+import { MAX_COUNTDOWN_NAME_LENGTH } from '@/_utils/validation';
 
 const INITIAL_STATE: CountdownFormState = { error: '', location: '' };
 
