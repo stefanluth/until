@@ -8,7 +8,7 @@ import { NavBar } from '@/_components/NavBar';
 import './globals.css';
 
 const inter = localFont({
-  src: './fonts/inter-latin.woff2',
+  src: '../assets/fonts/inter-latin.woff2',
   weight: '100 900',
   style: 'normal',
   display: 'swap',

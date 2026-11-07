@@ -3,6 +3,6 @@ node_modules
 package-lock.json
 next-env.d.ts
 .unlazy
-app/fonts
+assets/fonts
 *.sql
 GATES.md
