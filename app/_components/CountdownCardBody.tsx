@@ -1,3 +1,4 @@
+import { type CountdownUnit, getVisibleUnits } from '@/_utils/duration';
 import type { CountdownVariant } from '@/types';
 
 const CARD_ROW_CLASS = 'flex flex-1 w-full flex-wrap items-center justify-center gap-x-6 gap-y-4 p-4 sm:gap-x-8 sm:p-5';
@@ -7,6 +8,13 @@ const DETAIL_ROW_CLASS =
   'flex w-full flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12 sm:gap-y-8 lg:gap-x-16 mt-10 sm:mt-14';
 const DETAIL_VALUE_CLASS = 'text-6xl sm:text-7xl md:text-8xl lg:text-9xl leading-none tabular-nums';
 const DETAIL_LABEL_CLASS = 'text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-[0.2em]';
+
+const SINGULAR_LABELS: Record<CountdownUnit, string> = {
+  days: 'day',
+  hours: 'hour',
+  minutes: 'minute',
+  seconds: 'second',
+};
 
 export function CountdownCardBody({
   d,
@@ -21,25 +29,21 @@ export function CountdownCardBody({
   s: number;
   variant?: CountdownVariant;
 }) {
-  const parts = [
-    { value: d, label: 'days' },
-    { value: h, label: 'hours' },
-    { value: m, label: 'minutes' },
-    { value: s, label: 'seconds' },
-  ];
-  const first = parts.findIndex((part) => part.value > 0);
-  const visible = first < 0 ? [] : first === 0 ? parts.slice(0, 1) : parts.slice(first);
+  const values: Record<CountdownUnit, number> = { days: d, hours: h, minutes: m, seconds: s };
+  const visible = getVisibleUnits(values);
   const isDetail = variant === 'detail';
 
   return (
     <div className={isDetail ? DETAIL_ROW_CLASS : CARD_ROW_CLASS}>
       {visible.length > 0 ? (
-        visible.map((part) => (
-          <div key={part.label} className="flex flex-col items-center">
+        visible.map((unit) => (
+          <div key={unit} className="flex flex-col items-center">
             <span className={isDetail ? DETAIL_VALUE_CLASS : CARD_VALUE_CLASS} suppressHydrationWarning>
-              {part.value}
+              {values[unit]}
             </span>
-            <span className={isDetail ? DETAIL_LABEL_CLASS : CARD_LABEL_CLASS}>{part.label}</span>
+            <span className={isDetail ? DETAIL_LABEL_CLASS : CARD_LABEL_CLASS}>
+              {values[unit] === 1 ? SINGULAR_LABELS[unit] : unit}
+            </span>
           </div>
         ))
       ) : (

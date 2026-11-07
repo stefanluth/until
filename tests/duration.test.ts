@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { splitRemaining } from '../app/_utils/duration.ts';
+import { getVisibleUnits, splitRemaining } from '../app/_utils/duration.ts';
 
 describe('splitRemaining', () => {
   it('splits days, hours, minutes, and seconds', () => {
@@ -27,5 +27,39 @@ describe('splitRemaining', () => {
 
   it('starts counting seconds after one full second', () => {
     assert.deepEqual(splitRemaining(1000), { days: 0, hours: 0, minutes: 0, seconds: 1 });
+  });
+});
+
+describe('getVisibleUnits', () => {
+  it('returns no units when the countdown has ended', () => {
+    assert.deepEqual(getVisibleUnits({ days: 0, hours: 0, minutes: 0, seconds: 0 }), []);
+  });
+
+  it('drops leading zero units under one day', () => {
+    assert.deepEqual(getVisibleUnits({ days: 0, hours: 23, minutes: 25, seconds: 26 }), [
+      'hours',
+      'minutes',
+      'seconds',
+    ]);
+  });
+
+  it('shows every unit from one day up to the threshold', () => {
+    assert.deepEqual(getVisibleUnits({ days: 1, hours: 0, minutes: 22, seconds: 13 }), [
+      'days',
+      'hours',
+      'minutes',
+      'seconds',
+    ]);
+    assert.deepEqual(getVisibleUnits({ days: 6, hours: 23, minutes: 59, seconds: 59 }), [
+      'days',
+      'hours',
+      'minutes',
+      'seconds',
+    ]);
+  });
+
+  it('shows only days at and above the threshold', () => {
+    assert.deepEqual(getVisibleUnits({ days: 7, hours: 0, minutes: 0, seconds: 0 }), ['days']);
+    assert.deepEqual(getVisibleUnits({ days: 30, hours: 5, minutes: 3, seconds: 2 }), ['days']);
   });
 });

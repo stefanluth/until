@@ -5,6 +5,26 @@ export type CountdownParts = {
   seconds: number;
 };
 
+const UNITS = ['days', 'hours', 'minutes', 'seconds'] as const;
+
+export type CountdownUnit = (typeof UNITS)[number];
+
+export const DAYS_ONLY_THRESHOLD = 7;
+
+export function getVisibleUnits(parts: CountdownParts): CountdownUnit[] {
+  const first = UNITS.findIndex((unit) => parts[unit] > 0);
+
+  if (first < 0) {
+    return [];
+  }
+
+  if (parts.days >= DAYS_ONLY_THRESHOLD) {
+    return ['days'];
+  }
+
+  return UNITS.slice(first);
+}
+
 export function splitRemaining(milliseconds: number): CountdownParts {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
 
