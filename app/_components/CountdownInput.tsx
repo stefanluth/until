@@ -2,7 +2,7 @@
 
 import Cookies from 'js-cookie';
 
-import { type FormEvent, useActionState, useRef } from 'react';
+import { type SubmitEvent, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { type CountdownFormState, submitCountdownAction } from '@/_actions/submitCountdown';
@@ -20,7 +20,7 @@ export default function CountdownInput() {
   const { requestConsent } = useConsent();
   const [state, formAction] = useActionState(submitCountdownAction, INITIAL_STATE);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     if (!isConsentGranted(Cookies.get(CONSENT_COOKIE))) {
       event.preventDefault();
 
