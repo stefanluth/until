@@ -1,21 +1,9 @@
-import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
+'use client';
 
-import { CONSENT_COOKIE, COOKIE_OPTIONS } from '../_utils/cookies';
+import { useTransition } from 'react';
 
-export async function CookieNotice() {
-  const consent = (await cookies()).get(CONSENT_COOKIE);
-
-  if (consent?.value === 'true') {
-    return null;
-  }
-
-  const accept = async () => {
-    'use server';
-    const cookieStore = await cookies();
-    cookieStore.set(CONSENT_COOKIE, 'true', COOKIE_OPTIONS);
-    revalidatePath('/');
-  };
+export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | Promise<void>; onCancel: () => void }) {
+  const [pending, startTransition] = useTransition();
 
   return (
     <div
@@ -24,6 +12,9 @@ export async function CookieNotice() {
       aria-modal="true"
       aria-labelledby="cookie-consent-title"
       data-consent-gate="true"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && !pending) onCancel();
+      }}
     >
       <div className="flex flex-col w-full max-w-3xl max-h-[calc(100vh-2rem)] gap-2 p-4 overflow-y-auto text-sm sm:text-base text-justify border border-gray-300 bg-white text-gray-800 rounded-lg shadow-xl">
         <h2 id="cookie-consent-title" className="text-lg sm:text-xl font-semibold">
@@ -50,15 +41,25 @@ export async function CookieNotice() {
 
         <p>By clicking &quot;Accept&quot;, you agree to the use of cookies.</p>
 
-        <form action={accept}>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
-            className="w-full text-base sm:text-lg bg-purple-700 text-white py-2 px-4 rounded-md"
-            type="submit"
+            className="text-base sm:text-lg text-purple-700 py-2 px-4 rounded-md border border-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
+            type="button"
+            onClick={onCancel}
+            disabled={pending}
+          >
+            Cancel
+          </button>
+          <button
+            className="text-base sm:text-lg bg-purple-700 text-white py-2 px-4 rounded-md disabled:cursor-not-allowed disabled:bg-purple-400"
+            type="button"
+            onClick={() => startTransition(onAccept)}
+            disabled={pending}
             autoFocus
           >
-            Accept
+            {pending ? 'Accepting...' : 'Accept'}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );

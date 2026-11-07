@@ -3,6 +3,8 @@
 import Cookies from 'js-cookie';
 import { ExternalLink } from 'lucide-react';
 
+import { useState } from 'react';
+
 import Link from 'next/link';
 
 import { COUNTDOWN_LIST_COOKIE } from '@/_utils/cookies';
@@ -13,7 +15,9 @@ import { RemoveButton } from './RemoveButton';
 import { ShareButton } from './ShareButton';
 
 export function CountdownCardActions({ id, showOpen = true }: { id: string; showOpen?: boolean }) {
-  const countdownInCookies = hasCountdownId(Cookies.get(COUNTDOWN_LIST_COOKIE), id);
+  const cookieCountdownInList = hasCountdownId(Cookies.get(COUNTDOWN_LIST_COOKIE), id);
+  const [toggled, setToggled] = useState<boolean | null>(null);
+  const countdownInCookies = toggled ?? cookieCountdownInList;
 
   return (
     <div className="flex items-center gap-4 sm:gap-5 opacity-90" suppressHydrationWarning>
@@ -28,7 +32,11 @@ export function CountdownCardActions({ id, showOpen = true }: { id: string; show
         </Link>
       )}
       <ShareButton id={id} />
-      {countdownInCookies ? <RemoveButton id={id} /> : <AddButton id={id} />}
+      {countdownInCookies ? (
+        <RemoveButton id={id} onRemoved={() => setToggled(false)} />
+      ) : (
+        <AddButton id={id} onAdded={() => setToggled(true)} />
+      )}
     </div>
   );
 }

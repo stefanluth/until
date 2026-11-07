@@ -1,28 +1,31 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 
 import { CONSENT_COOKIE, isConsentGranted } from '@/_utils/cookies';
 import { addCountdownId, getCountdownList, setCountdownList } from '@/_utils/countdownList';
 import { isValidCountdownId } from '@/_utils/validation';
 
-export async function addCountdown(countdownId: string) {
+export type AddCountdownResult = 'added' | 'exists' | 'consent' | 'invalid';
+
+export async function addCountdown(countdownId: string): Promise<AddCountdownResult> {
   if (!isValidCountdownId(countdownId)) {
-    return;
+    return 'invalid';
   }
 
   const cookieStore = await cookies();
 
   if (!isConsentGranted(cookieStore.get(CONSENT_COOKIE)?.value)) {
-    redirect('/');
+    return 'consent';
   }
 
   const countdowns = getCountdownList(cookieStore);
 
   if (countdowns.includes(countdownId)) {
-    return;
+    return 'exists';
   }
 
   setCountdownList(cookieStore, addCountdownId(countdowns, countdownId));
+
+  return 'added';
 }

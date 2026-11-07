@@ -1,19 +1,36 @@
 'use client';
 
+import Cookies from 'js-cookie';
+
 import { type FormEvent, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { type CountdownFormState, submitCountdownAction } from '@/_actions/submitCountdown';
+import { CONSENT_COOKIE, isConsentGranted } from '@/_utils/cookies';
 import { parseWhen } from '@/_utils/parseWhen';
 import { MAX_COUNTDOWN_NAME_LENGTH } from '@/_utils/validation';
+
+import { useConsent } from './ConsentProvider';
 
 const INITIAL_STATE: CountdownFormState = { error: '', location: '' };
 
 export default function CountdownInput() {
   const dateInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const { requestConsent } = useConsent();
   const [state, formAction] = useActionState(submitCountdownAction, INITIAL_STATE);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (!isConsentGranted(Cookies.get(CONSENT_COOKIE))) {
+      event.preventDefault();
+
+      if (await requestConsent()) {
+        formRef.current?.requestSubmit();
+      }
+
+      return;
+    }
+
     const when = String(new FormData(event.currentTarget).get('when') ?? '');
     const parsed = parseWhen(when);
 
@@ -23,7 +40,7 @@ export default function CountdownInput() {
   }
 
   return (
-    <form className="flex flex-col gap-4 sm:gap-5" action={formAction} onSubmit={handleSubmit}>
+    <form ref={formRef} className="flex flex-col gap-4 sm:gap-5" action={formAction} onSubmit={handleSubmit}>
       <div>
         <div className="flex items-center">
           <label className="text-base sm:text-lg" htmlFor="name">

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import localFont from 'next/font/local';
 
+import { ConsentProvider } from '@/_components/ConsentProvider';
 import { Footer } from '@/_components/Footer';
 import { NavBar } from '@/_components/NavBar';
 
@@ -30,13 +31,15 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className={`${inter.className} h-full min-h-screen w-full flex flex-col`}>
-        <div className="group flex flex-1 flex-col">
-          <header className="flex flex-col">
-            <NavBar />
-          </header>
-          <main className="flex flex-col flex-1 py-8">{children}</main>
-          <Footer />
-        </div>
+        <ConsentProvider>
+          <div className="group flex flex-1 flex-col">
+            <header className="flex flex-col">
+              <NavBar />
+            </header>
+            <main className="flex flex-col flex-1 py-8">{children}</main>
+            <Footer />
+          </div>
+        </ConsentProvider>
       </body>
     </html>
   );
