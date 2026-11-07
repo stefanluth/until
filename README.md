@@ -8,7 +8,7 @@ Requires [Node.js](https://nodejs.org) 26 or newer.
 
 ```bash
 npm install
-psql "$DATABASE_URL" -f db/schema.sql
+psql "$DATABASE_URL" -f schema.sql
 npm run dev
 ```
 
@@ -106,6 +106,6 @@ The database schema is applied automatically the first time the `db_data` volume
 created. To re-apply it or reset production data (destructive):
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.prod exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < db/schema.sql
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < schema.sql
 docker compose -f docker-compose.prod.yml --env-file .env.prod down -v
 ```
