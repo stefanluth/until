@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { CountdownVariant } from '@/app/types';
+import type { CountdownVariant } from '@/types';
 
 export function CountdownCardHeader({
   name,

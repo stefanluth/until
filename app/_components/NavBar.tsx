@@ -5,7 +5,7 @@ import { House, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { isValidCountdownId } from '@/app/utils/validation';
+import { isValidCountdownId } from '@/utils/validation';
 
 import { CountdownCardActions } from './CountdownCardActions';
 

@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 
-import { CookieNotice } from '@/app/_components/CookieNotice';
-import CountdownInput from '@/app/_components/CountdownInput';
-import { CONSENT_COOKIE } from '@/app/utils/cookies';
+import { CookieNotice } from '@/_components/CookieNotice';
+import CountdownInput from '@/_components/CountdownInput';
+import { CONSENT_COOKIE } from '@/utils/cookies';
 
 export default async function Home() {
   const accepted = (await cookies()).get(CONSENT_COOKIE)?.value === 'true';

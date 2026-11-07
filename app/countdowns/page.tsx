@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 
-import CountdownCard from '@/app/_components/Countdown';
-import { findCountdownsByIds } from '@/app/db';
-import { getCountdownList } from '@/app/utils/countdownList';
+import CountdownCard from '@/_components/Countdown';
+import { findCountdownsByIds } from '@/db';
+import { getCountdownList } from '@/utils/countdownList';
 
 export default async function CountdownsPage() {
   const cookieStore = await cookies();

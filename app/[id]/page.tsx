@@ -4,8 +4,8 @@ import { cache } from 'react';
 
 import { notFound } from 'next/navigation';
 
-import CountdownCard from '@/app/_components/Countdown';
-import { findCountdownById } from '@/app/db';
+import CountdownCard from '@/_components/Countdown';
+import { findCountdownById } from '@/db';
 
 const getCountdown = cache(findCountdownById);
 

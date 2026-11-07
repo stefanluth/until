@@ -4,7 +4,7 @@ import { BookmarkOff } from 'lucide-react';
 
 import dynamic from 'next/dynamic';
 
-import { removeCountdown } from '@/app/_actions/removeCountdown';
+import { removeCountdown } from '@/_actions/removeCountdown';
 
 function RemoveButtonSSR({ id }: { id: string }) {
   return (

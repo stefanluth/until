@@ -1,4 +1,4 @@
-import type { CountdownVariant } from '@/app/types';
+import type { CountdownVariant } from '@/types';
 
 const CARD_ROW_CLASS = 'flex flex-1 w-full flex-wrap items-center justify-center gap-x-6 gap-y-4 p-4 sm:gap-x-8 sm:p-5';
 const CARD_VALUE_CLASS = 'text-5xl md:text-[3.25rem] leading-none tabular-nums';

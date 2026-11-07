@@ -4,7 +4,7 @@ import { Bookmark } from 'lucide-react';
 
 import dynamic from 'next/dynamic';
 
-import { addCountdown } from '@/app/_actions/addCountdown';
+import { addCountdown } from '@/_actions/addCountdown';
 
 export function AddButtonSSR({ id }: { id: string }) {
   return (
