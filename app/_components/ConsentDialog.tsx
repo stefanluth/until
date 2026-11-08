@@ -1,20 +1,43 @@
 'use client';
 
-import { useTransition } from 'react';
+import { type SyntheticEvent, useEffect, useRef, useTransition } from 'react';
 
 export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | Promise<void>; onCancel: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const acceptRef = useRef<HTMLButtonElement>(null);
   const [pending, startTransition] = useTransition();
 
+  useEffect(() => {
+    const dialog = dialogRef.current;
+
+    if (!dialog) {
+      return;
+    }
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
+    acceptRef.current?.focus();
+
+    return () => dialog.close();
+  }, []);
+
+  function handleCancel(event: SyntheticEvent<HTMLDialogElement>) {
+    event.preventDefault();
+
+    if (!pending) {
+      onCancel();
+    }
+  }
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-      role="dialog"
-      aria-modal="true"
+    <dialog
+      ref={dialogRef}
+      className="fixed inset-0 z-50 m-0 h-full w-full max-h-none max-w-none border-0 bg-black/50 p-4 open:flex open:items-center open:justify-center"
       aria-labelledby="cookie-consent-title"
       data-consent-gate="true"
-      onKeyDown={(event) => {
-        if (event.key === 'Escape' && !pending) onCancel();
-      }}
+      onCancel={handleCancel}
     >
       <div className="flex flex-col w-full max-w-3xl max-h-[calc(100vh-2rem)] gap-2 p-4 overflow-y-auto text-sm sm:text-base text-justify border border-gray-300 bg-white text-gray-800 rounded-lg shadow-xl">
         <h2 id="cookie-consent-title" className="text-lg sm:text-xl font-semibold">
@@ -51,16 +74,16 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
             Cancel
           </button>
           <button
+            ref={acceptRef}
             className="text-base sm:text-lg bg-purple-700 text-white py-2 px-4 rounded-md disabled:cursor-not-allowed disabled:bg-purple-400"
             type="button"
             onClick={() => startTransition(onAccept)}
             disabled={pending}
-            autoFocus
           >
             {pending ? 'Accepting...' : 'Accept'}
           </button>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }
