@@ -1,7 +1,13 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where([data-appearance='dark'], [data-appearance='dark'] *));
+
 @theme {
-  --color-brand: var(--color-purple-700);
+  --color-brand: #7e22ce;
+  --color-brand-strong: #6b21a8;
+  --color-brand-muted: #c084fc;
+  --color-brand-accent: #7e22ce;
+  --color-brand-foreground: #ffffff;
 }
 
 @layer base {
@@ -19,26 +25,106 @@
 }
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  color-scheme: light;
+  --foreground-rgb: 40, 20, 60;
+  --background-start-rgb: 216, 180, 254;
+  --background-end-rgb: 248, 243, 255;
+  --color-brand: #6b21a8;
+  --color-brand-strong: #581c87;
+  --color-brand-muted: #c084fc;
+  --color-brand-accent: #6b21a8;
+  --color-brand-foreground: #ffffff;
 
-  accent-color: var(--color-brand);
+  accent-color: var(--color-brand-accent);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 209, 161, 197;
-    --background-end-rgb: 116, 105, 182;
-  }
+:root[data-appearance='dark'] {
+  color-scheme: dark;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 110, 60, 115;
+  --background-end-rgb: 70, 50, 130;
+  --color-brand: #c084fc;
+  --color-brand-strong: #d8b4fe;
+  --color-brand-muted: #a855f7;
+  --color-brand-accent: #e9d5ff;
+  --color-brand-foreground: #1c1917;
+}
+
+:root[data-theme='sunset'] {
+  --foreground-rgb: 60, 20, 10;
+  --background-start-rgb: 254, 215, 170;
+  --background-end-rgb: 255, 247, 237;
+  --color-brand: #9a3412;
+  --color-brand-strong: #7c2d12;
+  --color-brand-muted: #fdba74;
+  --color-brand-accent: #9a3412;
+  --color-brand-foreground: #ffffff;
+}
+
+:root[data-theme='sunset'][data-appearance='dark'] {
+  --foreground-rgb: 255, 247, 237;
+  --background-start-rgb: 100, 35, 12;
+  --background-end-rgb: 55, 16, 5;
+  --color-brand: #fb923c;
+  --color-brand-strong: #fdba74;
+  --color-brand-muted: #c2410c;
+  --color-brand-accent: #fdba74;
+  --color-brand-foreground: #1c1917;
+}
+
+:root[data-theme='ocean'] {
+  --foreground-rgb: 8, 47, 73;
+  --background-start-rgb: 186, 230, 253;
+  --background-end-rgb: 240, 249, 255;
+  --color-brand: #1d4ed8;
+  --color-brand-strong: #1e40af;
+  --color-brand-muted: #93c5fd;
+  --color-brand-accent: #1d4ed8;
+  --color-brand-foreground: #ffffff;
+}
+
+:root[data-theme='ocean'][data-appearance='dark'] {
+  --foreground-rgb: 240, 249, 255;
+  --background-start-rgb: 8, 55, 85;
+  --background-end-rgb: 6, 38, 60;
+  --color-brand: #60a5fa;
+  --color-brand-strong: #93c5fd;
+  --color-brand-muted: #1e40af;
+  --color-brand-accent: #93c5fd;
+  --color-brand-foreground: #1c1917;
+}
+
+:root[data-theme='forest'] {
+  --foreground-rgb: 6, 46, 32;
+  --background-start-rgb: 167, 243, 208;
+  --background-end-rgb: 236, 253, 245;
+  --color-brand: #065f46;
+  --color-brand-strong: #064e3b;
+  --color-brand-muted: #6ee7b7;
+  --color-brand-accent: #065f46;
+  --color-brand-foreground: #ffffff;
+}
+
+:root[data-theme='forest'][data-appearance='dark'] {
+  --foreground-rgb: 236, 253, 245;
+  --background-start-rgb: 6, 70, 52;
+  --background-end-rgb: 2, 38, 29;
+  --color-brand: #34d399;
+  --color-brand-strong: #6ee7b7;
+  --color-brand-muted: #134e4a;
+  --color-brand-accent: #6ee7b7;
+  --color-brand-foreground: #1c1917;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  background: linear-gradient(to bottom, rgb(var(--background-end-rgb)), transparent) rgb(var(--background-start-rgb));
   font-variant-numeric: tabular-nums;
   overflow-x: hidden;
+}
+
+:root[data-appearance='dark'] body {
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }
 
 .scrollbar-compensate {
@@ -51,7 +137,7 @@ body:has([data-consent-gate]) {
 
 ::selection {
   background-color: var(--color-brand);
-  color: white;
+  color: var(--color-brand-foreground);
 }
 
 ::placeholder {
@@ -59,9 +145,8 @@ body:has([data-consent-gate]) {
 }
 
 :where(a, button):focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-brand-accent);
   outline-offset: 2px;
-  border-radius: 0.25rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -91,7 +176,7 @@ body:has([data-consent-gate]) {
 
 input,
 select {
-  @apply bg-white text-zinc-900 p-2 border border-gray-300 rounded-md;
+  @apply bg-white text-zinc-900 p-2 border border-gray-300 rounded-xl;
 
   &:-webkit-autofill {
     -webkit-text-fill-color: var(--color-zinc-900);

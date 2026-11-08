@@ -90,7 +90,7 @@ function SubmitButton() {
 
   return (
     <button
-      className="text-lg sm:text-xl text-white py-2.5 sm:py-3 px-5 sm:px-6 rounded-md bg-purple-700 disabled:cursor-not-allowed disabled:bg-purple-400"
+      className="text-lg sm:text-xl text-brand-foreground py-2.5 sm:py-3 px-5 sm:px-6 rounded-xl bg-brand disabled:cursor-not-allowed disabled:bg-brand-muted"
       type="submit"
       disabled={pending}
     >

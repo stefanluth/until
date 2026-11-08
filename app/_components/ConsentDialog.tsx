@@ -39,7 +39,7 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
       data-consent-gate="true"
       onCancel={handleCancel}
     >
-      <div className="flex flex-col w-full max-w-3xl max-h-[calc(100vh-2rem)] gap-2 p-4 overflow-y-auto text-sm sm:text-base text-justify border border-gray-300 bg-white text-gray-800 rounded-lg shadow-xl">
+      <div className="flex flex-col w-full max-w-3xl max-h-[calc(100vh-2rem)] gap-2 p-4 overflow-y-auto text-sm sm:text-base text-justify border border-gray-300 bg-white text-gray-800 rounded-2xl shadow-xl">
         <h2 id="cookie-consent-title" className="text-lg sm:text-xl font-semibold">
           Cookie consent
         </h2>
@@ -63,7 +63,7 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
 
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
-            className="text-base sm:text-lg text-purple-700 py-2 px-4 rounded-md border border-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="text-base sm:text-lg text-brand-accent py-2 px-4 rounded-xl border border-brand-accent disabled:cursor-not-allowed disabled:opacity-60"
             type="button"
             onClick={onCancel}
             disabled={pending}
@@ -72,7 +72,7 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
           </button>
           <button
             ref={acceptRef}
-            className="text-base sm:text-lg bg-purple-700 text-white py-2 px-4 rounded-md disabled:cursor-not-allowed disabled:bg-purple-400"
+            className="text-base sm:text-lg bg-brand text-brand-foreground py-2 px-4 rounded-xl disabled:cursor-not-allowed disabled:bg-brand-muted"
             type="button"
             onClick={() => startTransition(onAccept)}
             disabled={pending}

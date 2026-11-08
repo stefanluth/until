@@ -15,7 +15,7 @@ export default async function CountdownsPage() {
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Your countdowns</h1>
         <p className="max-w-sm text-base opacity-75 sm:text-lg">You haven&apos;t saved any countdowns yet.</p>
         <Link
-          className="mt-2 inline-flex min-h-11 items-center justify-center rounded-full bg-purple-700 px-5 text-base font-medium text-white transition-colors hover:bg-purple-800 active:bg-purple-900"
+          className="mt-2 inline-flex min-h-11 items-center justify-center rounded-full bg-brand px-5 text-base font-medium text-brand-foreground transition-colors hover:bg-brand-strong active:bg-brand-strong"
           href="/"
         >
           Create a countdown
