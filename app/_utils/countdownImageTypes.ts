@@ -9,6 +9,7 @@ export type CountdownImageUnit = {
 export type CountdownImageContent = {
   name: string;
   dateLabel: string;
+  timeLabel: string | null;
   units: CountdownImageUnit[];
   ended: boolean;
   url?: string;

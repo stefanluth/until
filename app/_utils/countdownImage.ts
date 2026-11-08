@@ -1,4 +1,4 @@
-import { formatCountdownDate, unitLabel } from './countdownDisplay.ts';
+import { formatCountdownDateParts, unitLabel } from './countdownDisplay.ts';
 import type { CountdownImageContent } from './countdownImageTypes.ts';
 import { type CountdownParts, getVisibleUnits } from './duration.ts';
 
@@ -22,10 +22,12 @@ export function buildCountdownImageContent({
     value: remaining[unit],
     label: unitLabel(unit, remaining[unit]),
   }));
+  const { date: dateLabel, time: timeLabel } = formatCountdownDateParts(date, locale);
 
   return {
     name,
-    dateLabel: formatCountdownDate(date, locale),
+    dateLabel,
+    timeLabel,
     units,
     ended: units.length === 0,
     url,

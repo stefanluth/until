@@ -11,8 +11,13 @@ export function unitLabel(unit: CountdownUnit, value: number): string {
   return value === 1 ? SINGULAR_LABELS[unit] : unit;
 }
 
-export function formatCountdownDate(date: Date, locale?: string): string {
-  const timeString = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+export type CountdownDateParts = {
+  date: string;
+  time: string | null;
+};
+
+export function formatCountdownDateParts(date: Date, locale?: string): CountdownDateParts {
+  const time = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   const dateString = date.toLocaleDateString(locale, {
     weekday: 'long',
     year: 'numeric',
@@ -21,5 +26,5 @@ export function formatCountdownDate(date: Date, locale?: string): string {
   });
   const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
 
-  return isMidnight ? dateString : `${dateString} | ${timeString}`;
+  return { date: dateString, time: isMidnight ? null : time };
 }

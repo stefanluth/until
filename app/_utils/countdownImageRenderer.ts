@@ -54,11 +54,8 @@ export function drawCountdownImage(
 
   const titleBottom = titleTop + (title.lines.length - 1) * titleLineHeight + title.size;
   const dateY = titleBottom + 40 * scale;
-  const date = fitLine(ctx, content.dateLabel, maxWidth, 36 * scale, 26 * scale, fontFamily, 400);
 
-  ctx.globalAlpha = 0.8;
-  ctx.font = font(400, date.size, fontFamily);
-  ctx.fillText(date.text, centerX, dateY);
+  drawDateLine(ctx, content, centerX, dateY, maxWidth, fontFamily, scale, foreground);
 
   const unitsY = 710 * scale;
 
@@ -117,6 +114,67 @@ export function triggerPngDownload(blob: Blob, filename: string): void {
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function drawDateLine(
+  ctx: CanvasRenderingContext2D,
+  content: CountdownImageContent,
+  centerX: number,
+  y: number,
+  maxWidth: number,
+  fontFamily: string,
+  scale: number,
+  foreground: string,
+): void {
+  const gap = 18 * scale;
+  const dividerWidth = Math.max(1, scale);
+  const minSize = Math.round(26 * scale);
+  const hasTime = content.timeLabel !== null;
+  const measureGroup = (size: number) => {
+    ctx.font = font(400, size, fontFamily);
+    const dateWidth = ctx.measureText(content.dateLabel).width;
+    const timeWidth = content.timeLabel ? ctx.measureText(content.timeLabel).width : 0;
+    const totalWidth = dateWidth + (hasTime ? gap + dividerWidth + gap + timeWidth : 0);
+
+    return { dateWidth, timeWidth, totalWidth };
+  };
+
+  let size = Math.round(36 * scale);
+  let { dateWidth, timeWidth, totalWidth } = measureGroup(size);
+
+  while (size > minSize && totalWidth > maxWidth) {
+    size -= 2;
+    ({ dateWidth, timeWidth, totalWidth } = measureGroup(size));
+  }
+
+  let dateText = content.dateLabel;
+
+  if (totalWidth > maxWidth) {
+    const available = maxWidth - (hasTime ? gap + dividerWidth + gap + timeWidth : 0);
+    dateText = truncateLine(ctx, dateText, Math.max(0, available));
+    dateWidth = ctx.measureText(dateText).width;
+    totalWidth = dateWidth + (hasTime ? gap + dividerWidth + gap + timeWidth : 0);
+  }
+
+  let x = centerX - totalWidth / 2;
+
+  ctx.globalAlpha = 0.8;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.font = font(400, size, fontFamily);
+  ctx.fillStyle = foreground;
+  ctx.fillText(dateText, x, y);
+
+  if (!content.timeLabel) {
+    return;
+  }
+
+  x += dateWidth + gap;
+  ctx.globalAlpha = 0.25;
+  ctx.fillRect(x, y + size * 0.15, dividerWidth, size * 0.7);
+  x += dividerWidth + gap;
+  ctx.globalAlpha = 0.8;
+  ctx.fillText(content.timeLabel, x, y);
 }
 
 function drawUnits(

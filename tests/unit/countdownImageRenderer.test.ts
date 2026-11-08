@@ -44,6 +44,7 @@ const THEME: CountdownImageTheme = {
 const CONTENT: CountdownImageContent = {
   name: 'New Year 2027',
   dateLabel: 'Friday, January 1, 2027',
+  timeLabel: '13:05',
   units: [
     { unit: 'days', value: 42, label: 'days' },
     { unit: 'hours', value: 3, label: 'hours' },
@@ -76,6 +77,7 @@ describe('drawCountdownImage', () => {
     assert.ok(all.includes('until'));
     assert.ok(all.join(' ').includes('New Year 2027'));
     assert.ok(all.includes('Friday, January 1, 2027'));
+    assert.ok(all.includes('13:05'));
     assert.ok(all.includes('42'));
     assert.ok(all.includes('DAYS'));
     assert.ok(all.includes('https://until.example/new-year-2027-1a2b3c4d'));
@@ -127,6 +129,14 @@ describe('drawCountdownImage', () => {
     assert.ok(all.includes('Countdown has ended!'));
     assert.ok(!all.includes('42'));
     assert.ok(!all.includes('DAYS'));
+  });
+
+  it('draws only the date when there is no time', () => {
+    const ctx = draw({ ...CONTENT, timeLabel: null });
+    const all = ctx.texts.map((entry) => entry.text);
+
+    assert.ok(all.includes('Friday, January 1, 2027'));
+    assert.ok(!all.includes('13:05'));
   });
 
   it('uses the theme colors for the background gradient', () => {

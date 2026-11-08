@@ -19,12 +19,24 @@ describe('buildCountdownImageContent', () => {
     assert.equal(content.name, 'New Year');
     assert.equal(content.url, URL);
     assert.equal(content.dateLabel, 'Friday, January 1, 2027');
+    assert.equal(content.timeLabel, null);
     assert.deepEqual(content.units, [
       { unit: 'days', value: 1, label: 'day' },
       { unit: 'hours', value: 2, label: 'hours' },
       { unit: 'minutes', value: 3, label: 'minutes' },
       { unit: 'seconds', value: 4, label: 'seconds' },
     ]);
+  });
+
+  it('includes the time when the countdown has one', () => {
+    const content = buildCountdownImageContent({
+      name: 'New Year',
+      date: new Date(2027, 0, 1, 13, 5, 0),
+      remaining: { days: 1, hours: 2, minutes: 3, seconds: 4 },
+    });
+
+    assert.equal(content.dateLabel, 'Friday, January 1, 2027');
+    assert.ok(content.timeLabel?.includes('01:05'));
   });
 
   it('keeps the suffix rule for sub-day countdowns', () => {
