@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Link } from 'lucide-react';
+import { ClipboardCheck, Link } from 'lucide-react';
 
 import { useState } from 'react';
 
@@ -17,7 +17,7 @@ export function LinkButton({ id }: { id: string }) {
         setTimeout(() => setCopied(false), 1500);
       }}
     >
-      {copied ? <Check className="w-5 h-5 sm:w-6 sm:h-6" /> : <Link className="w-5 h-5 sm:w-6 sm:h-6" />}
+      {copied ? <ClipboardCheck className="w-5 h-5 sm:w-6 sm:h-6" /> : <Link className="w-5 h-5 sm:w-6 sm:h-6" />}
       <span className="sr-only" role="status">
         {copied ? 'Copied!' : ''}
       </span>
