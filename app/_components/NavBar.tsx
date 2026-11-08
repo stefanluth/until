@@ -36,7 +36,7 @@ export function NavBar() {
 
   return (
     <nav
-      className={`flex h-16 sm:h-20 items-center justify-between gap-2 pl-4 sm:gap-5 sm:pl-8 lg:pl-48 scrollbar-compensate [--compensated-padding:1.5rem] sm:[--compensated-padding:2rem] lg:[--compensated-padding:12rem] ${
+      className={`flex h-16 sm:h-20 items-center justify-between gap-2 pl-4 sm:gap-5 sm:pl-8 lg:pl-48 scrollbar-compensate [--compensated-padding:1.5rem] sm:[--compensated-padding:2rem] lg:[--compensated-padding:12rem] max-sm:[&_a]:h-12 max-sm:[&_a]:min-w-12 max-sm:[&_button]:h-12 max-sm:[&_button]:min-w-12 max-sm:[&_svg]:h-6 max-sm:[&_svg]:w-6 ${
         countdownId ? 'nav-reveal' : ''
       }`}
     >
