@@ -3,7 +3,7 @@ import { renderCountdownImagePng, triggerPngDownload } from './countdownImageRen
 import type { CountdownImageTheme } from './countdownImageTypes.ts';
 import { splitRemaining } from './duration.ts';
 
-export async function downloadCountdownImage({
+export async function renderCountdownImageBlob({
   id,
   name,
   date,
@@ -11,7 +11,7 @@ export async function downloadCountdownImage({
   id: string;
   name: string;
   date: Date;
-}): Promise<void> {
+}): Promise<Blob> {
   const remaining = splitRemaining(date.getTime() - Date.now());
   const content = buildCountdownImageContent({
     name,
@@ -23,7 +23,19 @@ export async function downloadCountdownImage({
 
   await waitForFont(theme.fontFamily);
 
-  const blob = await renderCountdownImagePng(content, theme);
+  return await renderCountdownImagePng(content, theme);
+}
+
+export async function downloadCountdownImage({
+  id,
+  name,
+  date,
+}: {
+  id: string;
+  name: string;
+  date: Date;
+}): Promise<void> {
+  const blob = await renderCountdownImageBlob({ id, name, date });
   triggerPngDownload(blob, buildCountdownImageFilename(name, date));
 }
 

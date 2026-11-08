@@ -11,9 +11,10 @@ import { COUNTDOWN_LIST_COOKIE } from '@/_utils/cookies';
 import { hasCountdownId } from '@/_utils/countdownList';
 
 import { AddButton } from './AddButton';
+import { CopyImageButton } from './CopyImageButton';
 import { DownloadButton } from './DownloadButton';
+import { LinkButton } from './LinkButton';
 import { RemoveButton } from './RemoveButton';
-import { ShareButton } from './ShareButton';
 
 export function CountdownCardActions({
   id,
@@ -42,7 +43,8 @@ export function CountdownCardActions({
           <ExternalLink className="w-5 h-5 sm:w-6 sm:h-6" />
         </Link>
       )}
-      <ShareButton id={id} />
+      <LinkButton id={id} />
+      {name && date && <CopyImageButton id={id} name={name} date={date} />}
       {name && date && <DownloadButton id={id} name={name} date={date} />}
       {countdownInCookies ? (
         <RemoveButton id={id} onRemoved={() => setToggled(false)} />
