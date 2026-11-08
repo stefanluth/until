@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { formatCountdownDate } from '@/_utils/countdownDisplay';
 import type { CountdownVariant } from '@/types';
 
 export function CountdownCardHeader({
@@ -13,15 +14,7 @@ export function CountdownCardHeader({
   actions?: ReactNode;
   variant?: CountdownVariant;
 }) {
-  const timeString = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-  const dateString = date.toLocaleDateString(undefined, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
-  const dateLabel = isMidnight ? dateString : `${dateString} | ${timeString}`;
+  const dateLabel = formatCountdownDate(date);
 
   if (variant === 'detail') {
     return (

@@ -11,10 +11,21 @@ import { COUNTDOWN_LIST_COOKIE } from '@/_utils/cookies';
 import { hasCountdownId } from '@/_utils/countdownList';
 
 import { AddButton } from './AddButton';
+import { DownloadButton } from './DownloadButton';
 import { RemoveButton } from './RemoveButton';
 import { ShareButton } from './ShareButton';
 
-export function CountdownCardActions({ id, showOpen = true }: { id: string; showOpen?: boolean }) {
+export function CountdownCardActions({
+  id,
+  name,
+  date,
+  showOpen = true,
+}: {
+  id: string;
+  name?: string;
+  date?: Date;
+  showOpen?: boolean;
+}) {
   const cookieCountdownInList = hasCountdownId(Cookies.get(COUNTDOWN_LIST_COOKIE), id);
   const [toggled, setToggled] = useState<boolean | null>(null);
   const countdownInCookies = toggled ?? cookieCountdownInList;
@@ -32,6 +43,7 @@ export function CountdownCardActions({ id, showOpen = true }: { id: string; show
         </Link>
       )}
       <ShareButton id={id} />
+      {name && date && <DownloadButton id={id} name={name} date={date} />}
       {countdownInCookies ? (
         <RemoveButton id={id} onRemoved={() => setToggled(false)} />
       ) : (

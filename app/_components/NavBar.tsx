@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { isValidCountdownId } from '@/_utils/validation';
 
 import { CountdownCardActions } from './CountdownCardActions';
+import { useCountdownMeta } from './CountdownMetaContext';
 
 const LINKS = [
   { href: '/', label: 'Create a countdown', Icon: Plus },
@@ -35,6 +36,8 @@ function getCountdownId(pathname: string): string | null {
 export function NavBar() {
   const pathname = usePathname();
   const countdownId = getCountdownId(pathname);
+  const meta = useCountdownMeta();
+  const activeMeta = meta?.id === countdownId ? meta : null;
 
   return (
     <nav
@@ -44,7 +47,7 @@ export function NavBar() {
     >
       {countdownId && (
         <>
-          <CountdownCardActions id={countdownId} showOpen={false} />
+          <CountdownCardActions id={countdownId} showOpen={false} name={activeMeta?.name} date={activeMeta?.date} />
           <span className="h-6 w-px bg-white/40" aria-hidden />
         </>
       )}

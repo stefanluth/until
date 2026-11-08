@@ -5,6 +5,7 @@ import { cache } from 'react';
 import { notFound } from 'next/navigation';
 
 import CountdownCard from '@/_components/Countdown';
+import { CountdownDetailMeta } from '@/_components/CountdownDetailMeta';
 import { findCountdownById } from '@/db';
 
 const getCountdown = cache(findCountdownById);
@@ -29,6 +30,7 @@ export default async function CountdownPage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="flex flex-1 flex-col">
+      <CountdownDetailMeta id={countdown.id} name={countdown.name} date={countdown.date} />
       <CountdownCard {...countdown} variant="detail" />
     </div>
   );

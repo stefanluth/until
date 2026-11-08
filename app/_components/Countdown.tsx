@@ -38,7 +38,9 @@ export default function CountdownCard({ variant = 'card', ...countdown }: Countd
         name={countdown.name}
         date={countdown.date}
         variant={variant}
-        actions={isDetail ? undefined : <CountdownCardActions id={countdown.id} />}
+        actions={
+          isDetail ? undefined : <CountdownCardActions id={countdown.id} name={countdown.name} date={countdown.date} />
+        }
       />
       <CountdownCardBody
         d={remaining.days}
