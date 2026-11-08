@@ -8,6 +8,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useId,
   useRef,
   useState,
@@ -99,6 +100,10 @@ export function Menu({
     setPanelLimit(Math.max(0, (nextSide === 'top' ? above : below) - 16));
   }, [placement]);
 
+  const handleResize = useEffectEvent(() => {
+    measure();
+  });
+
   const toggle = useCallback(() => {
     if (!open) {
       measure();
@@ -142,14 +147,10 @@ export function Menu({
       return;
     }
 
-    function handleResize() {
-      measure();
-    }
-
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [open, placement, measure]);
+  }, [open, placement]);
 
   const resolvedPlacement = placement === 'auto' ? side : placement;
   const positionClass = resolvedPlacement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2';
