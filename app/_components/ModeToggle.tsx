@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { type Mode, applyMode, isMode, storeMode } from '@/_utils/themes';
 
-import { Menu, useMenuClose } from './Menu';
+import { Menu } from './Menu';
 import { MenuOption } from './MenuOption';
 import { FOOTER_ICON_BUTTON_CLASS, ICON_CLASS } from './actionStyles';
 
@@ -27,18 +27,13 @@ function currentMode(): Mode {
 }
 
 function ModeOptions({ mode, apply }: { mode: Mode; apply: (mode: Mode) => void }) {
-  const close = useMenuClose();
-
   return MODE_OPTIONS.map(({ id, label, Icon }) => (
     <MenuOption
       key={id}
       selected={mode === id}
       leading={<Icon className="h-4 w-4" aria-hidden />}
       label={label}
-      onSelect={() => {
-        apply(id);
-        close();
-      }}
+      onSelect={() => apply(id)}
     />
   ));
 }

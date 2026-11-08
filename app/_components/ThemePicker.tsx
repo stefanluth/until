@@ -14,7 +14,7 @@ import {
   storeTheme,
 } from '@/_utils/themes';
 
-import { Menu, useMenuClose } from './Menu';
+import { Menu } from './Menu';
 import { MenuOption } from './MenuOption';
 import { FOOTER_ICON_BUTTON_CLASS, ICON_CLASS } from './actionStyles';
 
@@ -29,8 +29,6 @@ function currentTheme(): ThemeId {
 }
 
 function ThemeOptions({ theme, apply }: { theme: ThemeId; apply: (id: ThemeId) => void }) {
-  const close = useMenuClose();
-
   return THEMES.map((option) => (
     <MenuOption
       key={option.id}
@@ -43,10 +41,7 @@ function ThemeOptions({ theme, apply }: { theme: ThemeId; apply: (id: ThemeId) =
         />
       }
       label={option.label}
-      onSelect={() => {
-        apply(option.id);
-        close();
-      }}
+      onSelect={() => apply(option.id)}
     />
   ));
 }
