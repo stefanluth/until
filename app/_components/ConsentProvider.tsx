@@ -6,8 +6,7 @@ import { type ReactNode, createContext, useCallback, useContext, useEffect, useM
 
 import { usePathname } from 'next/navigation';
 
-import { grantConsent } from '@/_actions/grantConsent';
-import { CONSENT_COOKIE, isConsentGranted } from '@/_utils/cookies';
+import { CONSENT_COOKIE, COOKIE_OPTIONS, isConsentGranted } from '@/_utils/cookies';
 
 import { ConsentDialog } from './ConsentDialog';
 
@@ -55,8 +54,13 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
     resolve?.(granted);
   }, []);
 
-  const accept = useCallback(async () => {
-    await grantConsent();
+  const accept = useCallback(() => {
+    Cookies.set(CONSENT_COOKIE, 'true', {
+      expires: COOKIE_OPTIONS.maxAge / (60 * 60 * 24),
+      path: COOKIE_OPTIONS.path,
+      sameSite: COOKIE_OPTIONS.sameSite,
+      secure: window.location.protocol === 'https:',
+    });
     finish(true);
   }, [finish]);
 
