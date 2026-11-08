@@ -41,13 +41,13 @@ function RemoveButtonSSR({ id, onRemoved }: { id: string; onRemoved?: () => void
 
   return (
     <button
-      className="inline-flex items-center text-white hover:text-gray-200 disabled:opacity-60"
+      className="inline-flex items-center text-white hover:text-gray-200 disabled:opacity-60 p-1 -m-1 sm:p-0 sm:m-0"
       title="Remove this countdown from your list"
       aria-label="Remove this countdown from your list"
       onClick={remove}
       disabled={pending}
     >
-      <BookmarkOff className="w-5 h-5 sm:w-6 sm:h-6" />
+      <BookmarkOff className="w-6 h-6" />
     </button>
   );
 }

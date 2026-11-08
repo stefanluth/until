@@ -32,14 +32,14 @@ export function DownloadButton({ id, name, date }: { id: string; name: string; d
 
   return (
     <button
-      className="inline-flex items-center text-white hover:text-gray-200 disabled:opacity-60"
+      className="inline-flex items-center text-white hover:text-gray-200 disabled:opacity-60 p-1 -m-1 sm:p-0 sm:m-0"
       title={label}
       aria-label={label}
       aria-busy={pending}
       disabled={pending}
       onClick={save}
     >
-      <Download className="w-5 h-5 sm:w-6 sm:h-6" />
+      <Download className="w-6 h-6" />
       <span className="sr-only" role="status">
         {pending ? 'Downloading image…' : failed ? 'Could not download the image' : ''}
       </span>

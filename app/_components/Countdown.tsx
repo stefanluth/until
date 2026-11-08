@@ -31,7 +31,7 @@ export default function CountdownCard({ variant = 'card', ...countdown }: Countd
       className={
         isDetail
           ? 'flex flex-1 flex-col items-center justify-center w-full max-w-6xl px-4 mx-auto text-center'
-          : 'flex flex-col w-full min-h-80 max-w-2xl rounded-2xl backdrop-brightness-105'
+          : 'flex flex-col w-full min-h-56 sm:min-h-80 max-w-2xl rounded-2xl backdrop-brightness-105'
       }
     >
       <CountdownCardHeader
@@ -39,7 +39,9 @@ export default function CountdownCard({ variant = 'card', ...countdown }: Countd
         date={countdown.date}
         variant={variant}
         actions={
-          isDetail ? undefined : <CountdownCardActions id={countdown.id} name={countdown.name} date={countdown.date} />
+          isDetail ? undefined : (
+            <CountdownCardActions id={countdown.id} name={countdown.name} date={countdown.date} compactOnMobile />
+          )
         }
       />
       <CountdownCardBody

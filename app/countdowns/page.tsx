@@ -13,7 +13,7 @@ export default async function CountdownsPage() {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-2xl gap-8 mx-auto">
+    <div className="flex flex-col w-full max-w-2xl gap-4 sm:gap-8 mx-auto px-4 md:px-0">
       {countdowns.map((countdown) => (
         <CountdownCard key={countdown.id} {...countdown} />
       ))}

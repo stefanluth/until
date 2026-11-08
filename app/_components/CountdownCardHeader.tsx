@@ -31,12 +31,12 @@ export function CountdownCardHeader({
 
   return (
     <div className="flex w-full flex-col border-b">
-      {actions && <div className="flex justify-end px-4 pt-3 sm:px-6 sm:pt-4">{actions}</div>}
+      {actions && <div className="flex justify-end px-4 pt-2 sm:px-6 sm:pt-4">{actions}</div>}
       <div
-        className={`flex min-w-0 flex-col gap-2 px-4 pb-4 text-center sm:px-6 sm:pb-5 ${actions ? '' : 'pt-4 sm:pt-5'}`}
+        className={`flex min-w-0 flex-col gap-2 px-4 pb-3 text-center sm:px-6 sm:pb-5 ${actions ? '' : 'pt-4 sm:pt-5'}`}
       >
-        <h1 className="text-4xl md:text-[2.5rem] leading-tight break-words">{name}</h1>
-        <h3 className="text-lg" suppressHydrationWarning>
+        <h1 className="text-3xl sm:text-4xl md:text-[2.5rem] leading-tight break-words">{name}</h1>
+        <h3 className="text-base sm:text-lg" suppressHydrationWarning>
           {dateLabel}
         </h3>
       </div>

@@ -54,12 +54,12 @@ export function NavBar() {
       {LINKS.filter((link) => link.href !== pathname).map(({ href, label, Icon }) => (
         <Link
           key={href}
-          className="inline-flex items-center text-white hover:text-gray-200"
+          className="inline-flex items-center text-white hover:text-gray-200 p-1 -m-1 sm:p-0 sm:m-0"
           href={href}
           title={label}
           aria-label={label}
         >
-          <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+          <Icon className="w-6 h-6" />
         </Link>
       ))}
     </nav>
