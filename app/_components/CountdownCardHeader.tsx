@@ -1,44 +1,39 @@
-import type { ReactNode } from 'react';
-
 import { formatCountdownDate } from '@/_utils/countdownDisplay';
 import type { CountdownVariant } from '@/types';
 
 export function CountdownCardHeader({
   name,
   date,
-  actions,
   variant = 'card',
 }: {
   name: string;
   date: Date;
-  actions?: ReactNode;
   variant?: CountdownVariant;
 }) {
   const dateLabel = formatCountdownDate(date);
 
   if (variant === 'detail') {
     return (
-      <div className="flex w-full flex-col items-center gap-2 sm:gap-4 text-center">
-        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl leading-none tracking-tight break-words">
+      <div className="flex w-full flex-col items-center gap-2 text-center sm:gap-4">
+        <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight break-words sm:text-5xl md:text-7xl lg:text-8xl">
           {name}
         </h1>
-        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl" suppressHydrationWarning>
+        <p className="text-base opacity-80 sm:text-xl md:text-2xl" suppressHydrationWarning>
           {dateLabel}
-        </h3>
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="flex w-full flex-col border-b">
-      {actions && <div className="flex justify-end px-4 pt-2 sm:px-6 sm:pt-4">{actions}</div>}
-      <div
-        className={`flex min-w-0 flex-col gap-2 px-4 pb-3 text-center sm:px-6 sm:pb-5 ${actions ? '' : 'pt-4 sm:pt-5'}`}
-      >
-        <h1 className="text-3xl sm:text-4xl md:text-[2.5rem] leading-tight break-words">{name}</h1>
-        <h3 className="text-base sm:text-lg" suppressHydrationWarning>
+    <div className="flex w-full flex-col border-b border-black/10 dark:border-white/15">
+      <div className="flex min-w-0 flex-col gap-1 px-4 pb-4 pt-2 text-center sm:gap-2 sm:px-6 sm:pb-5 sm:pt-3">
+        <h2 className="text-balance text-2xl font-semibold leading-tight tracking-tight break-words sm:text-4xl md:text-[2.5rem]">
+          {name}
+        </h2>
+        <p className="text-sm opacity-80 sm:text-lg" suppressHydrationWarning>
           {dateLabel}
-        </h3>
+        </p>
       </div>
     </div>
   );

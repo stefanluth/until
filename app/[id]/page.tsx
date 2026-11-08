@@ -29,7 +29,7 @@ export default async function CountdownPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col pb-10 pt-2 sm:pb-0">
       <CountdownDetailMeta id={countdown.id} name={countdown.name} date={countdown.date} />
       <CountdownCard {...countdown} variant="detail" />
     </div>

@@ -3,13 +3,15 @@ import { type CountdownUnit, getVisibleUnits } from '@/_utils/duration';
 import type { CountdownVariant } from '@/types';
 
 const CARD_ROW_CLASS =
-  'flex flex-1 w-full flex-wrap items-center justify-center gap-x-5 gap-y-3 p-3 sm:gap-x-8 sm:gap-y-4 sm:p-5';
-const CARD_VALUE_CLASS = 'text-4xl sm:text-5xl md:text-[3.25rem] leading-none tabular-nums';
-const CARD_LABEL_CLASS = 'text-sm sm:text-base uppercase tracking-wide';
+  'flex flex-1 w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 p-3 sm:gap-x-8 sm:gap-y-4 sm:p-5';
+const CARD_VALUE_CLASS =
+  'text-3xl font-semibold leading-none tabular-nums tracking-tight min-[380px]:text-4xl sm:text-5xl md:text-[3.25rem]';
+const CARD_LABEL_CLASS = 'text-xs uppercase tracking-widest opacity-75 sm:text-sm';
 const DETAIL_ROW_CLASS =
-  'flex w-full flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12 sm:gap-y-8 lg:gap-x-16 mt-10 sm:mt-14';
-const DETAIL_VALUE_CLASS = 'text-6xl sm:text-7xl md:text-8xl lg:text-9xl leading-none tabular-nums';
-const DETAIL_LABEL_CLASS = 'text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-[0.2em]';
+  'flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-5 px-2 mt-8 sm:gap-x-12 sm:gap-y-8 sm:mt-14 lg:gap-x-16';
+const DETAIL_VALUE_CLASS =
+  'text-5xl font-semibold leading-none tabular-nums tracking-tight min-[380px]:text-6xl sm:text-7xl md:text-8xl lg:text-9xl';
+const DETAIL_LABEL_CLASS = 'text-xs uppercase tracking-[0.2em] opacity-75 sm:text-base md:text-lg lg:text-xl';
 
 export function CountdownCardBody({
   d,
@@ -43,8 +45,8 @@ export function CountdownCardBody({
         <div
           className={
             isDetail
-              ? 'text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-center'
-              : 'text-xl sm:text-2xl md:text-[2.75rem] text-center'
+              ? 'text-3xl font-medium text-center sm:text-5xl md:text-7xl'
+              : 'text-xl font-medium text-center sm:text-2xl md:text-[2.75rem]'
           }
         >
           Countdown has ended!

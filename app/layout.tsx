@@ -31,7 +31,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <body className={`${inter.className} h-full min-h-screen w-full flex flex-col`}>
+      <body className={`${inter.className} h-full min-h-dvh w-full flex flex-col`}>
         <ConsentProvider>
           <CountdownMetaProvider>
             <div className="group relative flex flex-1 flex-col">

@@ -9,8 +9,17 @@ import dynamic from 'next/dynamic';
 import { removeCountdown } from '@/_actions/removeCountdown';
 
 import { useConsent } from './ConsentProvider';
+import { ICON_BUTTON_CLASS, ICON_CLASS, MENU_ITEM_CLASS } from './actionStyles';
 
-function RemoveButtonSSR({ id, onRemoved }: { id: string; onRemoved?: () => void }) {
+function RemoveButtonSSR({
+  id,
+  onRemoved,
+  withLabel = false,
+}: {
+  id: string;
+  onRemoved?: () => void;
+  withLabel?: boolean;
+}) {
   const { requestConsent } = useConsent();
   const [pending, setPending] = useState(false);
 
@@ -41,13 +50,14 @@ function RemoveButtonSSR({ id, onRemoved }: { id: string; onRemoved?: () => void
 
   return (
     <button
-      className="inline-flex items-center text-white hover:text-gray-200 disabled:opacity-60 p-1 -m-1 sm:p-0 sm:m-0"
+      className={withLabel ? MENU_ITEM_CLASS : ICON_BUTTON_CLASS}
       title="Remove this countdown from your list"
       aria-label="Remove this countdown from your list"
       onClick={remove}
       disabled={pending}
     >
-      <BookmarkOff className="w-6 h-6" />
+      <BookmarkOff className={ICON_CLASS} />
+      {withLabel && <span>Remove from list</span>}
     </button>
   );
 }

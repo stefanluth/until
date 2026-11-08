@@ -1,6 +1,6 @@
 'use client';
 
-import { House, Plus } from 'lucide-react';
+import { ArrowLeft, House, Plus } from 'lucide-react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -9,6 +9,7 @@ import { isValidCountdownId } from '@/_utils/validation';
 
 import { CountdownCardActions } from './CountdownCardActions';
 import { useCountdownMeta } from './CountdownMetaContext';
+import { ICON_BUTTON_CLASS, ICON_CLASS } from './actionStyles';
 
 const LINKS = [
   { href: '/', label: 'Create a new countdown', Icon: Plus },
@@ -41,27 +42,37 @@ export function NavBar() {
 
   return (
     <nav
-      className={`flex h-16 sm:h-20 gap-4 sm:gap-5 pl-8 lg:pl-48 justify-end items-center scrollbar-compensate [--compensated-padding:2rem] lg:[--compensated-padding:12rem] ${
+      className={`flex h-16 sm:h-20 items-center justify-between gap-2 pl-4 sm:gap-5 sm:pl-8 lg:pl-48 scrollbar-compensate [--compensated-padding:2rem] lg:[--compensated-padding:12rem] ${
         countdownId ? 'nav-reveal' : ''
       }`}
     >
-      {countdownId && (
-        <>
-          <CountdownCardActions id={countdownId} showOpen={false} name={activeMeta?.name} date={activeMeta?.date} />
-          <span className="h-6 w-px bg-white/40" aria-hidden />
-        </>
-      )}
-      {LINKS.filter((link) => link.href !== pathname).map(({ href, label, Icon }) => (
-        <Link
-          key={href}
-          className="inline-flex items-center text-white hover:text-gray-200 p-1 -m-1 sm:p-0 sm:m-0"
-          href={href}
-          title={label}
-          aria-label={label}
-        >
-          <Icon className="w-6 h-6" />
-        </Link>
-      ))}
+      <div className="flex items-center">
+        {countdownId && (
+          <Link
+            className={ICON_BUTTON_CLASS}
+            href="/countdowns"
+            title="Back to your saved countdowns"
+            aria-label="Back to your saved countdowns"
+          >
+            <ArrowLeft className={ICON_CLASS} />
+          </Link>
+        )}
+      </div>
+      <div className="flex items-center gap-1 sm:gap-5">
+        {countdownId && (
+          <>
+            <CountdownCardActions id={countdownId} compactOnMobile name={activeMeta?.name} date={activeMeta?.date} />
+            <span className="h-6 w-px bg-black/10 dark:bg-white/25" aria-hidden />
+          </>
+        )}
+        {LINKS.filter((link) => link.href !== pathname && !(countdownId && link.href === '/countdowns')).map(
+          ({ href, label, Icon }) => (
+            <Link key={href} className={ICON_BUTTON_CLASS} href={href} title={label} aria-label={label}>
+              <Icon className={ICON_CLASS} />
+            </Link>
+          ),
+        )}
+      </div>
     </nav>
   );
 }

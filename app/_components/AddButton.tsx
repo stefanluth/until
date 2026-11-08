@@ -9,8 +9,17 @@ import dynamic from 'next/dynamic';
 import { addCountdown } from '@/_actions/addCountdown';
 
 import { useConsent } from './ConsentProvider';
+import { ICON_BUTTON_CLASS, ICON_CLASS, LABEL_BUTTON_CLASS } from './actionStyles';
 
-export function AddButtonSSR({ id, onAdded }: { id: string; onAdded?: () => void }) {
+export function AddButtonSSR({
+  id,
+  onAdded,
+  showLabel = false,
+}: {
+  id: string;
+  onAdded?: () => void;
+  showLabel?: boolean;
+}) {
   const { requestConsent } = useConsent();
   const [pending, setPending] = useState(false);
 
@@ -41,13 +50,14 @@ export function AddButtonSSR({ id, onAdded }: { id: string; onAdded?: () => void
 
   return (
     <button
-      className="inline-flex items-center text-white hover:text-gray-200 disabled:opacity-60 p-1 -m-1 sm:p-0 sm:m-0"
+      className={showLabel ? LABEL_BUTTON_CLASS : ICON_BUTTON_CLASS}
       title="Save this countdown to your list"
       aria-label="Save this countdown to your list"
       onClick={add}
       disabled={pending}
     >
-      <Bookmark className="w-6 h-6" />
+      <Bookmark className={ICON_CLASS} />
+      {showLabel && <span>Save</span>}
     </button>
   );
 }
