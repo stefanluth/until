@@ -42,8 +42,8 @@ export function AddButtonSSR({ id, onAdded }: { id: string; onAdded?: () => void
   return (
     <button
       className="inline-flex items-center text-white hover:text-gray-200 disabled:opacity-60"
-      title="Add this countdown to your list"
-      aria-label="Add this countdown to your list"
+      title="Save this countdown to your list"
+      aria-label="Save this countdown to your list"
       onClick={add}
       disabled={pending}
     >

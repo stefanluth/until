@@ -11,8 +11,8 @@ import { CountdownCardActions } from './CountdownCardActions';
 import { useCountdownMeta } from './CountdownMetaContext';
 
 const LINKS = [
-  { href: '/', label: 'Create a countdown', Icon: Plus },
-  { href: '/countdowns', label: 'Show all countdowns', Icon: House },
+  { href: '/', label: 'Create a new countdown', Icon: Plus },
+  { href: '/countdowns', label: 'View your saved countdowns', Icon: House },
 ];
 
 const RESERVED_PATHS = new Set(['', 'countdowns', '_not-found']);

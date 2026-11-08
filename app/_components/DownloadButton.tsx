@@ -24,7 +24,11 @@ export function DownloadButton({ id, name, date }: { id: string; name: string; d
     }
   }
 
-  const label = failed ? 'Could not save the image' : pending ? 'Saving image…' : 'Save this countdown as an image';
+  const label = failed
+    ? 'Could not download the image'
+    : pending
+      ? 'Downloading image…'
+      : 'Download this countdown as an image';
 
   return (
     <button
@@ -37,7 +41,7 @@ export function DownloadButton({ id, name, date }: { id: string; name: string; d
     >
       <Download className="w-5 h-5 sm:w-6 sm:h-6" />
       <span className="sr-only" role="status">
-        {pending ? 'Saving image…' : failed ? 'Could not save the image' : ''}
+        {pending ? 'Downloading image…' : failed ? 'Could not download the image' : ''}
       </span>
     </button>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { Clipboard, ClipboardCheck } from 'lucide-react';
+import { ClipboardCheck, Image as ImageIcon } from 'lucide-react';
 
 import { useState } from 'react';
 
@@ -34,7 +34,7 @@ export function CopyImageButton({ id, name, date }: { id: string; name: string; 
       ? 'Copying image…'
       : copied
         ? 'Copied!'
-        : 'Copy this countdown as an image';
+        : 'Copy this countdown as an image to the clipboard';
 
   return (
     <button
@@ -45,7 +45,7 @@ export function CopyImageButton({ id, name, date }: { id: string; name: string; 
       disabled={pending}
       onClick={copy}
     >
-      {copied ? <ClipboardCheck className="w-5 h-5 sm:w-6 sm:h-6" /> : <Clipboard className="w-5 h-5 sm:w-6 sm:h-6" />}
+      {copied ? <ClipboardCheck className="w-5 h-5 sm:w-6 sm:h-6" /> : <ImageIcon className="w-5 h-5 sm:w-6 sm:h-6" />}
       <span className="sr-only" role="status">
         {pending ? 'Copying image…' : failed ? 'Could not copy the image' : copied ? 'Copied!' : ''}
       </span>
