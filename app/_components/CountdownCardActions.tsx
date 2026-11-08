@@ -21,6 +21,49 @@ const MENU_PANEL_CLASS =
 const subscribeToCookies = () => () => {};
 const getServerCookieSnapshot = () => null;
 
+function useCountdownInCookies(id: string) {
+  const [toggled, setToggled] = useState<boolean | null>(null);
+  const cookieCountdownInList = useSyncExternalStore<boolean | null>(
+    subscribeToCookies,
+    () => hasCountdownId(Cookies.get(COUNTDOWN_LIST_COOKIE), id),
+    getServerCookieSnapshot,
+  );
+
+  return { countdownInCookies: toggled ?? cookieCountdownInList, setToggled };
+}
+
+function ShareActions({ id, name, date, withLabel }: { id: string; name?: string; date?: Date; withLabel: boolean }) {
+  return (
+    <>
+      <LinkButton id={id} withLabel={withLabel} />
+      {name && date && <CopyImageButton id={id} name={name} date={date} withLabel={withLabel} />}
+      {name && date && <DownloadButton id={id} name={name} date={date} withLabel={withLabel} />}
+    </>
+  );
+}
+
+function SaveOrRemoveButton({
+  id,
+  countdownInCookies,
+  onAdded,
+  onRemoved,
+}: {
+  id: string;
+  countdownInCookies: boolean | null;
+  onAdded: () => void;
+  onRemoved: () => void;
+}) {
+  if (countdownInCookies === true) {
+    return <RemoveButton id={id} onRemoved={onRemoved} />;
+  }
+
+  if (countdownInCookies === false) {
+    return <AddButton id={id} onAdded={onAdded} />;
+  }
+
+  return null;
+}
+
 export function CountdownCardActions({
   id,
   name,
@@ -32,18 +75,12 @@ export function CountdownCardActions({
   date?: Date;
   compactOnMobile?: boolean;
 }) {
-  const [toggled, setToggled] = useState<boolean | null>(null);
+  const { countdownInCookies, setToggled } = useCountdownInCookies(id);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
   const menuRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const cookieCountdownInList = useSyncExternalStore<boolean | null>(
-    subscribeToCookies,
-    () => hasCountdownId(Cookies.get(COUNTDOWN_LIST_COOKIE), id),
-    getServerCookieSnapshot,
-  );
-  const countdownInCookies = toggled ?? cookieCountdownInList;
 
   useEffect(() => {
     if (!menuOpen) {
@@ -74,28 +111,14 @@ export function CountdownCardActions({
     };
   }, [menuOpen]);
 
-  function renderShareActions(withLabel: boolean) {
-    return (
-      <>
-        <LinkButton id={id} withLabel={withLabel} />
-        {name && date && <CopyImageButton id={id} name={name} date={date} withLabel={withLabel} />}
-        {name && date && <DownloadButton id={id} name={name} date={date} withLabel={withLabel} />}
-      </>
-    );
+  function markAdded() {
+    setToggled(true);
   }
 
-  function renderRemoveButton(withLabel: boolean) {
-    return (
-      <RemoveButton
-        id={id}
-        withLabel={withLabel}
-        onRemoved={() => {
-          setToggled(false);
-          setMenuOpen(false);
-          triggerRef.current?.focus();
-        }}
-      />
-    );
+  function markRemoved() {
+    setToggled(false);
+    setMenuOpen(false);
+    triggerRef.current?.focus();
   }
 
   return (
@@ -104,7 +127,7 @@ export function CountdownCardActions({
         <>
           {countdownInCookies === false && (
             <div className="sm:hidden">
-              <AddButton id={id} showLabel onAdded={() => setToggled(true)} />
+              <AddButton id={id} showLabel onAdded={markAdded} />
             </div>
           )}
           <button
@@ -127,31 +150,33 @@ export function CountdownCardActions({
             className={`${menuOpen ? 'flex' : 'hidden'} ${MENU_PANEL_CLASS} sm:hidden`}
           >
             <p className="px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/50">Actions</p>
-            {renderShareActions(true)}
+            <ShareActions id={id} name={name} date={date} withLabel />
             {countdownInCookies === true && (
               <>
                 <div className="my-1 h-px bg-white/10" aria-hidden />
-                {renderRemoveButton(true)}
+                <RemoveButton id={id} withLabel onRemoved={markRemoved} />
               </>
             )}
           </div>
           <div className="hidden items-center gap-5 sm:flex">
-            {renderShareActions(false)}
-            {countdownInCookies === true ? (
-              renderRemoveButton(false)
-            ) : countdownInCookies === false ? (
-              <AddButton id={id} onAdded={() => setToggled(true)} />
-            ) : null}
+            <ShareActions id={id} name={name} date={date} withLabel={false} />
+            <SaveOrRemoveButton
+              id={id}
+              countdownInCookies={countdownInCookies}
+              onAdded={markAdded}
+              onRemoved={markRemoved}
+            />
           </div>
         </>
       ) : (
         <>
-          {renderShareActions(false)}
-          {countdownInCookies === true ? (
-            renderRemoveButton(false)
-          ) : countdownInCookies === false ? (
-            <AddButton id={id} onAdded={() => setToggled(true)} />
-          ) : null}
+          <ShareActions id={id} name={name} date={date} withLabel={false} />
+          <SaveOrRemoveButton
+            id={id}
+            countdownInCookies={countdownInCookies}
+            onAdded={markAdded}
+            onRemoved={markRemoved}
+          />
         </>
       )}
     </div>
