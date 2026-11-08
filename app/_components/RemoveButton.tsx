@@ -4,14 +4,12 @@ import { BookmarkOff } from 'lucide-react';
 
 import { useState } from 'react';
 
-import dynamic from 'next/dynamic';
-
 import { removeCountdown } from '@/_actions/removeCountdown';
 
 import { useConsent } from './ConsentProvider';
 import { ICON_BUTTON_CLASS, ICON_CLASS, MENU_ITEM_CLASS } from './actionStyles';
 
-function RemoveButtonSSR({
+export function RemoveButton({
   id,
   onRemoved,
   withLabel = false,
@@ -61,5 +59,3 @@ function RemoveButtonSSR({
     </button>
   );
 }
-
-export const RemoveButton = dynamic(() => Promise.resolve(RemoveButtonSSR), { ssr: false });

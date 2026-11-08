@@ -4,14 +4,12 @@ import { Bookmark } from 'lucide-react';
 
 import { useState } from 'react';
 
-import dynamic from 'next/dynamic';
-
 import { addCountdown } from '@/_actions/addCountdown';
 
 import { useConsent } from './ConsentProvider';
 import { ICON_BUTTON_CLASS, ICON_CLASS, LABEL_BUTTON_CLASS } from './actionStyles';
 
-export function AddButtonSSR({
+export function AddButton({
   id,
   onAdded,
   showLabel = false,
@@ -61,5 +59,3 @@ export function AddButtonSSR({
     </button>
   );
 }
-
-export const AddButton = dynamic(() => Promise.resolve(AddButtonSSR), { ssr: false });
