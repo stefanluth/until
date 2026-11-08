@@ -38,7 +38,7 @@ export default function RootLayout({
               <header className="absolute inset-x-0 top-0 z-10 flex flex-col">
                 <NavBar />
               </header>
-              <main className="flex flex-1 flex-col py-20">{children}</main>
+              <main className="flex flex-1 flex-col pt-20 pb-12 sm:pb-16">{children}</main>
               <Footer />
             </div>
           </CountdownMetaProvider>

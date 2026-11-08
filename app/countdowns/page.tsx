@@ -25,7 +25,7 @@ export default async function CountdownsPage() {
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 pb-8 sm:gap-6 sm:px-0 sm:pb-0">
+    <section className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 pb-2 sm:gap-6 sm:px-0 sm:pb-0">
       <header className="flex items-end justify-between gap-3 px-1">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Your countdowns</h1>
         <p className="shrink-0 pb-1 text-sm opacity-70">
