@@ -14,9 +14,9 @@ import { createCookieStore } from '../support/cookies.ts';
 
 describe('readCountdownIds', () => {
   it('keeps valid IDs and drops malformed entries', () => {
-    assert.deepEqual(readCountdownIds('Birthday-abc12345,bad id,My%20Event-def67890'), [
-      'Birthday-abc12345',
-      'My%20Event-def67890',
+    assert.deepEqual(readCountdownIds('birthday-abc12345,bad id,my-event-def67890'), [
+      'birthday-abc12345',
+      'my-event-def67890',
     ]);
   });
 
@@ -35,9 +35,9 @@ describe('readCountdownIds', () => {
 
 describe('hasCountdownId', () => {
   it('matches an exact ID only', () => {
-    assert.equal(hasCountdownId('Birthday-abc12345,Other-def67890', 'Birthday-abc12345'), true);
-    assert.equal(hasCountdownId('Birthday-abc12345,Other-def67890', 'Birthday'), false);
-    assert.equal(hasCountdownId(undefined, 'Birthday-abc12345'), false);
+    assert.equal(hasCountdownId('birthday-abc12345,other-def67890', 'birthday-abc12345'), true);
+    assert.equal(hasCountdownId('birthday-abc12345,other-def67890', 'birthday'), false);
+    assert.equal(hasCountdownId(undefined, 'birthday-abc12345'), false);
   });
 });
 

@@ -51,12 +51,18 @@ describe('parseClientDate', () => {
 });
 
 describe('isValidCountdownId', () => {
-  it('accepts encoded countdown IDs', () => {
-    assert.equal(isValidCountdownId('Birthday-abc12345'), true);
-    assert.equal(isValidCountdownId('My%20Event-abc12345'), true);
+  it('accepts slug countdown IDs', () => {
+    assert.equal(isValidCountdownId('birthday-abc12345'), true);
+    assert.equal(isValidCountdownId('my-event-abc12345'), true);
+    assert.equal(isValidCountdownId('3-tage-abc12345'), true);
+    assert.equal(isValidCountdownId('countdown-abc12345'), true);
   });
 
   it('rejects malformed IDs', () => {
+    assert.equal(isValidCountdownId('Birthday-abc12345'), false);
+    assert.equal(isValidCountdownId('My%20Event-abc12345'), false);
+    assert.equal(isValidCountdownId('my event-abc12345'), false);
+    assert.equal(isValidCountdownId('my--event-abc12345'), false);
     assert.equal(isValidCountdownId('bad,id'), false);
     assert.equal(isValidCountdownId('bad\nid'), false);
     assert.equal(isValidCountdownId(''), false);

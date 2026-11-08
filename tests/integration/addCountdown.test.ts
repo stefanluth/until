@@ -32,8 +32,8 @@ const runtime = vi.hoisted(() => {
 
 vi.mock('next/headers', () => ({ cookies: runtime.cookies }));
 
-const VALID_ID = 'Birthday-abc12345';
-const OTHER_ID = 'Other-def67890';
+const VALID_ID = 'birthday-abc12345';
+const OTHER_ID = 'other-def67890';
 
 function cookieWrites() {
   return runtime.calls.filter((call) => call.type === 'set' || call.type === 'delete');

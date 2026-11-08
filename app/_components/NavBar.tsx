@@ -17,7 +17,6 @@ const LINKS = [
 ];
 
 const RESERVED_PATHS = new Set(['', 'countdowns', '_not-found']);
-const COUNTDOWN_PATH_RE = /^[A-Za-z0-9!'()*\-._~%]+-[0-9a-f]{8}$/;
 
 function getCountdownId(pathname: string): string | null {
   const segments = pathname.split('/').filter(Boolean);
@@ -26,12 +25,7 @@ function getCountdownId(pathname: string): string | null {
     return null;
   }
 
-  try {
-    const id = encodeURIComponent(decodeURIComponent(segments[0]));
-    return isValidCountdownId(id) && COUNTDOWN_PATH_RE.test(id) ? id : null;
-  } catch {
-    return null;
-  }
+  return isValidCountdownId(segments[0]) ? segments[0] : null;
 }
 
 export function NavBar() {

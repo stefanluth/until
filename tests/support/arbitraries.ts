@@ -1,6 +1,6 @@
 import fc from 'fast-check';
 
-export const validCountdownId = fc.stringMatching(/^[A-Za-z0-9!'()*\-._~%]+-[0-9a-f]{8}$/);
+export const validCountdownId = fc.stringMatching(/^[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}$/);
 export const validCountdownIds = fc.array(validCountdownId, { maxLength: 20 });
 
 export const countdownParts = fc.record({

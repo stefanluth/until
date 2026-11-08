@@ -9,13 +9,12 @@ const name = fc.string({ unit: 'grapheme', maxLength: 20 });
 const date = fc.integer({ min: 0, max: 253_402_300_799_999 }).map((milliseconds) => new Date(milliseconds));
 
 describe('createCountdownId properties', () => {
-  it('encodes the name and appends an eight-character hex hash', () => {
+  it('produces a readable URL-safe slug and an eight-character hex hash', () => {
     fc.assert(
       fc.property(name, date, (value, when) => {
         const id = createCountdownId(value, when);
 
-        assert.equal(id.slice(0, -9), encodeURIComponent(value));
-        assert.match(id.slice(-9), /^-[0-9a-f]{8}$/);
+        assert.match(id, /^[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}$/);
         assert.equal(isValidCountdownId(id), true);
       }),
     );

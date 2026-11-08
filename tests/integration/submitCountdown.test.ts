@@ -218,14 +218,14 @@ describe('submitCountdown guards', () => {
 
   it('filters malformed cookie entries when appending the new id', async () => {
     grantConsent();
-    runtime.values.set(COUNTDOWN_LIST_COOKIE, 'bad id,Other-def67890');
+    runtime.values.set(COUNTDOWN_LIST_COOKIE, 'bad id,other-def67890');
 
     await expect(submitCountdownAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE }))).rejects.toThrow(
       'REDIRECT:/countdowns',
     );
 
     const id = createCountdownId('Party', new Date(DATE));
-    expect(runtime.values.get(COUNTDOWN_LIST_COOKIE)).toBe(`Other-def67890,${id}`);
+    expect(runtime.values.get(COUNTDOWN_LIST_COOKIE)).toBe(`other-def67890,${id}`);
   });
 
   it('does not write a cookie when the database rejects', async () => {

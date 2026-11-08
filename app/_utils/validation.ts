@@ -2,7 +2,7 @@ export const MAX_COUNTDOWN_NAME_LENGTH = 48;
 export const MAX_COUNTDOWN_WHEN_LENGTH = 64;
 export const MAX_COUNTDOWN_ID_LENGTH = 512;
 
-const COUNTDOWN_ID_RE = /^[A-Za-z0-9!'()*\-._~%]+$/;
+const COUNTDOWN_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}$/;
 
 type FieldResult<T> = { ok: true; value: T } | { ok: false; error: string; location: 'name' | 'when' };
 

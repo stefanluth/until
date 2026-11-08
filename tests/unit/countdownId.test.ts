@@ -10,10 +10,35 @@ describe('createCountdownId', () => {
     assert.equal(createCountdownId('Birthday', DATE), createCountdownId('Birthday', DATE));
   });
 
-  it('uses an encoded name and eight hexadecimal hash characters', () => {
-    const id = createCountdownId('My Event', DATE);
+  it('uses a readable lowercase slug and eight hexadecimal hash characters', () => {
+    assert.match(createCountdownId('My Event', DATE), /^my-event-[0-9a-f]{8}$/);
+    assert.match(createCountdownId('3 tage', DATE), /^3-tage-[0-9a-f]{8}$/);
+  });
 
-    assert.match(id, /^My%20Event-[a-f0-9]{8}$/);
+  it('strips accents and punctuation', () => {
+    assert.match(createCountdownId('Café au lait!', DATE), /^cafe-au-lait-[0-9a-f]{8}$/);
+  });
+
+  it('falls back to a generic slug when the name has no ASCII letters', () => {
+    assert.match(createCountdownId('派对', DATE), /^countdown-[0-9a-f]{8}$/);
+    assert.match(createCountdownId('🎉 party', DATE), /^party-[0-9a-f]{8}$/);
+  });
+
+  it('keeps the slug bounded and never leaves a trailing hyphen', () => {
+    const slug = createCountdownId('a'.repeat(100), DATE).slice(0, -9);
+
+    assert.equal(slug.length <= 48, true);
+    assert.doesNotMatch(slug, /-$/);
+  });
+
+  it('does not contain percent-encoding, spaces, slashes, or uppercase letters', () => {
+    const id = createCountdownId('A B/C', DATE);
+
+    assert.doesNotMatch(id, /[% /]|[A-Z]/);
+  });
+
+  it('distinguishes names that slugify the same', () => {
+    assert.notEqual(createCountdownId('Café', DATE), createCountdownId('Cafe', DATE));
   });
 
   it('changes when the date changes', () => {
