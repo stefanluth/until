@@ -43,25 +43,22 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
         <h2 id="cookie-consent-title" className="text-lg sm:text-xl font-semibold">
           Cookie consent
         </h2>
-        <p>This site uses cookies to store the countdowns you create.</p>
-        <b>Here&apos;s how it works:</b>
-
+        <p>This site uses two cookies, both just to make it work. No ads, no tracking.</p>
+        <ul className="list-disc pl-5">
+          <li>One remembers that you accepted this notice.</li>
+          <li>One remembers the countdowns you saved.</li>
+        </ul>
+        <p>Both last for one year.</p>
         <p>
-          When you first submit a countdown, a cookie is created in your browser. This cookie also stores any other
-          countdowns you&apos;ve created, so you don&apos;t have to enter them again each time you visit. This cookie
-          lasts for 365 days.
+          When you create a countdown, its name and date are saved in our database so you can share it with a link.
+          Anyone with the link can see it, so please don&apos;t put private details in the name.
         </p>
+        <p>Removing a countdown only removes it from your saved list. The shared link still works.</p>
         <p>
-          Clicking &quot;Remove&quot; on a countdown only deletes that specific countdown from the cookie, not the
-          entire cookie.
+          To stop spam, we look at your IP address when you create a countdown. It stays in memory for up to 10 minutes
+          and is never saved to our database.
         </p>
-        <p>
-          We also store all countdowns in a database. This allows you to share your countdowns with a URL. However, for
-          your privacy, we only store the countdown&apos;s name and target date. We strongly suggest to avoid entering
-          personal details in your countdown names.
-        </p>
-        <b>No other data or information about you, like your device or location, is saved.</b>
-
+        <p>That&apos;s everything. We don&apos;t collect any other data about you.</p>
         <p>By clicking &quot;Accept&quot;, you agree to the use of cookies.</p>
 
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
