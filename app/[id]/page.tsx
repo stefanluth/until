@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const countdown = await getCountdown(id);
 
   return {
-    title: countdown?.name ? `${countdown.name} - Countdown` : 'Until',
+    title: countdown?.name ? `${countdown.name} - Countdown` : 'until',
     description: countdown ? `How long until ${countdown.name}?` : undefined,
   };
 }

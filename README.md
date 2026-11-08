@@ -1,6 +1,6 @@
-# Until
+# until
 
-Until is a simple countdown timer, sharable via URL.
+until is a simple countdown timer, sharable via URL.
 
 ## Local development
 

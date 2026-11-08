@@ -2,7 +2,7 @@ import type { CountdownImageContent, CountdownImageTheme } from './countdownImag
 
 export const COUNTDOWN_IMAGE_SIZE = 1080;
 
-const WORDMARK = 'Until';
+const WORDMARK = 'until';
 const MAX_TITLE_LINES = 3;
 const MAX_TITLE_HEIGHT = 200;
 

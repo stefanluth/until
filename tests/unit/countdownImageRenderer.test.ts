@@ -73,7 +73,7 @@ describe('drawCountdownImage', () => {
     const ctx = draw();
     const all = ctx.texts.map((entry) => entry.text);
 
-    assert.ok(all.includes('Until'));
+    assert.ok(all.includes('until'));
     assert.ok(all.join(' ').includes('New Year 2027'));
     assert.ok(all.includes('Friday, January 1, 2027'));
     assert.ok(all.includes('42'));

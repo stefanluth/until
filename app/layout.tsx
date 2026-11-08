@@ -17,8 +17,8 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Until',
-  description: 'Until is a simple countdown timer, sharable via URL.',
+  title: 'until',
+  description: 'until is a simple countdown timer, sharable via URL.',
 };
 
 export default function RootLayout({
