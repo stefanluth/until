@@ -9,7 +9,7 @@ export const LABEL_BUTTON_CLASS =
   'inline-flex h-11 items-center justify-center gap-2 rounded-full px-3.5 text-sm font-medium text-current transition-colors hover:bg-black/5 active:bg-black/10 disabled:opacity-60 dark:hover:bg-white/10 dark:active:bg-white/15';
 
 export const MENU_SURFACE_CLASS =
-  'rounded-2xl border border-white/60 bg-white/20 p-2 text-current shadow-xl backdrop-blur-2xl backdrop-brightness-110 dark:border-white/20 dark:bg-white/[0.07] dark:text-white dark:backdrop-brightness-100 dark:backdrop-saturate-150';
+  'rounded-2xl border border-white/50 bg-white/50 p-2 shadow-xl backdrop-blur-sm dark:border-white/20 dark:bg-black/50';
 
 export const MENU_ITEM_CLASS =
   'flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm text-current transition-colors hover:bg-black/5 active:bg-black/10 disabled:opacity-60 dark:text-white dark:hover:bg-white/10 dark:active:bg-white/15';
