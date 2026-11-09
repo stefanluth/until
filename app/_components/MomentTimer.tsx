@@ -13,31 +13,38 @@ const DETAIL_VALUE_CLASS =
   'text-5xl font-semibold leading-none tabular-nums tracking-tight min-[380px]:text-6xl sm:text-7xl md:text-8xl lg:text-9xl';
 const DETAIL_LABEL_CLASS = 'text-xs uppercase tracking-[0.2em] opacity-75 sm:text-base md:text-lg lg:text-xl';
 
+const CLASSES = {
+  card: {
+    row: CARD_ROW_CLASS,
+    value: CARD_VALUE_CLASS,
+    label: CARD_LABEL_CLASS,
+    finished: 'text-xl font-medium text-center sm:text-2xl md:text-[2.75rem]',
+  },
+  detail: {
+    row: DETAIL_ROW_CLASS,
+    value: DETAIL_VALUE_CLASS,
+    label: DETAIL_LABEL_CLASS,
+    finished: 'text-3xl font-medium text-center sm:text-5xl md:text-7xl',
+  },
+} as const;
+
 export function MomentTimer({ parts, variant = 'card' }: { parts: RemainingParts; variant?: MomentVariant }) {
   const visible = getVisibleUnits(parts);
-  const isDetail = variant === 'detail';
+  const classes = CLASSES[variant];
 
   return (
-    <div className={isDetail ? DETAIL_ROW_CLASS : CARD_ROW_CLASS}>
+    <div className={classes.row}>
       {visible.length > 0 ? (
         visible.map((unit) => (
           <div key={unit} className="flex flex-col items-center">
-            <span className={isDetail ? DETAIL_VALUE_CLASS : CARD_VALUE_CLASS} suppressHydrationWarning>
+            <span className={classes.value} suppressHydrationWarning>
               {parts[unit]}
             </span>
-            <span className={isDetail ? DETAIL_LABEL_CLASS : CARD_LABEL_CLASS}>{unitLabel(unit, parts[unit])}</span>
+            <span className={classes.label}>{unitLabel(unit, parts[unit])}</span>
           </div>
         ))
       ) : (
-        <div
-          className={
-            isDetail
-              ? 'text-3xl font-medium text-center sm:text-5xl md:text-7xl'
-              : 'text-xl font-medium text-center sm:text-2xl md:text-[2.75rem]'
-          }
-        >
-          Timer finished.
-        </div>
+        <div className={classes.finished}>Timer finished.</div>
       )}
     </div>
   );
