@@ -30,7 +30,8 @@ describe('moment URL properties', () => {
         assert.equal(moment.date.getTime(), floorToSecond(when));
         assert.equal(moment.id, token);
         assert.equal(isValidMomentId(token), true);
-        assert.doesNotMatch(token, /\.\d{3}Z$/);
+        assert.match(token, /[+-]\d{2}:\d{2}$/);
+        assert.doesNotMatch(token, /Z$/);
       }),
     );
   });
@@ -47,6 +48,40 @@ describe('moment URL properties', () => {
         assert.equal(moment.name, name);
         assert.equal(moment.date.getTime(), floorToSecond(when));
         assert.equal(moment.id, token);
+      }),
+    );
+  });
+
+  it('canonicalizes minute-precision tokens', () => {
+    fc.assert(
+      fc.property(validMomentName, date, (name, when) => {
+        const withoutSeconds = new Date(Math.floor(when.getTime() / 60_000) * 60_000);
+        const token = encodeMomentToken(name, withoutSeconds, 0);
+        const separatorIndex = token.lastIndexOf('@');
+        const datePart = token.slice(separatorIndex + 1);
+        const minuteToken = `${token.slice(0, separatorIndex + 1)}${datePart.slice(0, 16)}${datePart.slice(-6)}`;
+        const moment = decodeMomentToken(minuteToken);
+
+        assert.ok(moment);
+        assert.equal(moment.id, token);
+        assert.equal(moment.date.getTime(), withoutSeconds.getTime());
+      }),
+    );
+  });
+
+  it('round-trips an explicit offset', () => {
+    const offsetDate = fc
+      .integer({ min: Date.UTC(1970, 0, 1), max: Date.UTC(9998, 11, 31, 23, 59, 59, 999) })
+      .map((milliseconds) => new Date(milliseconds));
+
+    fc.assert(
+      fc.property(validMomentName, offsetDate, fc.integer({ min: -720, max: 840 }), (name, when, offsetMinutes) => {
+        const token = encodeMomentToken(name, when, offsetMinutes);
+        const moment = decodeMomentToken(token);
+
+        assert.ok(moment);
+        assert.equal(moment.id, token);
+        assert.equal(moment.date.getTime(), floorToSecond(when));
       }),
     );
   });

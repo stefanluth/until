@@ -23,7 +23,7 @@ describe('readMomentIds', () => {
   });
 
   it('canonicalizes equivalent token encodings', () => {
-    assert.deepEqual(readMomentIds('Caf%c3%a9@2026-01-01T00:00:00Z'), ['Caf%C3%A9@2026-01-01T00:00:00Z']);
+    assert.deepEqual(readMomentIds('Caf%c3%a9@2026-01-01T00:00:00+00:00'), ['Caf%C3%A9@2026-01-01T00:00:00+00:00']);
   });
 
   it('returns an empty list for a missing or empty cookie', () => {

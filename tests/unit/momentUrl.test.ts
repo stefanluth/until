@@ -12,7 +12,7 @@ import {
 
 const DATE = new Date('2026-01-01T00:00:00.000Z');
 const DATE_ISO = DATE.toISOString();
-const ISO = '2026-01-01T00:00:00Z';
+const ISO = '2026-01-01T00:00:00+00:00';
 
 function routeParam(name: string) {
   return encodeURIComponent(`${name}@${ISO}`);
@@ -38,8 +38,15 @@ describe('encodeMomentToken', () => {
     assert.equal(encodeMomentToken(`Party (2026)!`, DATE).startsWith('Party%20%282026%29%21@'), true);
   });
 
+  it('encodes the local offset instead of Z', () => {
+    assert.equal(encodeMomentToken('Party', DATE, 60), 'Party@2026-01-01T01:00:00+01:00');
+    assert.equal(encodeMomentToken('Party', DATE, -300), 'Party@2025-12-31T19:00:00-05:00');
+    assert.equal(encodeMomentToken('Party', DATE, 330), 'Party@2026-01-01T05:30:00+05:30');
+    assert.equal(encodeMomentToken('Party', DATE, 0), `Party@${ISO}`);
+  });
+
   it('strips milliseconds from the instant', () => {
-    assert.equal(encodeMomentToken('Party', new Date('2026-01-01T00:00:00.789Z')), `Party@${ISO}`);
+    assert.equal(encodeMomentToken('Party', new Date('2026-01-01T00:00:00.789Z'), 0), `Party@${ISO}`);
   });
 });
 
@@ -69,6 +76,29 @@ describe('decodeMomentToken', () => {
     assert.equal(moment.name, 'a@b');
   });
 
+  it('accepts tokens without seconds and adds :00', () => {
+    const moment = decodeMomentToken('Caf%C3%A9@2026-12-25T18:00+01:00');
+
+    assert.ok(moment);
+    assert.equal(moment.id, 'Caf%C3%A9@2026-12-25T18:00:00+01:00');
+    assert.equal(moment.date.toISOString(), '2026-12-25T17:00:00.000Z');
+  });
+
+  it('treats the parsed offset as the canonical offset', () => {
+    const moment = decodeMomentToken('Caf%C3%A9@2026-12-25T12:00-05:00');
+
+    assert.ok(moment);
+    assert.equal(moment.id, 'Caf%C3%A9@2026-12-25T12:00:00-05:00');
+    assert.equal(moment.date.toISOString(), '2026-12-25T17:00:00.000Z');
+  });
+
+  it('accepts a percent-encoded plus in the offset', () => {
+    const moment = decodeMomentToken('Caf%C3%A9@2026-12-25T18:00:00%2B01:00');
+
+    assert.ok(moment);
+    assert.equal(moment.id, 'Caf%C3%A9@2026-12-25T18:00:00+01:00');
+  });
+
   it('accepts names at the 32-character limit and rejects longer ones', () => {
     assert.ok(decodeMomentToken(encodeMomentToken('a'.repeat(32), DATE)));
     assert.equal(decodeMomentToken(encodeMomentToken('a'.repeat(33), DATE)), null);
@@ -81,15 +111,21 @@ describe('decodeMomentToken', () => {
       'no-delimiter',
       `Name@not-a-date`,
       `Name@2026-01-01`,
+      `Name@2026-01-01T00:00:00`,
+      `Name@2026-01-01T00:00:00Z`,
       `Name@2026-01-01T00:00:00.1Z`,
       `Name@2026-01-01T00:00:00.12Z`,
       `Name@2026-01-01T00:00:00.000Z`,
       `Name@2026-01-01T00:00:00.000Z `,
+      `Name@2026-01-01T00:00:00+15:00`,
+      `Name@2026-01-01T00:00:00+14:30`,
+      `Name@2026-01-01T00:00:00-13:00`,
+      `Name@2026-01-01T00:00:00+00:60`,
       `Bad%ZZ@${ISO}`,
       ` Bad@${ISO}`,
       `Bad@${ISO} `,
-      `Name@2026-02-31T00:00:00Z`,
-      `Name@0000-01-01T00:00:00Z`,
+      `Name@2026-02-31T00:00:00+00:00`,
+      `Name@0000-01-01T00:00:00+00:00`,
       `${'a'.repeat(513)}@${ISO}`,
       `${'a'.repeat(200)}@${ISO}`,
     ]) {
@@ -120,6 +156,14 @@ describe('decodeMomentParam', () => {
     assert.equal(moment.name, '100%');
   });
 
+  it('accepts route parameters without seconds', () => {
+    const moment = decodeMomentParam(encodeURIComponent('Café@2026-12-25T18:00+01:00'));
+
+    assert.ok(moment);
+    assert.equal(moment.id, 'Caf%C3%A9@2026-12-25T18:00:00+01:00');
+    assert.equal(moment.date.toISOString(), '2026-12-25T17:00:00.000Z');
+  });
+
   it('rejects malformed route parameters', () => {
     assert.equal(decodeMomentParam(encodeURIComponent('not-a-moment')), null);
     assert.equal(decodeMomentParam(encodeURIComponent(`Name@not-a-date`)), null);
@@ -138,7 +182,7 @@ describe('isValidMomentId and momentPath', () => {
   });
 
   it('builds an absolute site-relative path', () => {
-    assert.equal(momentPath('a%40b@2026-01-01T00:00:00Z'), '/a%40b@2026-01-01T00:00:00Z');
+    assert.equal(momentPath(`a%40b@${ISO}`), `/a%40b@${ISO}`);
   });
 
   it('rejects a route parameter passed as a plain name', () => {

@@ -46,7 +46,7 @@ describe('momentFromInput', () => {
 
     assert.deepEqual(momentFromInput('Party', '1d', now), {
       ok: true,
-      id: 'Party@2026-01-02T00:00:00Z',
+      id: 'Party@2026-01-02T00:00:00+00:00',
     });
   });
 

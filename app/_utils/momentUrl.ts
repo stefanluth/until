@@ -4,12 +4,12 @@ import { validateMomentName } from './validation.ts';
 const SEPARATOR = '@';
 const MAX_MOMENT_ID_LENGTH = 512;
 const MAX_ENCODED_MOMENT_ID_LENGTH = MAX_MOMENT_ID_LENGTH * 4;
-const ISO_SECONDS_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+const ISO_INSTANT_RE = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(?::(\d{2}))?([+-])(\d{2}):(\d{2})$/;
 const EXTRA_ESCAPED_RE = /[!'()*]/g;
 const NON_ASCII_PERCENT_RUN_RE = /(?:%[89A-Fa-f][0-9A-Fa-f])+/g;
 
-export function encodeMomentToken(name: string, date: Date): string {
-  return `${encodeName(name)}${SEPARATOR}${formatMomentInstant(date)}`;
+export function encodeMomentToken(name: string, date: Date, offsetMinutes = -date.getTimezoneOffset()): string {
+  return `${encodeName(name)}${SEPARATOR}${formatMomentInstant(date, offsetMinutes)}`;
 }
 
 export function decodeMomentToken(value: unknown): Moment | null {
@@ -30,7 +30,7 @@ export function decodeMomentToken(value: unknown): Moment | null {
     return null;
   }
 
-  return buildMoment(name, value.slice(separatorIndex + 1));
+  return buildMoment(name, value.slice(separatorIndex + 1).replace(/%2B/gi, '+'));
 }
 
 export function decodeMomentParam(value: unknown): Moment | null {
@@ -76,16 +76,54 @@ function buildMoment(name: string, rawDate: string): Moment | null {
     return null;
   }
 
-  if (!ISO_SECONDS_RE.test(rawDate)) {
+  const match = ISO_INSTANT_RE.exec(rawDate);
+  if (!match) {
     return null;
   }
 
-  const date = new Date(rawDate);
-  if (!Number.isFinite(date.getTime()) || formatMomentInstant(date) !== rawDate || date.getUTCFullYear() < 1) {
+  const [, dateTime, seconds = '00', sign, hours, minutes] = match;
+  if (Number(seconds) > 59) {
     return null;
   }
 
-  return { id: encodeMomentToken(name, date), name, date };
+  const offsetMinutes = parseOffsetMinutes(sign, hours, minutes);
+  if (offsetMinutes === null) {
+    return null;
+  }
+
+  const instant = `${dateTime}:${seconds}${formatOffset(offsetMinutes)}`;
+  const date = new Date(instant);
+  if (
+    !Number.isFinite(date.getTime()) ||
+    formatMomentInstant(date, offsetMinutes) !== instant ||
+    dateTime.startsWith('0000-')
+  ) {
+    return null;
+  }
+
+  return { id: encodeMomentToken(name, date, offsetMinutes), name, date };
+}
+
+function parseOffsetMinutes(sign: string, hours: string, minutes: string): number | null {
+  const hourCount = Number(hours);
+  const minuteCount = Number(minutes);
+  if (minuteCount > 59) {
+    return null;
+  }
+
+  const total = hourCount * 60 + minuteCount;
+  if (total > 14 * 60 || (sign === '-' && total > 12 * 60)) {
+    return null;
+  }
+
+  return sign === '-' ? -total : total;
+}
+
+function formatOffset(offsetMinutes: number): string {
+  const sign = offsetMinutes < 0 ? '-' : '+';
+  const absolute = Math.abs(offsetMinutes);
+
+  return `${sign}${String(Math.floor(absolute / 60)).padStart(2, '0')}:${String(absolute % 60).padStart(2, '0')}`;
 }
 
 function encodeName(name: string): string {
@@ -95,8 +133,10 @@ function encodeName(name: string): string {
   );
 }
 
-function formatMomentInstant(date: Date): string {
-  return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+function formatMomentInstant(date: Date, offsetMinutes: number): string {
+  const shifted = new Date(date.getTime() + offsetMinutes * 60_000);
+
+  return `${shifted.toISOString().slice(0, 19)}${formatOffset(offsetMinutes)}`;
 }
 
 function decodeNonAsciiRuns(value: string): string {

@@ -33,10 +33,10 @@ describe('addMomentToList', () => {
 
   it('stores the canonical token for an equivalent encoding', () => {
     const store = createCookieStore();
-    const moment = `Caf%c3%a9@2026-01-01T00:00:00Z`;
+    const moment = `Caf%c3%a9@2026-01-01T00:00:00+00:00`;
 
     assert.equal(addMomentToList(store, moment), 'added');
-    assert.equal(store.get(MOMENT_LIST_COOKIE)?.value, 'Caf%C3%A9@2026-01-01T00:00:00Z');
+    assert.equal(store.get(MOMENT_LIST_COOKIE)?.value, 'Caf%C3%A9@2026-01-01T00:00:00+00:00');
   });
 
   it('filters malformed entries before appending', () => {
