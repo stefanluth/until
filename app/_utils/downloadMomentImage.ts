@@ -42,10 +42,13 @@ export async function downloadMomentImage({ id, name, date }: MomentImageTarget)
 function readTheme(): MomentImageTheme {
   const root = getComputedStyle(document.documentElement);
   const body = getComputedStyle(document.body);
+  const start = `rgb(${readRgbTriplet(root.getPropertyValue('--background-start-rgb'), '214, 219, 220')})`;
+  const end = `rgb(${readRgbTriplet(root.getPropertyValue('--background-end-rgb'), '255, 255, 255')})`;
+  const dark = document.documentElement.dataset.appearance === 'dark';
 
   return {
-    backgroundStart: `rgb(${readRgbTriplet(root.getPropertyValue('--background-start-rgb'), '214, 219, 220')})`,
-    backgroundEnd: `rgb(${readRgbTriplet(root.getPropertyValue('--background-end-rgb'), '255, 255, 255')})`,
+    backgroundStart: dark ? start : end,
+    backgroundEnd: dark ? end : start,
     foreground: body.color || 'rgb(0, 0, 0)',
     fontFamily: body.fontFamily || 'sans-serif',
   };
