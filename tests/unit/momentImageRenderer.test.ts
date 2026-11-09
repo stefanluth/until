@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import type { MomentImageContent, MomentImageTheme } from '../../app/_utils/momentImage.ts';
-import { MOMENT_IMAGE_SIZE, drawMomentImage } from '../../app/_utils/momentImageRenderer.ts';
+import { MOMENT_IMAGE_WIDTH, drawMomentImage } from '../../app/_utils/momentImageRenderer.ts';
 
 class FakeContext {
   font = '10px sans-serif';
@@ -62,15 +62,15 @@ function textWidth(entry: { text: string; font: string }): number {
   return entry.text.length * fontSize(entry.font) * 0.55;
 }
 
-function draw(content: MomentImageContent = CONTENT): FakeContext {
+function draw(content: MomentImageContent = CONTENT): { ctx: FakeContext; height: number } {
   const ctx = new FakeContext();
-  drawMomentImage(ctx as unknown as CanvasRenderingContext2D, content, THEME, MOMENT_IMAGE_SIZE);
-  return ctx;
+  const height = drawMomentImage(ctx as unknown as CanvasRenderingContext2D, content, THEME, MOMENT_IMAGE_WIDTH);
+  return { ctx, height };
 }
 
 describe('drawMomentImage', () => {
   it('draws the wordmark, name, date, units, and URL', () => {
-    const ctx = draw();
+    const { ctx } = draw();
     const all = ctx.texts.map((entry) => entry.text);
 
     assert.ok(all.includes('until'));
@@ -83,12 +83,12 @@ describe('drawMomentImage', () => {
   });
 
   it('keeps every text position and width inside the canvas', () => {
-    const ctx = draw();
+    const { ctx, height } = draw();
 
     for (const entry of ctx.texts) {
-      assert.ok(Number.isFinite(entry.x) && entry.x >= 0 && entry.x <= MOMENT_IMAGE_SIZE);
-      assert.ok(Number.isFinite(entry.y) && entry.y >= 0 && entry.y <= MOMENT_IMAGE_SIZE);
-      assert.ok(textWidth(entry) <= MOMENT_IMAGE_SIZE - 128);
+      assert.ok(Number.isFinite(entry.x) && entry.x >= 0 && entry.x <= MOMENT_IMAGE_WIDTH);
+      assert.ok(Number.isFinite(entry.y) && entry.y >= 0 && entry.y <= height);
+      assert.ok(textWidth(entry) <= MOMENT_IMAGE_WIDTH - 128);
     }
 
     const title = ctx.texts.find((entry) => entry.text === CONTENT.name);
@@ -101,15 +101,15 @@ describe('drawMomentImage', () => {
   });
 
   it('wraps and truncates a long name within the canvas', () => {
-    const ctx = draw({ ...CONTENT, name: 'a'.repeat(300) });
+    const { ctx, height } = draw({ ...CONTENT, name: 'a'.repeat(300) });
     const titleLines = ctx.texts.filter((entry) => /^a+\u2026?$/.test(entry.text));
 
     assert.ok(titleLines.length <= 3);
 
     for (const entry of ctx.texts) {
-      assert.ok(entry.x >= 0 && entry.x <= MOMENT_IMAGE_SIZE);
-      assert.ok(entry.y >= 0 && entry.y <= MOMENT_IMAGE_SIZE);
-      assert.ok(textWidth(entry) <= MOMENT_IMAGE_SIZE - 128);
+      assert.ok(entry.x >= 0 && entry.x <= MOMENT_IMAGE_WIDTH);
+      assert.ok(entry.y >= 0 && entry.y <= height);
+      assert.ok(textWidth(entry) <= MOMENT_IMAGE_WIDTH - 128);
     }
 
     const date = ctx.texts.find((entry) => entry.text === CONTENT.dateLabel);
@@ -122,7 +122,7 @@ describe('drawMomentImage', () => {
   });
 
   it('draws the ended message without unit values', () => {
-    const ctx = draw({ ...CONTENT, units: [] });
+    const { ctx } = draw({ ...CONTENT, units: [] });
     const all = ctx.texts.map((entry) => entry.text);
 
     assert.ok(all.includes('Timer finished.'));
@@ -131,7 +131,7 @@ describe('drawMomentImage', () => {
   });
 
   it('draws only the date when there is no time', () => {
-    const ctx = draw({ ...CONTENT, timeLabel: null });
+    const { ctx } = draw({ ...CONTENT, timeLabel: null });
     const all = ctx.texts.map((entry) => entry.text);
 
     assert.ok(all.includes('Friday, January 1, 2027'));
@@ -139,7 +139,7 @@ describe('drawMomentImage', () => {
   });
 
   it('uses the theme colors for the background gradient', () => {
-    const ctx = draw();
+    const { ctx } = draw();
 
     assert.deepEqual(ctx.gradientStops, [
       { offset: 0, color: THEME.backgroundStart },

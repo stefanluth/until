@@ -1,98 +1,187 @@
 import type { MomentImageContent, MomentImageTheme } from './momentImage';
 
-export const MOMENT_IMAGE_SIZE = 720;
+export const MOMENT_IMAGE_WIDTH = 720;
 
 const WORDMARK = 'until';
 const MAX_TITLE_LINES = 3;
 const MAX_TITLE_HEIGHT = 200;
-const UNIT_SIZES: Record<number, number> = { 1: 240, 2: 214, 3: 188, 4: 134 };
+const UNIT_SIZES: Record<number, number> = { 1: 240, 2: 214, 3: 188, 4: 104 };
+const PADDING = 64;
+const GAP = 64;
 
 type FontWeight = 400 | 600 | 700;
+
+type UnitsLayout = {
+  height: number;
+  numberSize: number;
+  labelSize: number;
+  labelOffset: number;
+  centers: number[];
+};
+
+type MomentImageLayout = {
+  width: number;
+  height: number;
+  scale: number;
+  padding: number;
+  centerX: number;
+  maxWidth: number;
+  foreground: string;
+  fontFamily: string;
+  wordmark: { y: number; size: number };
+  title: { y: number; size: number; lineHeight: number; lines: string[] };
+  date: { y: number; size: number };
+  units: (UnitsLayout & { top: number }) | null;
+  finished: { y: number; size: number } | null;
+  url: { y: number; size: number; text: string } | null;
+};
+
+export function layoutMomentImage(
+  ctx: CanvasRenderingContext2D,
+  content: MomentImageContent,
+  theme: MomentImageTheme,
+  width: number = MOMENT_IMAGE_WIDTH,
+): MomentImageLayout {
+  const scale = width / MOMENT_IMAGE_WIDTH;
+  const padding = PADDING * scale;
+  const gap = GAP * scale;
+  const maxWidth = width - padding * 2;
+  const centerX = width / 2;
+  const foreground = theme.foreground || 'rgb(0, 0, 0)';
+  const fontFamily = theme.fontFamily || 'sans-serif';
+  let y = padding;
+
+  const wordmarkSize = 46 * scale;
+  const wordmark = { y, size: wordmarkSize };
+  y += wordmarkSize + gap;
+
+  const title = fitTitle(ctx, content.name || ' ', maxWidth, scale, fontFamily);
+  const lineHeight = title.size * 1.12;
+  const titleLayout = { ...title, y, lineHeight };
+  y += (title.lines.length - 1) * lineHeight + title.size + gap;
+
+  const dateSize = measureDateLine(ctx, content, maxWidth, fontFamily, scale);
+  const date = { y, size: dateSize };
+  y += dateSize + gap;
+
+  let units: (UnitsLayout & { top: number }) | null = null;
+  let finished: { y: number; size: number } | null = null;
+
+  if (content.units.length === 0) {
+    const size = 70 * scale;
+    finished = { y, size };
+    y += size;
+  } else {
+    units = { ...layoutUnits(ctx, content, padding, width, fontFamily, scale), top: y };
+    y += units.height;
+  }
+
+  let url: { y: number; size: number; text: string } | null = null;
+
+  if (content.url) {
+    y += gap;
+    const fitted = fitLine(ctx, content.url, maxWidth, 28 * scale, 16 * scale, fontFamily, 400);
+    url = { y, size: fitted.size, text: fitted.text };
+    y += fitted.size;
+  }
+
+  return {
+    width,
+    height: Math.ceil(y + padding),
+    scale,
+    padding,
+    centerX,
+    maxWidth,
+    foreground,
+    fontFamily,
+    wordmark,
+    title: titleLayout,
+    date,
+    units,
+    finished,
+    url,
+  };
+}
 
 export function drawMomentImage(
   ctx: CanvasRenderingContext2D,
   content: MomentImageContent,
   theme: MomentImageTheme,
-  size: number = MOMENT_IMAGE_SIZE,
-): void {
-  const scale = size / MOMENT_IMAGE_SIZE;
-  const padding = 64 * scale;
-  const maxWidth = size - padding * 2;
-  const centerX = size / 2;
-  const foreground = theme.foreground || 'rgb(0, 0, 0)';
-  const fontFamily = theme.fontFamily || 'sans-serif';
+  width: number = MOMENT_IMAGE_WIDTH,
+): number {
+  const layout = layoutMomentImage(ctx, content, theme, width);
+  const { height, maxWidth, scale, centerX, padding, foreground, fontFamily } = layout;
 
   ctx.save();
 
-  const background = ctx.createLinearGradient(0, 0, 0, size);
+  const background = ctx.createLinearGradient(0, 0, 0, height);
   background.addColorStop(0, theme.backgroundStart);
   background.addColorStop(1, theme.backgroundEnd);
   ctx.fillStyle = background;
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(0, 0, layout.width, height);
 
   ctx.fillStyle = foreground;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   ctx.globalAlpha = 0.9;
-  ctx.font = font(600, 46 * scale, fontFamily);
-  ctx.fillText(WORDMARK, padding, 40 * scale);
-
-  const title = fitTitle(ctx, content.name || ' ', maxWidth, scale, fontFamily);
-  const titleTop = 128 * scale;
-  const titleLineHeight = title.size * 1.12;
+  ctx.font = font(600, layout.wordmark.size, fontFamily);
+  ctx.fillText(WORDMARK, padding, layout.wordmark.y);
 
   ctx.textAlign = 'center';
   ctx.globalAlpha = 1;
-  ctx.font = font(700, title.size, fontFamily);
-  title.lines.forEach((line, index) => {
-    ctx.fillText(line, centerX, titleTop + index * titleLineHeight);
+  ctx.font = font(700, layout.title.size, fontFamily);
+  layout.title.lines.forEach((line, index) => {
+    ctx.fillText(line, centerX, layout.title.y + index * layout.title.lineHeight);
   });
 
-  const titleBottom = titleTop + (title.lines.length - 1) * titleLineHeight + title.size;
-  const dateY = titleBottom + 24 * scale;
-  const dateSize = drawDateLine(ctx, content, centerX, dateY, maxWidth, fontFamily, scale, foreground);
+  drawDateLine(ctx, content, centerX, layout.date.y, maxWidth, fontFamily, scale, foreground, layout.date.size);
 
-  const url = content.url ? fitLine(ctx, content.url, maxWidth, 28 * scale, 16 * scale, fontFamily, 400) : null;
-  const urlBaseline = size - 38 * scale;
-  const bandTop = dateY + dateSize + 16 * scale;
-  const bandBottom = url ? urlBaseline - url.size : size - padding;
-
-  if (content.units.length === 0) {
+  if (layout.finished) {
     ctx.globalAlpha = 1;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.font = font(700, 70 * scale, fontFamily);
-    ctx.fillText('Timer finished.', centerX, (bandTop + bandBottom) / 2);
-  } else {
-    drawUnits(ctx, content, bandTop, bandBottom, padding, maxWidth, fontFamily, scale, foreground);
+    ctx.font = font(700, layout.finished.size, fontFamily);
+    ctx.fillText('Timer finished.', centerX, layout.finished.y + layout.finished.size / 2);
+  } else if (layout.units) {
+    drawUnits(ctx, content, layout.units, fontFamily, foreground);
   }
 
-  if (url) {
+  if (layout.url) {
     ctx.globalAlpha = 0.7;
-    ctx.textBaseline = 'bottom';
+    ctx.textBaseline = 'top';
     ctx.textAlign = 'center';
-    ctx.font = font(400, url.size, fontFamily);
-    ctx.fillText(url.text, centerX, urlBaseline);
+    ctx.font = font(400, layout.url.size, fontFamily);
+    ctx.fillText(layout.url.text, centerX, layout.url.y);
   }
 
   ctx.restore();
+
+  return height;
 }
 
 export async function renderMomentImagePng(
   content: MomentImageContent,
   theme: MomentImageTheme,
-  size: number = MOMENT_IMAGE_SIZE,
+  width: number = MOMENT_IMAGE_WIDTH,
 ): Promise<Blob> {
   const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
+  canvas.width = width;
+  canvas.height = width;
+
+  let ctx = canvas.getContext('2d');
 
   if (!ctx) {
     throw new Error('Canvas 2D is not available');
   }
 
-  drawMomentImage(ctx, content, theme, size);
+  canvas.height = layoutMomentImage(ctx, content, theme, width).height;
+  ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('Canvas 2D is not available');
+  }
+
+  drawMomentImage(ctx, content, theme, width);
 
   return await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
@@ -114,6 +203,34 @@ export function triggerPngDownload(blob: Blob, filename: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function measureDateLine(
+  ctx: CanvasRenderingContext2D,
+  content: MomentImageContent,
+  maxWidth: number,
+  fontFamily: string,
+  scale: number,
+): number {
+  const gap = 12 * scale;
+  const dividerWidth = Math.max(1, scale);
+  const minSize = Math.round(20 * scale);
+  const hasTime = content.timeLabel !== null;
+  const measureWidth = (size: number) => {
+    ctx.font = font(400, size, fontFamily);
+    const dateWidth = ctx.measureText(content.dateLabel).width;
+    const timeWidth = content.timeLabel ? ctx.measureText(content.timeLabel).width : 0;
+
+    return dateWidth + (hasTime ? gap + dividerWidth + gap + timeWidth : 0);
+  };
+
+  let size = Math.round(32 * scale);
+
+  while (size > minSize && measureWidth(size) > maxWidth) {
+    size -= 2;
+  }
+
+  return size;
+}
+
 function drawDateLine(
   ctx: CanvasRenderingContext2D,
   content: MomentImageContent,
@@ -123,29 +240,18 @@ function drawDateLine(
   fontFamily: string,
   scale: number,
   foreground: string,
-): number {
+  size: number,
+): void {
   const gap = 12 * scale;
   const dividerWidth = Math.max(1, scale);
-  const minSize = Math.round(20 * scale);
   const hasTime = content.timeLabel !== null;
-  const measureGroup = (size: number) => {
-    ctx.font = font(400, size, fontFamily);
-    const dateWidth = ctx.measureText(content.dateLabel).width;
-    const timeWidth = content.timeLabel ? ctx.measureText(content.timeLabel).width : 0;
-    const totalWidth = dateWidth + (hasTime ? gap + dividerWidth + gap + timeWidth : 0);
 
-    return { dateWidth, timeWidth, totalWidth };
-  };
+  ctx.font = font(400, size, fontFamily);
 
-  let size = Math.round(32 * scale);
-  let { dateWidth, timeWidth, totalWidth } = measureGroup(size);
-
-  while (size > minSize && totalWidth > maxWidth) {
-    size -= 2;
-    ({ dateWidth, timeWidth, totalWidth } = measureGroup(size));
-  }
-
+  const timeWidth = content.timeLabel ? ctx.measureText(content.timeLabel).width : 0;
   let dateText = content.dateLabel;
+  let dateWidth = ctx.measureText(dateText).width;
+  let totalWidth = dateWidth + (hasTime ? gap + dividerWidth + gap + timeWidth : 0);
 
   if (totalWidth > maxWidth) {
     const available = maxWidth - (hasTime ? gap + dividerWidth + gap + timeWidth : 0);
@@ -164,7 +270,7 @@ function drawDateLine(
   ctx.fillText(dateText, x, y);
 
   if (!content.timeLabel) {
-    return size;
+    return;
   }
 
   x += dateWidth + gap;
@@ -173,49 +279,104 @@ function drawDateLine(
   x += dividerWidth + gap;
   ctx.globalAlpha = 0.8;
   ctx.fillText(content.timeLabel, x, y);
+}
 
-  return size;
+function layoutUnits(
+  ctx: CanvasRenderingContext2D,
+  content: MomentImageContent,
+  padding: number,
+  width: number,
+  fontFamily: string,
+  scale: number,
+): UnitsLayout {
+  const count = content.units.length;
+  const available = width - padding * 2;
+  const minGap = 24 * scale;
+
+  const measureNumbers = (fontSize: number) =>
+    content.units.map((entry) => {
+      ctx.font = font(700, fontSize, fontFamily);
+      return ctx.measureText(String(entry.value)).width;
+    });
+
+  const measureLabels = (fontSize: number) => {
+    ctx.font = font(400, fontSize, fontFamily);
+    return content.units.map((entry) => ctx.measureText(entry.label.toUpperCase()).width);
+  };
+
+  let numberSize = (UNIT_SIZES[count] ?? 104) * scale;
+  let numberWidths = measureNumbers(numberSize);
+  const totalNumberWidth = numberWidths.reduce((sum, entry) => sum + entry, 0);
+  const boxWidthsFor = (labelWidths: number[]) =>
+    numberWidths.map((numberWidth, index) => Math.max(numberWidth, labelWidths[index]));
+
+  if (count > 1 && totalNumberWidth + minGap * (count - 1) > available) {
+    numberSize *= (available - minGap * (count - 1)) / totalNumberWidth;
+    numberWidths = measureNumbers(numberSize);
+  }
+
+  numberSize = Math.max(1, Math.round(numberSize));
+  numberWidths = measureNumbers(numberSize);
+
+  const fits = (labelSize: number) => {
+    const boxWidths = boxWidthsFor(measureLabels(labelSize));
+
+    return boxWidths.reduce((sum, box) => sum + box, 0) + minGap * (count - 1) <= available;
+  };
+
+  let labelSize = 40 * scale;
+
+  if (count > 1 && !fits(labelSize)) {
+    let low = 1;
+    let high = labelSize;
+
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      const middle = (low + high) / 2;
+
+      if (fits(middle)) {
+        low = middle;
+      } else {
+        high = middle;
+      }
+    }
+
+    labelSize = low;
+  }
+
+  labelSize = Math.max(1, Math.round(labelSize));
+
+  const labelWidths = measureLabels(labelSize);
+  const boxWidths = boxWidthsFor(labelWidths);
+  const totalBoxWidth = boxWidths.reduce((sum, box) => sum + box, 0);
+  const gap = count > 1 ? (available - totalBoxWidth) / (count - 1) : 0;
+  const centers: number[] = [];
+  let cursor = padding + (count === 1 ? (available - totalBoxWidth) / 2 : 0);
+
+  for (const boxWidth of boxWidths) {
+    centers.push(cursor + boxWidth / 2);
+    cursor += boxWidth + gap;
+  }
+
+  const labelOffset = numberSize * 0.6;
+
+  return {
+    height: numberSize / 2 + labelOffset + labelSize / 2,
+    numberSize,
+    labelSize,
+    labelOffset,
+    centers,
+  };
 }
 
 function drawUnits(
   ctx: CanvasRenderingContext2D,
   content: MomentImageContent,
-  bandTop: number,
-  bandBottom: number,
-  padding: number,
-  maxWidth: number,
+  layout: UnitsLayout & { top: number },
   fontFamily: string,
-  scale: number,
   foreground: string,
 ): void {
-  const count = content.units.length;
-  const gap = count > 1 ? 12 * scale : 0;
-  const columnWidth = (maxWidth - gap * (count - 1)) / count;
-  const base = UNIT_SIZES[count] ?? 134;
-  const maxTextWidth = columnWidth * 0.92;
-
-  let numberSize = base * scale;
-  ctx.font = font(700, numberSize, fontFamily);
-  const widestNumber = Math.max(...content.units.map((entry) => ctx.measureText(String(entry.value)).width));
-  if (widestNumber > maxTextWidth) {
-    numberSize *= maxTextWidth / widestNumber;
-  }
-
-  let labelSize = 27 * scale;
-  ctx.font = font(400, labelSize, fontFamily);
-  const widestLabel = Math.max(...content.units.map((entry) => ctx.measureText(entry.label.toUpperCase()).width));
-  if (widestLabel > maxTextWidth) {
-    labelSize *= maxTextWidth / widestLabel;
-  }
-
-  const bandHeight = Math.max(0, bandBottom - bandTop);
-  const maxNumberByHeight = Math.max(0, (bandHeight - labelSize / 2) / 1.22);
-  numberSize = Math.max(1, Math.round(Math.min(numberSize, maxNumberByHeight)));
-  labelSize = Math.max(1, Math.round(labelSize));
-
-  const blockHeight = numberSize * 1.22 + labelSize / 2;
-  const blockTop = bandTop + Math.max(0, (bandHeight - blockHeight) / 2);
-  const unitsY = blockTop + numberSize / 2;
+  const { top, numberSize, labelSize, labelOffset, centers } = layout;
+  const unitsY = top + numberSize / 2;
 
   ctx.fillStyle = foreground;
   ctx.textAlign = 'center';
@@ -223,12 +384,12 @@ function drawUnits(
   ctx.globalAlpha = 1;
 
   content.units.forEach((entry, index) => {
-    const x = padding + index * (columnWidth + gap) + columnWidth / 2;
+    const x = centers[index];
     ctx.font = font(700, numberSize, fontFamily);
     ctx.fillText(String(entry.value), x, unitsY);
     ctx.globalAlpha = 0.8;
     ctx.font = font(400, labelSize, fontFamily);
-    ctx.fillText(entry.label.toUpperCase(), x, unitsY + numberSize * 0.72);
+    ctx.fillText(entry.label.toUpperCase(), x, unitsY + labelOffset);
     ctx.globalAlpha = 1;
   });
 }
