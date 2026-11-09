@@ -8,7 +8,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useEffectEvent,
   useId,
   useRef,
   useState,
@@ -98,17 +97,13 @@ export function Menu({
     setPanelLimit(Math.max(0, (nextSide === 'top' ? above : below) - 16));
   }, [placement]);
 
-  const handleResize = useEffectEvent(() => {
-    measure();
-  });
-
-  const toggle = useCallback(() => {
+  function toggle() {
     if (!open) {
       measure();
     }
 
     setOpen((value) => !value);
-  }, [open, measure]);
+  }
 
   useEffect(() => {
     if (!open) {
@@ -134,21 +129,16 @@ export function Menu({
     document.addEventListener('pointerdown', handlePointerDown);
     document.addEventListener('keydown', handleKeyDown);
 
+    if (placement === 'auto') {
+      window.addEventListener('resize', measure);
+    }
+
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', measure);
     };
-  }, [open, autoFocusFirst, close]);
-
-  useEffect(() => {
-    if (!open || placement !== 'auto') {
-      return;
-    }
-
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, [open, placement]);
+  }, [open, autoFocusFirst, close, placement, measure]);
 
   const resolvedPlacement = placement === 'auto' ? side : placement;
   const positionClass = resolvedPlacement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2';

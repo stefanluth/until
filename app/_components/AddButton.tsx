@@ -10,20 +10,20 @@ import { useConsentAction } from './useConsentAction';
 export function AddButton({
   id,
   onAdded,
-  showLabel = false,
+  withLabel = false,
 }: {
   id: string;
   onAdded?: () => void;
-  showLabel?: boolean;
+  withLabel?: boolean;
 }) {
   const { pending, run } = useConsentAction(() => saveMoment(id), ['added', 'exists'], onAdded);
 
   return (
     <ActionButton
       icon={Bookmark}
-      label="Save"
+      label="Save to list"
       description="Save this moment to your list"
-      variant={showLabel ? 'label' : 'icon'}
+      variant={withLabel ? 'menu' : 'icon'}
       pending={pending}
       onClick={run}
     />

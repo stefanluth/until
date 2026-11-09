@@ -55,24 +55,46 @@ function SaveOrRemoveButton({
   momentInCookies,
   onAdded,
   onRemoved,
+  withLabel = false,
+  onDone,
 }: {
   id: string;
   momentInCookies: boolean | null;
   onAdded: () => void;
   onRemoved: () => void;
+  withLabel?: boolean;
+  onDone?: () => void;
 }) {
   if (momentInCookies === true) {
-    return <RemoveButton id={id} onRemoved={onRemoved} />;
+    return (
+      <RemoveButton
+        id={id}
+        withLabel={withLabel}
+        onRemoved={() => {
+          onRemoved();
+          onDone?.();
+        }}
+      />
+    );
   }
 
   if (momentInCookies === false) {
-    return <AddButton id={id} onAdded={onAdded} />;
+    return (
+      <AddButton
+        id={id}
+        withLabel={withLabel}
+        onAdded={() => {
+          onAdded();
+          onDone?.();
+        }}
+      />
+    );
   }
 
   return null;
 }
 
-function InlineActions({ id, name, date, momentInCookies, onAdded, onRemoved, className }: ActionProps) {
+function ActionRow({ id, name, date, momentInCookies, onAdded, onRemoved, className }: ActionProps) {
   return (
     <div className={className}>
       <ShareActions id={id} name={name} date={date} withLabel={false} />
@@ -101,29 +123,16 @@ function MomentMenu({
   return (
     <>
       <ShareActions id={id} name={name} date={date} withLabel />
-      {momentInCookies === true && (
+      {momentInCookies !== null && (
         <>
           <div className="my-1 h-px bg-black/10 dark:bg-white/10" aria-hidden />
-          <RemoveButton
+          <SaveOrRemoveButton
             id={id}
+            momentInCookies={momentInCookies}
+            onAdded={onAdded}
+            onRemoved={onRemoved}
             withLabel
-            onRemoved={() => {
-              onRemoved();
-              close();
-            }}
-          />
-        </>
-      )}
-      {momentInCookies === false && (
-        <>
-          <div className="my-1 h-px bg-black/10 dark:bg-white/10" aria-hidden />
-          <AddButton
-            id={id}
-            showLabel
-            onAdded={() => {
-              onAdded();
-              close();
-            }}
+            onDone={close}
           />
         </>
       )}
@@ -193,10 +202,10 @@ export function MomentCardActions({
               onRemoved={markRemoved}
             />
           </Menu>
-          <InlineActions {...inline} className="hidden items-center gap-5 sm:flex" />
+          <ActionRow {...inline} className="hidden items-center gap-5 sm:flex" />
         </>
       ) : (
-        <InlineActions {...inline} className="flex items-center gap-1 sm:gap-5" />
+        <ActionRow {...inline} className="flex items-center gap-1 sm:gap-5" />
       )}
     </div>
   );

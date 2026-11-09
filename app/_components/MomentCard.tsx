@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -14,7 +14,7 @@ import { MomentTimer } from './MomentTimer';
 
 export default function MomentCard({ variant = 'card', ...moment }: Moment & { variant?: MomentVariant }) {
   const [now, setNow] = useState(() => Date.now());
-  const momentTime = useMemo(() => moment.date.getTime(), [moment.date]);
+  const momentTime = moment.date.getTime();
 
   useEffect(() => {
     if (momentTime <= Date.now()) return;
