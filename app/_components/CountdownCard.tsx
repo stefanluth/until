@@ -32,13 +32,7 @@ export default function CountdownCard({ variant = 'card', ...countdown }: Countd
     return (
       <div className="flex flex-1 flex-col items-center justify-center w-full max-w-6xl px-4 mx-auto text-center">
         <CountdownCardHeader name={countdown.name} date={countdown.date} variant="detail" />
-        <CountdownCardBody
-          d={remaining.days}
-          h={remaining.hours}
-          m={remaining.minutes}
-          s={remaining.seconds}
-          variant="detail"
-        />
+        <CountdownCardBody parts={remaining} variant="detail" />
       </div>
     );
   }
@@ -53,7 +47,7 @@ export default function CountdownCard({ variant = 'card', ...countdown }: Countd
       </div>
       <div className="pointer-events-none flex flex-1 flex-col">
         <CountdownCardHeader name={countdown.name} date={countdown.date} variant="card" />
-        <CountdownCardBody d={remaining.days} h={remaining.hours} m={remaining.minutes} s={remaining.seconds} />
+        <CountdownCardBody parts={remaining} />
       </div>
     </div>
   );

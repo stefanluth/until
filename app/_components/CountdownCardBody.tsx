@@ -1,5 +1,5 @@
 import { unitLabel } from '@/_utils/countdownDisplay';
-import { type CountdownUnit, getVisibleUnits } from '@/_utils/duration';
+import { type CountdownParts, getVisibleUnits } from '@/_utils/duration';
 import type { CountdownVariant } from '@/types';
 
 const CARD_ROW_CLASS =
@@ -13,21 +13,8 @@ const DETAIL_VALUE_CLASS =
   'text-5xl font-semibold leading-none tabular-nums tracking-tight min-[380px]:text-6xl sm:text-7xl md:text-8xl lg:text-9xl';
 const DETAIL_LABEL_CLASS = 'text-xs uppercase tracking-[0.2em] opacity-75 sm:text-base md:text-lg lg:text-xl';
 
-export function CountdownCardBody({
-  d,
-  h,
-  m,
-  s,
-  variant = 'card',
-}: {
-  d: number;
-  h: number;
-  m: number;
-  s: number;
-  variant?: CountdownVariant;
-}) {
-  const values: Record<CountdownUnit, number> = { days: d, hours: h, minutes: m, seconds: s };
-  const visible = getVisibleUnits(values);
+export function CountdownCardBody({ parts, variant = 'card' }: { parts: CountdownParts; variant?: CountdownVariant }) {
+  const visible = getVisibleUnits(parts);
   const isDetail = variant === 'detail';
 
   return (
@@ -36,9 +23,9 @@ export function CountdownCardBody({
         visible.map((unit) => (
           <div key={unit} className="flex flex-col items-center">
             <span className={isDetail ? DETAIL_VALUE_CLASS : CARD_VALUE_CLASS} suppressHydrationWarning>
-              {values[unit]}
+              {parts[unit]}
             </span>
-            <span className={isDetail ? DETAIL_LABEL_CLASS : CARD_LABEL_CLASS}>{unitLabel(unit, values[unit])}</span>
+            <span className={isDetail ? DETAIL_LABEL_CLASS : CARD_LABEL_CLASS}>{unitLabel(unit, parts[unit])}</span>
           </div>
         ))
       ) : (
