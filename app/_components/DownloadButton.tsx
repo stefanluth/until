@@ -2,10 +2,8 @@
 
 import { Download } from 'lucide-react';
 
-import { useState } from 'react';
-
 import { ActionButton } from './ActionButton';
-import { useDelayedPending } from './useDelayedPending';
+import { useMomentImageAction } from './useMomentImageAction';
 
 export function DownloadButton({
   id,
@@ -18,27 +16,11 @@ export function DownloadButton({
   date: Date;
   withLabel?: boolean;
 }) {
-  const { pending, start, finish } = useDelayedPending();
-  const [failed, setFailed] = useState(false);
+  const { pending, failed, run } = useMomentImageAction(async () => {
+    const { downloadMomentImage } = await import('@/_utils/downloadMomentImage');
 
-  async function save() {
-    if (!start()) {
-      return;
-    }
-
-    setFailed(false);
-
-    try {
-      const { downloadMomentImage } = await import('@/_utils/downloadMomentImage');
-      await downloadMomentImage({ id, name, date });
-    } catch (error) {
-      console.error('Failed to save the moment image', error);
-      setFailed(true);
-      setTimeout(() => setFailed(false), 2000);
-    } finally {
-      finish();
-    }
-  }
+    await downloadMomentImage({ id, name, date });
+  }, 'Failed to save the moment image');
 
   const label = failed ? 'Download failed' : pending ? 'Downloading image…' : 'Download image';
   const description = failed
@@ -56,7 +38,7 @@ export function DownloadButton({
       variant={withLabel ? 'menu' : 'icon'}
       pending={pending}
       status={status}
-      onClick={save}
+      onClick={run}
     />
   );
 }

@@ -5,7 +5,7 @@ import { ClipboardCheck, Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import { ActionButton } from './ActionButton';
-import { useDelayedPending } from './useDelayedPending';
+import { useMomentImageAction } from './useMomentImageAction';
 
 type CopyStatus = 'idle' | 'copying' | 'copied' | 'failed';
 
@@ -15,52 +15,6 @@ const COPY_STATE: Record<CopyStatus, { label: string; description: string; annou
   copied: { label: 'Copied!', description: 'Copied!', announcement: 'Copied!' },
   failed: { label: 'Copy failed', description: 'Could not copy the image', announcement: 'Could not copy the image' },
 };
-
-function getCopyStatus(failed: boolean, pending: boolean, copied: boolean): CopyStatus {
-  if (failed) {
-    return 'failed';
-  }
-
-  if (pending) {
-    return 'copying';
-  }
-
-  if (copied) {
-    return 'copied';
-  }
-
-  return 'idle';
-}
-
-function useCopyImage({ id, name, date }: { id: string; name: string; date: Date }) {
-  const { pending, start, finish } = useDelayedPending();
-  const [failed, setFailed] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  async function copy() {
-    if (!start()) {
-      return;
-    }
-
-    setFailed(false);
-    setCopied(false);
-
-    try {
-      const { copyMomentImage } = await import('@/_utils/downloadMomentImage');
-      await copyMomentImage({ id, name, date });
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch (error) {
-      console.error('Failed to copy the moment image', error);
-      setFailed(true);
-      setTimeout(() => setFailed(false), 2000);
-    } finally {
-      finish();
-    }
-  }
-
-  return { pending, status: getCopyStatus(failed, pending, copied), copy };
-}
 
 export function CopyImageButton({
   id,
@@ -73,7 +27,17 @@ export function CopyImageButton({
   date: Date;
   withLabel?: boolean;
 }) {
-  const { pending, status, copy } = useCopyImage({ id, name, date });
+  const [copied, setCopied] = useState(false);
+  const { pending, failed, run } = useMomentImageAction(async () => {
+    setCopied(false);
+
+    const { copyMomentImage } = await import('@/_utils/downloadMomentImage');
+
+    await copyMomentImage({ id, name, date });
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, 'Failed to copy the moment image');
+  const status: CopyStatus = failed ? 'failed' : pending ? 'copying' : copied ? 'copied' : 'idle';
   const { label, description, announcement } = COPY_STATE[status];
 
   return (
@@ -84,7 +48,7 @@ export function CopyImageButton({
       variant={withLabel ? 'menu' : 'icon'}
       pending={pending}
       status={announcement}
-      onClick={copy}
+      onClick={run}
     />
   );
 }
