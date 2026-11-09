@@ -3,8 +3,7 @@ import { join } from 'node:path';
 
 import { ImageResponse } from 'next/og';
 
-import { buildMomentImageContent } from '@/_utils/momentImage';
-import type { MomentImageContent } from '@/_utils/momentImageTypes';
+import { type MomentImageContent, buildMomentImageContent } from '@/_utils/momentImage';
 import { decodeMomentParam, momentDisplayPath, offsetMinutes } from '@/_utils/momentUrl';
 import { resolveSiteUrl } from '@/_utils/siteUrl';
 import { splitRemaining } from '@/_utils/timer';

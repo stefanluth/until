@@ -66,7 +66,7 @@ export function ModeToggle() {
     <Menu
       label="Color mode"
       placement="top"
-      widthClass="w-40"
+      className="w-40"
       trigger={({ triggerRef, triggerProps }) => (
         <button
           ref={triggerRef}

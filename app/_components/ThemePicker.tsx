@@ -59,7 +59,7 @@ export function ThemePicker() {
     <Menu
       label="Themes"
       placement="top"
-      widthClass="w-40"
+      className="w-40"
       trigger={({ triggerRef, triggerProps }) => (
         <button
           ref={triggerRef}

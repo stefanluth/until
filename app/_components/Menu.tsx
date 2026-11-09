@@ -13,10 +13,6 @@ import {
   useState,
 } from 'react';
 
-type MenuPlacement = 'top' | 'bottom' | 'auto';
-type MenuWidthClass = 'w-40' | 'w-56';
-type MenuZClass = 'z-20' | 'z-30';
-
 type MenuTrigger = {
   triggerRef: RefObject<HTMLButtonElement | null>;
   triggerProps: {
@@ -43,25 +39,14 @@ export function useMenuClose(): MenuClose {
 
 type MenuProps = {
   label: string;
-  placement: MenuPlacement;
-  widthClass: MenuWidthClass;
-  zClass?: MenuZClass;
+  placement: 'top' | 'bottom' | 'auto';
   autoFocusFirst?: boolean;
   className?: string;
   trigger: (props: MenuTrigger) => ReactNode;
   children: ReactNode;
 };
 
-export function Menu({
-  label,
-  placement,
-  widthClass,
-  zClass = 'z-20',
-  autoFocusFirst = false,
-  className,
-  trigger,
-  children,
-}: MenuProps) {
+export function Menu({ label, placement, autoFocusFirst = false, className, trigger, children }: MenuProps) {
   const [open, setOpen] = useState(false);
   const [side, setSide] = useState<'top' | 'bottom'>(placement === 'bottom' ? 'bottom' : 'top');
   const [panelLimit, setPanelLimit] = useState<number | null>(null);
@@ -146,7 +131,7 @@ export function Menu({
     placement === 'auto' && panelLimit !== null ? { maxHeight: panelLimit, overflowY: 'auto' } : undefined;
 
   return (
-    <div ref={containerRef} className={className ? `relative ${className}` : 'relative'}>
+    <div ref={containerRef} className="relative">
       {trigger({
         triggerRef,
         triggerProps: {
@@ -163,7 +148,7 @@ export function Menu({
           role="group"
           aria-label={label}
           style={panelStyle}
-          className={`absolute right-0 ${positionClass} ${zClass} flex ${widthClass} flex-col gap-1 rounded-2xl border border-white/50 bg-white/50 p-2 shadow-xl backdrop-blur-sm dark:border-white/20 dark:bg-black/50`}
+          className={`absolute right-0 ${positionClass} flex flex-col gap-1 rounded-2xl border border-white/50 bg-white/50 p-2 shadow-xl backdrop-blur-sm dark:border-white/20 dark:bg-black/50 ${className ?? ''}`}
         >
           <MenuCloseContext.Provider value={close}>{children}</MenuCloseContext.Provider>
         </div>

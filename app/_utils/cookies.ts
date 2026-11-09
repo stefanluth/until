@@ -7,13 +7,10 @@ export const COOKIE_OPTIONS = {
   sameSite: 'lax',
 } as const;
 
-type CookieOptions = {
-  maxAge: number;
-  path: string;
-  sameSite: 'lax' | 'strict' | 'none';
-};
-
-export function browserCookieOptions(protocol: string, options: CookieOptions = COOKIE_OPTIONS) {
+export function browserCookieOptions(
+  protocol: string,
+  options: { maxAge: number; path: string; sameSite: 'lax' | 'strict' | 'none' } = COOKIE_OPTIONS,
+) {
   return {
     expires: options.maxAge / (60 * 60 * 24),
     path: options.path,

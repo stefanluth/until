@@ -4,17 +4,21 @@ const CONTROL_CHARACTER_RE = /[\u0000-\u001f\u007f]/;
 
 export type MomentField = 'name' | 'when';
 
-type FieldResult<T> = { ok: true; value: T } | { ok: false; error: string; location: MomentField };
+type ValidationResult = { ok: true; value: string } | { ok: false; error: string; location: MomentField };
 
-type TextValidation = {
+function validateText({
+  value,
+  required,
+  tooLong,
+  maxLength,
+  location,
+}: {
   value: unknown;
   required: string;
   tooLong: string;
   maxLength: number;
   location: MomentField;
-};
-
-function validateText({ value, required, tooLong, maxLength, location }: TextValidation): FieldResult<string> {
+}): ValidationResult {
   if (typeof value !== 'string') {
     return { ok: false, error: required, location };
   }
@@ -32,7 +36,7 @@ function validateText({ value, required, tooLong, maxLength, location }: TextVal
   return { ok: true, value: text };
 }
 
-export function validateMomentName(value: unknown): FieldResult<string> {
+export function validateMomentName(value: unknown): ValidationResult {
   const result = validateText({
     value,
     required: 'Name is required',
@@ -61,7 +65,7 @@ function isWellFormed(value: string): boolean {
   }
 }
 
-export function validateMomentWhen(value: unknown): FieldResult<string> {
+export function validateMomentWhen(value: unknown): ValidationResult {
   return validateText({
     value,
     required: 'Duration or date is required',

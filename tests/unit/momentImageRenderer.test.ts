@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import type { MomentImageContent, MomentImageTheme } from '../../app/_utils/momentImage.ts';
 import { MOMENT_IMAGE_SIZE, drawMomentImage } from '../../app/_utils/momentImageRenderer.ts';
-import type { MomentImageContent, MomentImageTheme } from '../../app/_utils/momentImageTypes.ts';
 
 class FakeContext {
   font = '10px sans-serif';

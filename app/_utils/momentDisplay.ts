@@ -1,9 +1,4 @@
-type DateParts = {
-  date: string;
-  time: string | null;
-};
-
-export function formatDateParts(date: Date, locale?: string, timeZone?: string): DateParts {
+export function formatDateParts(date: Date, locale?: string, timeZone?: string) {
   const time = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone });
   const dateString = date.toLocaleDateString(locale, {
     weekday: 'long',

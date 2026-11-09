@@ -1,8 +1,22 @@
 import { formatDateParts } from './momentDisplay.ts';
-import type { MomentImageContent } from './momentImageTypes.ts';
 import { slugify } from './slug.ts';
-import { type RemainingParts, getVisibleUnits } from './timer.ts';
+import { type RemainingParts, type TimeUnit, getVisibleUnits } from './timer.ts';
 import { unitLabel } from './timerDisplay.ts';
+
+export type MomentImageContent = {
+  name: string;
+  dateLabel: string;
+  timeLabel: string | null;
+  units: { unit: TimeUnit; value: number; label: string }[];
+  url?: string;
+};
+
+export type MomentImageTheme = {
+  backgroundStart: string;
+  backgroundEnd: string;
+  foreground: string;
+  fontFamily: string;
+};
 
 export function buildMomentImageContent({
   name,

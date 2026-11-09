@@ -1,15 +1,11 @@
 import { COOKIE_OPTIONS } from '../../app/_utils/cookies.ts';
+import type { MomentCookieStore } from '../../app/_utils/momentList.ts';
 
 type CookieStoreCall =
   | { type: 'set'; name: string; value: string; options: typeof COOKIE_OPTIONS }
   | { type: 'delete'; options: { name: string; path: string } };
 
-export type FakeCookieStore = {
-  calls: CookieStoreCall[];
-  get(name: string): { value: string } | undefined;
-  set(name: string, value: string, options: typeof COOKIE_OPTIONS): void;
-  delete(options: { name: string; path: string }): void;
-};
+export type FakeCookieStore = MomentCookieStore & { calls: CookieStoreCall[] };
 
 export function createCookieStore(initial: Record<string, string> = {}): FakeCookieStore {
   const values = new Map(Object.entries(initial));

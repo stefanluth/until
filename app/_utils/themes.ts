@@ -6,15 +6,8 @@ export type ThemeId = 'default' | 'sunset' | 'ocean' | 'forest';
 export const MODES = ['light', 'dark', 'system'] as const;
 
 export type Mode = (typeof MODES)[number];
-type Appearance = 'light' | 'dark';
 
-type ThemeDefinition = {
-  id: ThemeId;
-  label: string;
-  swatch: string;
-};
-
-export const THEMES: readonly ThemeDefinition[] = [
+export const THEMES: readonly { id: ThemeId; label: string; swatch: string }[] = [
   { id: 'default', label: 'Default', swatch: 'linear-gradient(135deg, #d8b4fe, #6b21a8)' },
   { id: 'sunset', label: 'Sunset', swatch: 'linear-gradient(135deg, #fdba74, #ea580c)' },
   { id: 'ocean', label: 'Ocean', swatch: 'linear-gradient(135deg, #7dd3fc, #2563eb)' },
@@ -28,8 +21,6 @@ const THEME_IDS: ReadonlySet<string> = new Set<string>(THEMES.map((theme) => the
 const MODE_IDS: ReadonlySet<string> = new Set<string>(MODES);
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
-type ThemeRoot = { dataset: { theme?: string } };
-type ModeRoot = { dataset: { mode?: string; appearance?: string } };
 
 export function isThemeId(value: unknown): value is ThemeId {
   return typeof value === 'string' && THEME_IDS.has(value);
@@ -73,7 +64,7 @@ export function storeMode(mode: Mode, storage: StorageLike | null = getStorage()
   storeValue(MODE_STORAGE_KEY, mode, storage);
 }
 
-export function resolveAppearance(mode: Mode, prefersDark: boolean): Appearance {
+export function resolveAppearance(mode: Mode, prefersDark: boolean) {
   if (mode === 'light' || mode === 'dark') {
     return mode;
   }
@@ -89,7 +80,7 @@ function prefersDark(): boolean {
   }
 }
 
-export function applyTheme(id: ThemeId, root: ThemeRoot = document.documentElement): void {
+export function applyTheme(id: ThemeId, root: { dataset: { theme?: string } } = document.documentElement): void {
   if (id === DEFAULT_THEME) {
     delete root.dataset.theme;
 
@@ -101,7 +92,7 @@ export function applyTheme(id: ThemeId, root: ThemeRoot = document.documentEleme
 
 export function applyMode(
   mode: Mode,
-  root: ModeRoot = document.documentElement,
+  root: { dataset: { mode?: string; appearance?: string } } = document.documentElement,
   systemPrefersDark = prefersDark(),
 ): void {
   root.dataset.mode = mode;

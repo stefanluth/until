@@ -30,16 +30,6 @@ function useMomentInCookies(id: string) {
   return { momentInCookies: toggled ?? cookieMomentInList, setToggled };
 }
 
-type ActionProps = {
-  id: string;
-  name?: string;
-  date?: Date;
-  momentInCookies: boolean | null;
-  onAdded: () => void;
-  onRemoved: () => void;
-  className: string;
-};
-
 function ShareActions({ id, name, date, withLabel }: { id: string; name?: string; date?: Date; withLabel: boolean }) {
   return (
     <>
@@ -94,7 +84,23 @@ function SaveOrRemoveButton({
   return null;
 }
 
-function ActionRow({ id, name, date, momentInCookies, onAdded, onRemoved, className }: ActionProps) {
+function ActionRow({
+  id,
+  name,
+  date,
+  momentInCookies,
+  onAdded,
+  onRemoved,
+  className,
+}: {
+  id: string;
+  name?: string;
+  date?: Date;
+  momentInCookies: boolean | null;
+  onAdded: () => void;
+  onRemoved: () => void;
+  className: string;
+}) {
   return (
     <div className={className}>
       <ShareActions id={id} name={name} date={date} withLabel={false} />
@@ -174,34 +180,34 @@ export function MomentCardActions({
     <div className="relative flex items-center gap-1 sm:gap-5">
       {compactOnMobile ? (
         <>
-          <Menu
-            label="Moment actions"
-            placement="auto"
-            widthClass="w-56"
-            zClass="z-30"
-            autoFocusFirst
-            className="sm:hidden"
-            trigger={({ triggerRef, triggerProps }) => (
-              <button
-                ref={triggerRef}
-                {...triggerProps}
-                className={ICON_BUTTON_CLASS}
-                title="More actions"
-                aria-label="More actions"
-              >
-                <Ellipsis className={ICON_CLASS} />
-              </button>
-            )}
-          >
-            <MomentMenu
-              id={id}
-              name={name}
-              date={date}
-              momentInCookies={momentInCookies}
-              onAdded={markAdded}
-              onRemoved={markRemoved}
-            />
-          </Menu>
+          <div className="sm:hidden">
+            <Menu
+              label="Moment actions"
+              placement="auto"
+              autoFocusFirst
+              className="w-56 z-30"
+              trigger={({ triggerRef, triggerProps }) => (
+                <button
+                  ref={triggerRef}
+                  {...triggerProps}
+                  className={ICON_BUTTON_CLASS}
+                  title="More actions"
+                  aria-label="More actions"
+                >
+                  <Ellipsis className={ICON_CLASS} />
+                </button>
+              )}
+            >
+              <MomentMenu
+                id={id}
+                name={name}
+                date={date}
+                momentInCookies={momentInCookies}
+                onAdded={markAdded}
+                onRemoved={markRemoved}
+              />
+            </Menu>
+          </div>
           <ActionRow {...inline} className="hidden items-center gap-5 sm:flex" />
         </>
       ) : (

@@ -1,7 +1,6 @@
 import type { Moment } from '../types.ts';
-import { buildMomentImageContent, buildMomentImageFilename } from './momentImage.ts';
+import { type MomentImageTheme, buildMomentImageContent, buildMomentImageFilename } from './momentImage.ts';
 import { renderMomentImagePng, triggerPngDownload } from './momentImageRenderer.ts';
-import type { MomentImageTheme } from './momentImageTypes.ts';
 import { momentDisplayPath } from './momentUrl.ts';
 import { splitRemaining } from './timer.ts';
 

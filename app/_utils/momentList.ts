@@ -1,16 +1,11 @@
 import { COOKIE_OPTIONS, MOMENT_LIST_COOKIE } from './cookies.ts';
 import { decodeMomentToken } from './momentUrl.ts';
 
-type CookieReader = {
+export type MomentCookieStore = {
   get(name: string): { value: string } | undefined;
-};
-
-type CookieWriter = {
   set(name: string, value: string, options: typeof COOKIE_OPTIONS): void;
   delete(options: { name: string; path: string }): void;
 };
-
-export type MomentCookieStore = CookieReader & CookieWriter;
 
 export function readMomentIds(raw: string | undefined): string[] {
   return (raw ?? '')
@@ -31,11 +26,11 @@ export function removeMomentId(momentIds: string[], momentId: string): string[] 
   return momentIds.filter((id) => id !== momentId);
 }
 
-export function getMomentList(cookieStore: CookieReader): string[] {
+export function getMomentList(cookieStore: MomentCookieStore): string[] {
   return readMomentIds(cookieStore.get(MOMENT_LIST_COOKIE)?.value);
 }
 
-export function setMomentList(cookieStore: CookieWriter, momentIds: string[]): void {
+export function setMomentList(cookieStore: MomentCookieStore, momentIds: string[]): void {
   if (momentIds.length === 0) {
     cookieStore.delete({ name: MOMENT_LIST_COOKIE, path: COOKIE_OPTIONS.path });
     return;

@@ -1,4 +1,4 @@
-import type { MomentImageContent, MomentImageTheme } from './momentImageTypes';
+import type { MomentImageContent, MomentImageTheme } from './momentImage';
 
 export const MOMENT_IMAGE_SIZE = 720;
 
@@ -8,11 +8,6 @@ const MAX_TITLE_HEIGHT = 200;
 const UNIT_SIZES: Record<number, number> = { 1: 240, 2: 214, 3: 188, 4: 134 };
 
 type FontWeight = 400 | 600 | 700;
-
-type FittedLine = {
-  text: string;
-  size: number;
-};
 
 export function drawMomentImage(
   ctx: CanvasRenderingContext2D,
@@ -349,7 +344,7 @@ function fitLine(
   minSize: number,
   fontFamily: string,
   weight: FontWeight,
-): FittedLine {
+) {
   for (let size = Math.round(preferredSize); size >= Math.round(minSize); size -= 2) {
     ctx.font = font(weight, size, fontFamily);
 
