@@ -30,6 +30,16 @@ function useCountdownInCookies(id: string) {
   return { countdownInCookies: toggled ?? cookieCountdownInList, setToggled };
 }
 
+type ActionProps = {
+  id: string;
+  name?: string;
+  date?: Date;
+  countdownInCookies: boolean | null;
+  onAdded: () => void;
+  onRemoved: () => void;
+  className: string;
+};
+
 function ShareActions({ id, name, date, withLabel }: { id: string; name?: string; date?: Date; withLabel: boolean }) {
   return (
     <>
@@ -62,6 +72,15 @@ function SaveOrRemoveButton({
   return null;
 }
 
+function InlineActions({ id, name, date, countdownInCookies, onAdded, onRemoved, className }: ActionProps) {
+  return (
+    <div className={className}>
+      <ShareActions id={id} name={name} date={date} withLabel={false} />
+      <SaveOrRemoveButton id={id} countdownInCookies={countdownInCookies} onAdded={onAdded} onRemoved={onRemoved} />
+    </div>
+  );
+}
+
 function CountdownMenu({
   id,
   name,
@@ -73,7 +92,7 @@ function CountdownMenu({
   name?: string;
   date?: Date;
   countdownInCookies: boolean | null;
-  onRemoved: (close?: () => void) => void;
+  onRemoved: () => void;
 }) {
   const close = useMenuClose();
 
@@ -83,7 +102,14 @@ function CountdownMenu({
       {countdownInCookies === true && (
         <>
           <div className="my-1 h-px bg-black/10 dark:bg-white/10" aria-hidden />
-          <RemoveButton id={id} withLabel onRemoved={() => onRemoved(close)} />
+          <RemoveButton
+            id={id}
+            withLabel
+            onRemoved={() => {
+              onRemoved();
+              close();
+            }}
+          />
         </>
       )}
     </>
@@ -107,10 +133,18 @@ export function CountdownCardActions({
     setToggled(true);
   }
 
-  function markRemoved(close?: () => void) {
+  function markRemoved() {
     setToggled(false);
-    close?.();
   }
+
+  const inline = {
+    id,
+    name,
+    date,
+    countdownInCookies,
+    onAdded: markAdded,
+    onRemoved: markRemoved,
+  };
 
   return (
     <div className="relative flex items-center gap-1 sm:gap-5">
@@ -148,26 +182,10 @@ export function CountdownCardActions({
               onRemoved={markRemoved}
             />
           </Menu>
-          <div className="hidden items-center gap-5 sm:flex">
-            <ShareActions id={id} name={name} date={date} withLabel={false} />
-            <SaveOrRemoveButton
-              id={id}
-              countdownInCookies={countdownInCookies}
-              onAdded={markAdded}
-              onRemoved={markRemoved}
-            />
-          </div>
+          <InlineActions {...inline} className="hidden items-center gap-5 sm:flex" />
         </>
       ) : (
-        <>
-          <ShareActions id={id} name={name} date={date} withLabel={false} />
-          <SaveOrRemoveButton
-            id={id}
-            countdownInCookies={countdownInCookies}
-            onAdded={markAdded}
-            onRemoved={markRemoved}
-          />
-        </>
+        <InlineActions {...inline} className="flex items-center gap-1 sm:gap-5" />
       )}
     </div>
   );

@@ -104,14 +104,10 @@ function FieldError({ state, field }: { state: CountdownFormState; field: 'name'
     return null;
   }
 
-  return <ErrorInfo error={state.error} className="ml-auto mr-2" />;
-}
-
-function ErrorInfo({ error, className = '' }: { error: string; className?: string }) {
   return (
     <div
-      className={`h-6 w-6 leading-5 text-white text-center align-middle bg-red-500 border-2 border-red-500 rounded-full cursor-pointer ${className}`}
-      title={error}
+      className="ml-auto mr-2 h-6 w-6 leading-5 text-white text-center align-middle bg-red-500 border-2 border-red-500 rounded-full cursor-pointer"
+      title={state.error}
     >
       !
     </div>
