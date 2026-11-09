@@ -38,6 +38,19 @@ describe('buildMomentImageContent', () => {
     assert.ok(content.timeLabel?.includes('01:05'));
   });
 
+  it('formats the date in a provided offset', () => {
+    const content = buildMomentImageContent({
+      name: 'Late',
+      date: new Date('2026-12-25T23:00:00Z'),
+      remaining: { days: 1, hours: 2, minutes: 3, seconds: 4 },
+      locale: 'en-US',
+      offsetMinutes: 60,
+    });
+
+    assert.equal(content.dateLabel, 'Saturday, December 26, 2026');
+    assert.equal(content.timeLabel, null);
+  });
+
   it('keeps the suffix rule for sub-day moments', () => {
     const content = buildMomentImageContent({
       name: 'Soon',

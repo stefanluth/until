@@ -7,6 +7,7 @@ import { Footer } from '@/_components/Footer';
 import { MomentMetaProvider } from '@/_components/MomentMetaContext';
 import { NavBar } from '@/_components/NavBar';
 import { ThemeBootScript } from '@/_components/ThemeBootScript';
+import { resolveSiteUrl } from '@/_utils/siteUrl';
 
 import './globals.css';
 
@@ -18,8 +19,16 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(resolveSiteUrl()),
   title: 'until',
   description: 'until is a simple, shareable timer.',
+  openGraph: {
+    type: 'website',
+    siteName: 'until',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export default function RootLayout({

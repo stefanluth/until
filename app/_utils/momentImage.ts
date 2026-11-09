@@ -1,4 +1,4 @@
-import { formatMomentDateParts } from './momentDisplay.ts';
+import { formatDateParts } from './momentDisplay.ts';
 import type { MomentImageContent } from './momentImageTypes.ts';
 import { slugify } from './slug.ts';
 import { type RemainingParts, getVisibleUnits } from './timer.ts';
@@ -10,19 +10,26 @@ export function buildMomentImageContent({
   remaining,
   url,
   locale,
+  offsetMinutes,
 }: {
   name: string;
   date: Date;
   remaining: RemainingParts;
   url?: string;
   locale?: string;
+  offsetMinutes?: number;
 }): MomentImageContent {
   const units = getVisibleUnits(remaining).map((unit) => ({
     unit,
     value: remaining[unit],
     label: unitLabel(unit, remaining[unit]),
   }));
-  const { date: dateLabel, time: timeLabel } = formatMomentDateParts(date, locale);
+  const displayDate = offsetMinutes === undefined ? date : new Date(date.getTime() + offsetMinutes * 60_000);
+  const { date: dateLabel, time: timeLabel } = formatDateParts(
+    displayDate,
+    locale,
+    offsetMinutes === undefined ? undefined : 'UTC',
+  );
 
   return {
     name,

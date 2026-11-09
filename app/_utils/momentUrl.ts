@@ -5,11 +5,12 @@ const SEPARATOR = '@';
 const MAX_MOMENT_ID_LENGTH = 512;
 const MAX_ENCODED_MOMENT_ID_LENGTH = MAX_MOMENT_ID_LENGTH * 4;
 const ISO_INSTANT_RE = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(?::(\d{2}))?([+-])(\d{2}):(\d{2})$/;
+const OFFSET_SUFFIX_RE = /([+-])(\d{2}):(\d{2})$/;
 const EXTRA_ESCAPED_RE = /[!'()*]/g;
 const NON_ASCII_PERCENT_RUN_RE = /(?:%[89A-Fa-f][0-9A-Fa-f])+/g;
 
 export function encodeMomentToken(name: string, date: Date, offsetMinutes = -date.getTimezoneOffset()): string {
-  return `${encodeName(name)}${SEPARATOR}${formatMomentInstant(date, offsetMinutes)}`;
+  return `${encodeName(name)}${SEPARATOR}${formatInstant(date, offsetMinutes)}`;
 }
 
 export function decodeMomentToken(value: unknown): Moment | null {
@@ -67,6 +68,16 @@ export function momentDisplayPath(id: string): string {
   return `/${decodeNonAsciiRuns(id)}`;
 }
 
+export function offsetMinutes(momentId: string): number {
+  const match = OFFSET_SUFFIX_RE.exec(momentId);
+
+  if (!match) {
+    return 0;
+  }
+
+  return parseOffsetMinutes(match[1], match[2], match[3]) ?? 0;
+}
+
 function buildMoment(name: string, rawDate: string): Moment | null {
   const nameResult = validateMomentName(name);
   if (!nameResult.ok || nameResult.value !== name) {
@@ -92,7 +103,7 @@ function buildMoment(name: string, rawDate: string): Moment | null {
   const date = new Date(instant);
   if (
     !Number.isFinite(date.getTime()) ||
-    formatMomentInstant(date, offsetMinutes) !== instant ||
+    formatInstant(date, offsetMinutes) !== instant ||
     dateTime.startsWith('0000-')
   ) {
     return null;
@@ -130,7 +141,7 @@ function encodeName(name: string): string {
   );
 }
 
-function formatMomentInstant(date: Date, offsetMinutes: number): string {
+function formatInstant(date: Date, offsetMinutes: number): string {
   const shifted = new Date(date.getTime() + offsetMinutes * 60_000);
 
   return `${shifted.toISOString().slice(0, 19)}${formatOffset(offsetMinutes)}`;

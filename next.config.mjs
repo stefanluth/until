@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  outputFileTracingIncludes: {
+    '**/opengraph-image*': ['./assets/fonts/*.woff'],
+  },
   async headers() {
     return [
       {

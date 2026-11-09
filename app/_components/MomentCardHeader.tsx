@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 
-import { formatMomentDateParts } from '@/_utils/momentDisplay';
+import { formatDateParts } from '@/_utils/momentDisplay';
 import type { MomentVariant } from '@/types';
 
 // Nothing to subscribe to; the snapshot flips once after hydration.
@@ -18,11 +18,11 @@ function useMounted(): boolean {
 }
 
 /** Renders the moment's date and time for the viewer. */
-function MomentDate({ date, className }: { date: Date; className: string }) {
+function DateLabel({ date, className }: { date: Date; className: string }) {
   const mounted = useMounted();
 
   // Format on the client so the date uses the viewer's timezone and locale.
-  const parts = mounted ? formatMomentDateParts(date) : null;
+  const parts = mounted ? formatDateParts(date) : null;
 
   return (
     <p
@@ -58,7 +58,7 @@ export function MomentCardHeader({
         <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight break-words sm:text-5xl md:text-7xl lg:text-8xl">
           {name}
         </h1>
-        <MomentDate date={date} className="text-base sm:text-xl md:text-2xl" />
+        <DateLabel date={date} className="text-base sm:text-xl md:text-2xl" />
       </div>
     );
   }
@@ -69,7 +69,7 @@ export function MomentCardHeader({
         <h2 className="text-balance px-10 text-2xl font-semibold leading-tight tracking-tight break-words sm:px-0 sm:text-4xl md:text-[2.5rem]">
           {name}
         </h2>
-        <MomentDate date={date} className="text-sm sm:text-lg" />
+        <DateLabel date={date} className="text-sm sm:text-lg" />
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import {
   encodeMomentToken,
   momentDisplayPath,
   momentPath,
+  offsetMinutes,
 } from '../../app/_utils/momentUrl.ts';
 
 const DATE = new Date('2026-01-01T00:00:00.000Z');
@@ -201,5 +202,19 @@ describe('momentDisplayPath', () => {
 
     assert.equal(momentPath(token), `/Caf%C3%A9@${ISO}`);
     assert.equal(momentDisplayPath(token), `/Café@${ISO}`);
+  });
+});
+
+describe('offsetMinutes', () => {
+  it('reads the canonical offset suffix from a moment id', () => {
+    assert.equal(offsetMinutes(`Party@${ISO}`), 0);
+    assert.equal(offsetMinutes('Party@2026-01-01T01:00:00+01:00'), 60);
+    assert.equal(offsetMinutes('Party@2025-12-31T19:00:00-05:00'), -300);
+    assert.equal(offsetMinutes('Party@2026-01-01T05:30:00+05:30'), 330);
+  });
+
+  it('falls back to UTC when the id has no usable offset', () => {
+    assert.equal(offsetMinutes('not-a-moment'), 0);
+    assert.equal(offsetMinutes('Party@2026-01-01T00:00:00+15:00'), 0);
   });
 });
