@@ -2,7 +2,7 @@
 
 import Cookies from 'js-cookie';
 
-import { type SubmitEvent, useActionState, useRef } from 'react';
+import { type SubmitEvent, useActionState, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { type CountdownFormState, submitCountdownAction } from '@/_actions/submitCountdown';
@@ -17,6 +17,8 @@ const INITIAL_STATE: CountdownFormState = { error: '', location: '' };
 export default function CountdownInput() {
   const dateInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [name, setName] = useState('');
+  const [when, setWhen] = useState('');
   const { requestConsent } = useConsent();
   const [state, formAction] = useActionState(submitCountdownAction, INITIAL_STATE);
 
@@ -31,8 +33,8 @@ export default function CountdownInput() {
       return;
     }
 
-    const when = String(new FormData(event.currentTarget).get('when') ?? '');
-    const parsed = parseWhen(when);
+    const whenText = String(new FormData(event.currentTarget).get('when') ?? '');
+    const parsed = parseWhen(whenText);
 
     if (dateInputRef.current) {
       dateInputRef.current.value = parsed?.toISOString() ?? '';
@@ -56,6 +58,8 @@ export default function CountdownInput() {
           placeholder="e.g. Family Reunion"
           autoComplete="on"
           maxLength={MAX_COUNTDOWN_NAME_LENGTH}
+          value={name}
+          onChange={(event) => setName(event.target.value)}
           required
         />
       </div>
@@ -73,6 +77,8 @@ export default function CountdownInput() {
           name="when"
           placeholder="1d 2h 3m or 25-12-2026 18:00"
           autoComplete="off"
+          value={when}
+          onChange={(event) => setWhen(event.target.value)}
           required
         />
         <input ref={dateInputRef} type="hidden" name="date" />
