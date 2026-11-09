@@ -1,16 +1,11 @@
+import type { Moment } from '../types.ts';
 import { buildMomentImageContent, buildMomentImageFilename } from './momentImage.ts';
 import { renderMomentImagePng, triggerPngDownload } from './momentImageRenderer.ts';
 import type { MomentImageTheme } from './momentImageTypes.ts';
 import { momentDisplayPath } from './momentUrl.ts';
 import { splitRemaining } from './timer.ts';
 
-type MomentImageTarget = {
-  id: string;
-  name: string;
-  date: Date;
-};
-
-export async function renderMomentImageBlob({ id, name, date }: MomentImageTarget): Promise<Blob> {
+export async function renderMomentImageBlob({ id, name, date }: Moment): Promise<Blob> {
   const remaining = splitRemaining(date.getTime() - Date.now());
   const content = buildMomentImageContent({
     name,
@@ -25,7 +20,7 @@ export async function renderMomentImageBlob({ id, name, date }: MomentImageTarge
   return await renderMomentImagePng(content, theme);
 }
 
-export async function copyMomentImage({ id, name, date }: MomentImageTarget): Promise<void> {
+export async function copyMomentImage({ id, name, date }: Moment): Promise<void> {
   if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
     throw new Error('Copying images to the clipboard is not supported in this browser');
   }
@@ -35,7 +30,7 @@ export async function copyMomentImage({ id, name, date }: MomentImageTarget): Pr
   await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
 }
 
-export async function downloadMomentImage({ id, name, date }: MomentImageTarget): Promise<void> {
+export async function downloadMomentImage({ id, name, date }: Moment): Promise<void> {
   const blob = await renderMomentImageBlob({ id, name, date });
   triggerPngDownload(blob, buildMomentImageFilename(name, date));
 }

@@ -29,7 +29,6 @@ export function buildMomentImageContent({
     dateLabel,
     timeLabel,
     units,
-    ended: units.length === 0,
     url,
   };
 }

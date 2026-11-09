@@ -51,7 +51,6 @@ const CONTENT: MomentImageContent = {
     { unit: 'minutes', value: 2, label: 'minutes' },
     { unit: 'seconds', value: 1, label: 'seconds' },
   ],
-  ended: false,
   url: 'https://until.example/new-year-2027-1a2b3c4d',
 };
 
@@ -123,7 +122,7 @@ describe('drawMomentImage', () => {
   });
 
   it('draws the ended message without unit values', () => {
-    const ctx = draw({ ...CONTENT, units: [], ended: true });
+    const ctx = draw({ ...CONTENT, units: [] });
     const all = ctx.texts.map((entry) => entry.text);
 
     assert.ok(all.includes('Timer finished.'));

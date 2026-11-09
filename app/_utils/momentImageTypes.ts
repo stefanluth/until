@@ -11,7 +11,6 @@ export type MomentImageContent = {
   dateLabel: string;
   timeLabel: string | null;
   units: ImageUnit[];
-  ended: boolean;
   url?: string;
 };
 

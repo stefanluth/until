@@ -5,6 +5,7 @@ export const MOMENT_IMAGE_SIZE = 720;
 const WORDMARK = 'until';
 const MAX_TITLE_LINES = 3;
 const MAX_TITLE_HEIGHT = 200;
+const UNIT_SIZES: Record<number, number> = { 1: 240, 2: 214, 3: 188, 4: 134 };
 
 type FontWeight = 400 | 600 | 700;
 
@@ -61,7 +62,7 @@ export function drawMomentImage(
   const bandTop = dateY + dateSize + 16 * scale;
   const bandBottom = url ? urlBaseline - url.size : size - padding;
 
-  if (content.ended || content.units.length === 0) {
+  if (content.units.length === 0) {
     ctx.globalAlpha = 1;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
@@ -195,7 +196,7 @@ function drawUnits(
   const count = content.units.length;
   const gap = count > 1 ? 12 * scale : 0;
   const columnWidth = (maxWidth - gap * (count - 1)) / count;
-  const base = count === 1 ? 240 : count === 2 ? 214 : count === 3 ? 188 : 134;
+  const base = UNIT_SIZES[count] ?? 134;
   const maxTextWidth = columnWidth * 0.92;
 
   let numberSize = base * scale;

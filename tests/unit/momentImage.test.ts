@@ -15,7 +15,6 @@ describe('buildMomentImageContent', () => {
       url: URL,
     });
 
-    assert.equal(content.ended, false);
     assert.equal(content.name, 'New Year');
     assert.equal(content.url, URL);
     assert.equal(content.dateLabel, 'Friday, January 1, 2027');
@@ -61,7 +60,7 @@ describe('buildMomentImageContent', () => {
     assert.deepEqual(content.units, [{ unit: 'days', value: 7, label: 'days' }]);
   });
 
-  it('marks a finished moment as ended', () => {
+  it('leaves no units for a finished moment', () => {
     const content = buildMomentImageContent({
       name: 'Done',
       date: DATE,
@@ -69,7 +68,6 @@ describe('buildMomentImageContent', () => {
       locale: 'en-US',
     });
 
-    assert.equal(content.ended, true);
     assert.deepEqual(content.units, []);
   });
 });
