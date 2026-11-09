@@ -50,8 +50,8 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
         </ul>
         <p>Both last for one year.</p>
         <p>
-          A moment&apos;s name and date are part of its link. Anyone with the link can see them, so please don&apos;t
-          put private details in the name.
+          A moment&apos;s name and date live in its link, not in a database. Anyone you share the link with can read
+          them, so don&apos;t put private details in the name.
         </p>
         <p>
           The saved-moments cookie is only set when you save a moment. Removing a moment only removes it from your saved
