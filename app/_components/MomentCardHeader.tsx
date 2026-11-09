@@ -1,18 +1,43 @@
+'use client';
+
+import { useSyncExternalStore } from 'react';
+
 import { formatMomentDateParts } from '@/_utils/momentDisplay';
 import type { MomentVariant } from '@/types';
 
+// Nothing to subscribe to; the snapshot flips once after hydration.
+const subscribeToMount = () => () => {};
+
+/** Reports whether the component has hydrated on the client. */
+function useMounted(): boolean {
+  return useSyncExternalStore(
+    subscribeToMount,
+    () => true,
+    () => false,
+  );
+}
+
+/** Renders the moment's date and time for the viewer. */
 function MomentDate({ date, className }: { date: Date; className: string }) {
-  const { date: dateText, time } = formatMomentDateParts(date);
+  const mounted = useMounted();
+
+  // Format on the client so the date uses the viewer's timezone and locale.
+  const parts = mounted ? formatMomentDateParts(date) : null;
 
   return (
     <p
       className={`flex flex-col items-center gap-0.5 leading-snug opacity-80 sm:flex-row sm:justify-center sm:gap-3 ${className}`}
     >
-      <span suppressHydrationWarning>{dateText}</span>
-      {time && (
-        <span suppressHydrationWarning className="whitespace-nowrap sm:border-l sm:border-current/25 sm:pl-3">
-          {time}
-        </span>
+      {parts ? (
+        <>
+          <span>{parts.date}</span>
+          {parts.time && (
+            <span className="whitespace-nowrap sm:border-l sm:border-current/25 sm:pl-3">{parts.time}</span>
+          )}
+        </>
+      ) : (
+        // Reserve the line height until the client formats the date.
+        <span aria-hidden>&nbsp;</span>
       )}
     </p>
   );
