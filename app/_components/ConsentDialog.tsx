@@ -46,17 +46,17 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
         <p>This site uses two cookies, both just to make it work. No ads, no tracking.</p>
         <ul className="list-disc pl-5">
           <li>One remembers that you accepted this notice.</li>
-          <li>One remembers the countdowns you saved.</li>
+          <li>One remembers the moments you saved.</li>
         </ul>
         <p>Both last for one year.</p>
         <p>
-          When you create a countdown, its name and date are saved in our database so you can share it with a link.
-          Anyone with the link can see it, so please don&apos;t put private details in the name.
+          When you create a moment, its name and date are saved in our database so you can share it with a link. Anyone
+          with the link can see it, so please don&apos;t put private details in the name.
         </p>
-        <p>Removing a countdown only removes it from your saved list. The shared link still works.</p>
+        <p>Removing a moment only removes it from your saved list. The shared link still works.</p>
         <p>
-          To stop spam, we look at your IP address when you create a countdown. It stays in memory for up to 10 minutes
-          and is never saved to our database.
+          To stop spam, we look at your IP address when you create a moment. It stays in memory for up to 10 minutes and
+          is never saved to our database.
         </p>
         <p>That&apos;s everything. We don&apos;t collect any other data about you.</p>
         <p>By clicking &quot;Accept&quot;, you agree to the use of cookies.</p>

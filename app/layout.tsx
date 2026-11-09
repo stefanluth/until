@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 
 import { ConsentProvider } from '@/_components/ConsentProvider';
-import { CountdownMetaProvider } from '@/_components/CountdownMetaContext';
 import { Footer } from '@/_components/Footer';
+import { MomentMetaProvider } from '@/_components/MomentMetaContext';
 import { NavBar } from '@/_components/NavBar';
 import { ThemeBootScript } from '@/_components/ThemeBootScript';
 
@@ -19,7 +19,7 @@ const inter = localFont({
 
 export const metadata: Metadata = {
   title: 'until',
-  description: 'until is a simple countdown timer, sharable via URL.',
+  description: 'until is a simple, shareable timer.',
 };
 
 export default function RootLayout({
@@ -36,7 +36,7 @@ export default function RootLayout({
         {/* Server-injected into <head> before paint; renders null on the client. */}
         <ThemeBootScript />
         <ConsentProvider>
-          <CountdownMetaProvider>
+          <MomentMetaProvider>
             <div className="group relative flex flex-1 flex-col">
               <header className="absolute inset-x-0 top-0 z-10 flex flex-col">
                 <NavBar />
@@ -44,7 +44,7 @@ export default function RootLayout({
               <main className="flex flex-1 flex-col pt-20 pb-14 sm:pb-16">{children}</main>
               <Footer />
             </div>
-          </CountdownMetaProvider>
+          </MomentMetaProvider>
         </ConsentProvider>
       </body>
     </html>

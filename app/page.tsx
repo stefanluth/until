@@ -1,4 +1,4 @@
-import CountdownInput from '@/_components/CountdownInput';
+import MomentInput from '@/_components/MomentInput';
 
 export default function Home() {
   return (
@@ -7,7 +7,7 @@ export default function Home() {
         How long until?
       </h1>
       <div className="w-full max-w-md sm:max-w-lg">
-        <CountdownInput />
+        <MomentInput />
       </div>
     </div>
   );

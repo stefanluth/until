@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 
-import type { Countdown } from './types';
+import type { Moment } from './types';
 
 const DEFAULT_POOL_MAX = 10;
 const CONNECTION_TIMEOUT_MS = 5000;
@@ -8,31 +8,31 @@ const IDLE_TIMEOUT_MS = 30000;
 const QUERY_TIMEOUT_MS = 5000;
 
 const globalForPg = globalThis as unknown as {
-  countdownPool: Pool | undefined;
+  momentPool: Pool | undefined;
 };
 
-const COUNTDOWN_SQL = {
-  findMany: 'SELECT id, name, "date" FROM countdowns WHERE id = ANY($1::text[]) ORDER BY "date" ASC',
-  findOne: 'SELECT id, name, "date" FROM countdowns WHERE id = $1 LIMIT 1',
-  create: 'INSERT INTO countdowns (id, name, "date") VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',
+const MOMENT_SQL = {
+  findMany: 'SELECT id, name, "date" FROM moments WHERE id = ANY($1::text[]) ORDER BY "date" ASC',
+  findOne: 'SELECT id, name, "date" FROM moments WHERE id = $1 LIMIT 1',
+  create: 'INSERT INTO moments (id, name, "date") VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',
 } as const;
 
-export async function findCountdownsByIds(ids: string[]): Promise<Countdown[]> {
+export async function findMomentsByIds(ids: string[]): Promise<Moment[]> {
   if (ids.length === 0) {
     return [];
   }
 
-  const { rows } = await getPool().query<Countdown>(COUNTDOWN_SQL.findMany, [ids]);
+  const { rows } = await getPool().query<Moment>(MOMENT_SQL.findMany, [ids]);
   return rows;
 }
 
-export async function findCountdownById(id: string): Promise<Countdown | null> {
-  const { rows } = await getPool().query<Countdown>(COUNTDOWN_SQL.findOne, [id]);
+export async function findMomentById(id: string): Promise<Moment | null> {
+  const { rows } = await getPool().query<Moment>(MOMENT_SQL.findOne, [id]);
   return rows[0] ?? null;
 }
 
-export async function createCountdown(countdown: Countdown): Promise<boolean> {
-  const result = await getPool().query(COUNTDOWN_SQL.create, [countdown.id, countdown.name, countdown.date]);
+export async function createMoment(moment: Moment): Promise<boolean> {
+  const result = await getPool().query(MOMENT_SQL.create, [moment.id, moment.name, moment.date]);
   return result.rowCount === 1;
 }
 
@@ -41,13 +41,13 @@ export async function pingDatabase(): Promise<void> {
 }
 
 function getPool() {
-  if (!globalForPg.countdownPool) {
+  if (!globalForPg.momentPool) {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) {
       throw new Error('DATABASE_URL is not set');
     }
 
-    globalForPg.countdownPool = new Pool({
+    globalForPg.momentPool = new Pool({
       connectionString,
       max: getPoolMax(),
       connectionTimeoutMillis: CONNECTION_TIMEOUT_MS,
@@ -58,7 +58,7 @@ function getPool() {
     });
   }
 
-  return globalForPg.countdownPool;
+  return globalForPg.momentPool;
 }
 
 function getPoolMax() {

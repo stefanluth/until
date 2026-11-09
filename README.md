@@ -1,6 +1,6 @@
 # until
 
-until is a simple countdown timer, sharable via URL.
+until is a simple, shareable timer.
 
 ## Requirements
 
@@ -73,7 +73,7 @@ Neon), use its pooled connection string and set `PG_POOL_MAX` low.
 ## Operations
 
 - `GET /api/health` returns 503 when the database is unavailable.
-- Countdown creation is rate-limited per client IP with a global fallback.
+- Timer creation is rate-limited per client IP with a global fallback.
   Limits live in memory per process, so they are approximate across instances
   and cold starts.
 - Cookies are `Secure` in production unless `COOKIE_SECURE=false`.

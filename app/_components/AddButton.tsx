@@ -2,7 +2,7 @@
 
 import { Bookmark } from 'lucide-react';
 
-import { addCountdown } from '@/_actions/addCountdown';
+import { addMoment } from '@/_actions/addMoment';
 
 import { ActionButton } from './ActionButton';
 import { useConsentAction } from './useConsentAction';
@@ -16,13 +16,13 @@ export function AddButton({
   onAdded?: () => void;
   showLabel?: boolean;
 }) {
-  const { pending, run } = useConsentAction(() => addCountdown(id), ['added', 'exists'], onAdded);
+  const { pending, run } = useConsentAction(() => addMoment(id), ['added', 'exists'], onAdded);
 
   return (
     <ActionButton
       icon={Bookmark}
       label="Save"
-      description="Save this countdown to your list"
+      description="Save this moment to your list"
       variant={showLabel ? 'label' : 'icon'}
       pending={pending}
       onClick={run}

@@ -29,10 +29,10 @@ export function DownloadButton({
     setFailed(false);
 
     try {
-      const { downloadCountdownImage } = await import('@/_utils/downloadCountdownImage');
-      await downloadCountdownImage({ id, name, date });
+      const { downloadMomentImage } = await import('@/_utils/downloadMomentImage');
+      await downloadMomentImage({ id, name, date });
     } catch (error) {
-      console.error('Failed to save the countdown image', error);
+      console.error('Failed to save the moment image', error);
       setFailed(true);
       setTimeout(() => setFailed(false), 2000);
     } finally {
@@ -45,7 +45,7 @@ export function DownloadButton({
     ? 'Could not download the image'
     : pending
       ? 'Downloading image…'
-      : 'Download this countdown as an image';
+      : 'Download this moment as an image';
   const status = pending ? 'Downloading image…' : failed ? 'Could not download the image' : '';
 
   return (

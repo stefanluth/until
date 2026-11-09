@@ -19,7 +19,7 @@ export function LinkButton({ id, withLabel = false }: { id: string; withLabel?: 
     <ActionButton
       icon={icon}
       label={label}
-      description="Copy the URL to this countdown"
+      description="Copy the URL to this moment"
       variant={withLabel ? 'menu' : 'icon'}
       status={announcement}
       onClick={() => {

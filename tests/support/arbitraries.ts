@@ -1,9 +1,9 @@
 import fc from 'fast-check';
 
-export const validCountdownId = fc.stringMatching(/^[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}$/);
-export const validCountdownIds = fc.array(validCountdownId, { maxLength: 20 });
+export const validMomentId = fc.stringMatching(/^[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}$/);
+export const validMomentIds = fc.array(validMomentId, { maxLength: 20 });
 
-export const countdownParts = fc.record({
+export const remainingParts = fc.record({
   days: fc.integer({ min: 0, max: 100_000 }),
   hours: fc.integer({ min: 0, max: 23 }),
   minutes: fc.integer({ min: 0, max: 59 }),

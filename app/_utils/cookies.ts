@@ -1,5 +1,5 @@
 export const CONSENT_COOKIE = 'consent';
-export const COUNTDOWN_LIST_COOKIE = 'countdowns';
+export const MOMENT_LIST_COOKIE = 'moments';
 
 type CookieEnvironment = {
   COOKIE_SECURE?: string;

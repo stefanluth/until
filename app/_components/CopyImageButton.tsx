@@ -10,7 +10,7 @@ import { useDelayedPending } from './useDelayedPending';
 type CopyStatus = 'idle' | 'copying' | 'copied' | 'failed';
 
 const COPY_STATE: Record<CopyStatus, { label: string; description: string; announcement: string }> = {
-  idle: { label: 'Copy image', description: 'Copy this countdown as an image to the clipboard', announcement: '' },
+  idle: { label: 'Copy image', description: 'Copy this moment as an image to the clipboard', announcement: '' },
   copying: { label: 'Copying image…', description: 'Copying image…', announcement: 'Copying image…' },
   copied: { label: 'Copied!', description: 'Copied!', announcement: 'Copied!' },
   failed: { label: 'Copy failed', description: 'Could not copy the image', announcement: 'Could not copy the image' },
@@ -46,12 +46,12 @@ function useCopyImage({ id, name, date }: { id: string; name: string; date: Date
     setCopied(false);
 
     try {
-      const { copyCountdownImage } = await import('@/_utils/downloadCountdownImage');
-      await copyCountdownImage({ id, name, date });
+      const { copyMomentImage } = await import('@/_utils/downloadMomentImage');
+      await copyMomentImage({ id, name, date });
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (error) {
-      console.error('Failed to copy the countdown image', error);
+      console.error('Failed to copy the moment image', error);
       setFailed(true);
       setTimeout(() => setFailed(false), 2000);
     } finally {

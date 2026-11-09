@@ -4,34 +4,34 @@ import { cache } from 'react';
 
 import { notFound } from 'next/navigation';
 
-import CountdownCard from '@/_components/CountdownCard';
-import { CountdownDetailMeta } from '@/_components/CountdownDetailMeta';
-import { findCountdownById } from '@/db';
+import MomentCard from '@/_components/MomentCard';
+import { MomentDetailMeta } from '@/_components/MomentDetailMeta';
+import { findMomentById } from '@/db';
 
-const getCountdown = cache(findCountdownById);
+const getMoment = cache(findMomentById);
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const countdown = await getCountdown(id);
+  const moment = await getMoment(id);
 
   return {
-    title: countdown?.name ? `${countdown.name} - Countdown` : 'until',
-    description: countdown ? `How long until ${countdown.name}?` : undefined,
+    title: moment?.name ? `${moment.name} - until` : 'until',
+    description: moment ? `How long until ${moment.name}?` : undefined,
   };
 }
 
-export default async function CountdownPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function MomentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const countdown = await getCountdown(id);
+  const moment = await getMoment(id);
 
-  if (!countdown) {
+  if (!moment) {
     notFound();
   }
 
   return (
     <div className="flex flex-1 flex-col pb-10 pt-2 sm:pb-0">
-      <CountdownDetailMeta id={countdown.id} name={countdown.name} date={countdown.date} />
-      <CountdownCard {...countdown} variant="detail" />
+      <MomentDetailMeta id={moment.id} name={moment.name} date={moment.date} />
+      <MomentCard {...moment} variant="detail" />
     </div>
   );
 }

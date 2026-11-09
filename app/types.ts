@@ -1,7 +1,7 @@
-export type Countdown = {
+export type Moment = {
   id: string;
   name: string;
   date: Date;
 };
 
-export type CountdownVariant = 'card' | 'detail';
+export type MomentVariant = 'card' | 'detail';

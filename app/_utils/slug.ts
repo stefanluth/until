@@ -1,5 +1,5 @@
 const MAX_SLUG_LENGTH = 48;
-const EMPTY_SLUG = 'countdown';
+const EMPTY_SLUG = 'moment';
 
 export function slugify(name: string): string {
   const slug = name
