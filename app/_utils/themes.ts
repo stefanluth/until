@@ -6,9 +6,9 @@ export type ThemeId = 'default' | 'sunset' | 'ocean' | 'forest';
 export const MODES = ['light', 'dark', 'system'] as const;
 
 export type Mode = (typeof MODES)[number];
-export type Appearance = 'light' | 'dark';
+type Appearance = 'light' | 'dark';
 
-export type ThemeDefinition = {
+type ThemeDefinition = {
   id: ThemeId;
   label: string;
   swatch: string;
@@ -57,16 +57,6 @@ export function readStoredTheme(storage: StorageLike | null = getStorage()): The
   }
 }
 
-export function readStoredMode(storage: StorageLike | null = getStorage()): Mode {
-  try {
-    const value = storage?.getItem(MODE_STORAGE_KEY);
-
-    return isMode(value) ? value : DEFAULT_MODE;
-  } catch {
-    return DEFAULT_MODE;
-  }
-}
-
 export function storeTheme(id: ThemeId, storage: StorageLike | null = getStorage()): void {
   try {
     storage?.setItem(THEME_STORAGE_KEY, id);
@@ -91,7 +81,7 @@ export function resolveAppearance(mode: Mode, prefersDark: boolean): Appearance 
   return prefersDark ? 'dark' : 'light';
 }
 
-export function prefersDark(): boolean {
+function prefersDark(): boolean {
   try {
     return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
   } catch {
@@ -116,8 +106,4 @@ export function applyMode(
 ): void {
   root.dataset.mode = mode;
   root.dataset.appearance = resolveAppearance(mode, systemPrefersDark);
-}
-
-export function nextMode(mode: Mode): Mode {
-  return MODES[(MODES.indexOf(mode) + 1) % MODES.length];
 }

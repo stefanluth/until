@@ -12,8 +12,6 @@ import {
   applyTheme,
   isMode,
   isThemeId,
-  nextMode,
-  readStoredMode,
   readStoredTheme,
   resolveAppearance,
   storeMode,
@@ -77,13 +75,6 @@ describe('stored preferences', () => {
     assert.equal(readStoredTheme(null), DEFAULT_THEME);
   });
 
-  it('reads a stored mode and falls back to the default', () => {
-    assert.equal(readStoredMode(memoryStorage({ [MODE_STORAGE_KEY]: 'dark' })), 'dark');
-    assert.equal(readStoredMode(memoryStorage({ [MODE_STORAGE_KEY]: 'sepia' })), DEFAULT_MODE);
-    assert.equal(readStoredMode(memoryStorage()), DEFAULT_MODE);
-    assert.equal(readStoredMode(null), DEFAULT_MODE);
-  });
-
   it('writes themes and modes', () => {
     const storage = memoryStorage();
 
@@ -105,7 +96,6 @@ describe('stored preferences', () => {
     };
 
     assert.equal(readStoredTheme(broken), DEFAULT_THEME);
-    assert.equal(readStoredMode(broken), DEFAULT_MODE);
     assert.doesNotThrow(() => storeTheme('sunset', broken));
     assert.doesNotThrow(() => storeMode('dark', broken));
   });
@@ -120,12 +110,6 @@ describe('appearance resolution', () => {
   it('follows the OS preference in system mode', () => {
     assert.equal(resolveAppearance('system', true), 'dark');
     assert.equal(resolveAppearance('system', false), 'light');
-  });
-
-  it('cycles light -> dark -> system -> light', () => {
-    assert.equal(nextMode('light'), 'dark');
-    assert.equal(nextMode('dark'), 'system');
-    assert.equal(nextMode('system'), 'light');
   });
 });
 
