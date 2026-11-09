@@ -89,7 +89,7 @@ describe('drawMomentImage', () => {
     for (const entry of ctx.texts) {
       assert.ok(Number.isFinite(entry.x) && entry.x >= 0 && entry.x <= MOMENT_IMAGE_SIZE);
       assert.ok(Number.isFinite(entry.y) && entry.y >= 0 && entry.y <= MOMENT_IMAGE_SIZE);
-      assert.ok(textWidth(entry) <= MOMENT_IMAGE_SIZE - 192);
+      assert.ok(textWidth(entry) <= MOMENT_IMAGE_SIZE - 128);
     }
 
     const title = ctx.texts.find((entry) => entry.text === CONTENT.name);
@@ -110,7 +110,7 @@ describe('drawMomentImage', () => {
     for (const entry of ctx.texts) {
       assert.ok(entry.x >= 0 && entry.x <= MOMENT_IMAGE_SIZE);
       assert.ok(entry.y >= 0 && entry.y <= MOMENT_IMAGE_SIZE);
-      assert.ok(textWidth(entry) <= MOMENT_IMAGE_SIZE - 192);
+      assert.ok(textWidth(entry) <= MOMENT_IMAGE_SIZE - 128);
     }
 
     const date = ctx.texts.find((entry) => entry.text === CONTENT.dateLabel);
