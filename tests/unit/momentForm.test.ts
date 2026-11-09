@@ -34,6 +34,22 @@ describe('momentFromInput', () => {
     });
   });
 
+  it('keeps seconds when the input sets them', () => {
+    assert.deepEqual(momentFromInput('Party', '25-12-2026 18:00:30', NOW), {
+      ok: true,
+      id: encodeMomentToken('Party', new Date(2026, 11, 25, 18, 0, 30)),
+    });
+  });
+
+  it('strips milliseconds from duration targets', () => {
+    const now = new Date('2026-01-01T00:00:00.789Z');
+
+    assert.deepEqual(momentFromInput('Party', '1d', now), {
+      ok: true,
+      id: 'Party@2026-01-02T00:00:00Z',
+    });
+  });
+
   it('rejects a missing or overlong name', () => {
     assert.deepEqual(momentFromInput('', '1d'), {
       ok: false,

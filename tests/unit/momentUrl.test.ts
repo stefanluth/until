@@ -6,14 +6,16 @@ import {
   decodeMomentToken,
   encodeMomentToken,
   isValidMomentId,
+  momentDisplayPath,
   momentPath,
 } from '../../app/_utils/momentUrl.ts';
 
 const DATE = new Date('2026-01-01T00:00:00.000Z');
-const ISO = DATE.toISOString();
+const DATE_ISO = DATE.toISOString();
+const ISO = '2026-01-01T00:00:00Z';
 
-function routeParam(name: string, date = DATE) {
-  return encodeURIComponent(`${name}@${date.toISOString()}`);
+function routeParam(name: string) {
+  return encodeURIComponent(`${name}@${ISO}`);
 }
 
 describe('encodeMomentToken', () => {
@@ -35,6 +37,10 @@ describe('encodeMomentToken', () => {
   it('escapes characters that plain encodeURIComponent leaves in place', () => {
     assert.equal(encodeMomentToken(`Party (2026)!`, DATE).startsWith('Party%20%282026%29%21@'), true);
   });
+
+  it('strips milliseconds from the instant', () => {
+    assert.equal(encodeMomentToken('Party', new Date('2026-01-01T00:00:00.789Z')), `Party@${ISO}`);
+  });
 });
 
 describe('decodeMomentToken', () => {
@@ -44,8 +50,16 @@ describe('decodeMomentToken', () => {
 
       assert.ok(moment);
       assert.equal(moment.name, name);
-      assert.equal(moment.date.toISOString(), ISO);
+      assert.equal(moment.date.toISOString(), DATE_ISO);
     }
+  });
+
+  it('accepts legacy millisecond tokens and canonicalizes them', () => {
+    const moment = decodeMomentToken('Caf%C3%A9@2026-01-01T00:00:00.123Z');
+
+    assert.ok(moment);
+    assert.equal(moment.id, `Caf%C3%A9@${ISO}`);
+    assert.equal(moment.date.toISOString(), DATE_ISO);
   });
 
   it('canonicalizes equivalent percent-encoding', () => {
@@ -71,17 +85,18 @@ describe('decodeMomentToken', () => {
   it('rejects malformed tokens', () => {
     for (const token of [
       '',
-      '@2026-01-01T00:00:00.000Z',
+      '@2026-01-01T00:00:00Z',
       'no-delimiter',
       `Name@not-a-date`,
       `Name@2026-01-01`,
-      `Name@2026-01-01T00:00:00Z`,
+      `Name@2026-01-01T00:00:00.1Z`,
+      `Name@2026-01-01T00:00:00.12Z`,
       `Name@2026-01-01T00:00:00.000Z `,
       `Bad%ZZ@${ISO}`,
       ` Bad@${ISO}`,
       `Bad@${ISO} `,
-      `Name@2026-02-31T00:00:00.000Z`,
-      `Name@0000-01-01T00:00:00.000Z`,
+      `Name@2026-02-31T00:00:00Z`,
+      `Name@0000-01-01T00:00:00Z`,
       `${'a'.repeat(513)}@${ISO}`,
       `${'a'.repeat(200)}@${ISO}`,
     ]) {
@@ -112,6 +127,15 @@ describe('decodeMomentParam', () => {
     assert.equal(moment.name, '100%');
   });
 
+  it('accepts a legacy millisecond route parameter and canonicalizes it', () => {
+    const token = encodeMomentToken('Café', DATE);
+    const moment = decodeMomentParam(encodeURIComponent('Café@2026-01-01T00:00:00.500Z'));
+
+    assert.ok(moment);
+    assert.equal(moment.id, token);
+    assert.equal(moment.date.toISOString(), DATE_ISO);
+  });
+
   it('rejects malformed route parameters', () => {
     assert.equal(decodeMomentParam(encodeURIComponent('not-a-moment')), null);
     assert.equal(decodeMomentParam(encodeURIComponent(`Name@not-a-date`)), null);
@@ -129,10 +153,32 @@ describe('isValidMomentId and momentPath', () => {
   });
 
   it('builds an absolute site-relative path', () => {
-    assert.equal(momentPath('a%40b@2026-01-01T00:00:00.000Z'), '/a%40b@2026-01-01T00:00:00.000Z');
+    assert.equal(momentPath('a%40b@2026-01-01T00:00:00Z'), '/a%40b@2026-01-01T00:00:00Z');
   });
 
   it('rejects a route parameter passed as a plain name', () => {
     assert.equal(decodeMomentParam(routeParam('Café'))?.name, 'Café');
+  });
+});
+
+describe('momentDisplayPath', () => {
+  it('decodes non-ASCII escapes for display', () => {
+    assert.equal(momentDisplayPath(`Caf%C3%A9@${ISO}`), `/Café@${ISO}`);
+    assert.equal(momentDisplayPath(`%F0%9F%8E%89%20party@${ISO}`), `/🎉%20party@${ISO}`);
+  });
+
+  it('leaves ASCII delimiters encoded so the URL stays unambiguous', () => {
+    assert.equal(momentDisplayPath(`a%2Fb%40c%25d%3Fe@${ISO}`), `/a%2Fb%40c%25d%3Fe@${ISO}`);
+  });
+
+  it('leaves an invalid UTF-8 run unchanged', () => {
+    assert.equal(momentDisplayPath(`bad%C3@${ISO}`), `/bad%C3@${ISO}`);
+  });
+
+  it('keeps the copied link path encoded', () => {
+    const token = encodeMomentToken('Café', DATE);
+
+    assert.equal(momentPath(token), `/Caf%C3%A9@${ISO}`);
+    assert.equal(momentDisplayPath(token), `/Café@${ISO}`);
   });
 });

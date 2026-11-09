@@ -1,7 +1,7 @@
 import { buildMomentImageContent, buildMomentImageFilename } from './momentImage.ts';
 import { renderMomentImagePng, triggerPngDownload } from './momentImageRenderer.ts';
 import type { MomentImageTheme } from './momentImageTypes.ts';
-import { momentPath } from './momentUrl.ts';
+import { momentDisplayPath } from './momentUrl.ts';
 import { splitRemaining } from './timer.ts';
 
 type MomentImageTarget = {
@@ -16,7 +16,7 @@ export async function renderMomentImageBlob({ id, name, date }: MomentImageTarge
     name,
     date,
     remaining,
-    url: `${location.origin}${momentPath(id)}`,
+    url: `${location.origin}${momentDisplayPath(id)}`,
   });
   const theme = readTheme();
 
