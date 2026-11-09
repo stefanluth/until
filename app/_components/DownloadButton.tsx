@@ -4,7 +4,7 @@ import { Download } from 'lucide-react';
 
 import { useState } from 'react';
 
-import { ICON_BUTTON_CLASS, ICON_CLASS, MENU_ITEM_CLASS } from './actionStyles';
+import { ActionButton } from './ActionButton';
 import { useDelayedPending } from './useDelayedPending';
 
 export function DownloadButton({
@@ -46,24 +46,17 @@ export function DownloadButton({
     : pending
       ? 'Downloading image…'
       : 'Download this countdown as an image';
+  const status = pending ? 'Downloading image…' : failed ? 'Could not download the image' : '';
 
   return (
-    <button
-      className={withLabel ? MENU_ITEM_CLASS : ICON_BUTTON_CLASS}
-      title={description}
-      aria-label={description}
-      aria-busy={pending}
-      disabled={pending}
+    <ActionButton
+      icon={Download}
+      label={label}
+      description={description}
+      variant={withLabel ? 'menu' : 'icon'}
+      pending={pending}
+      status={status}
       onClick={save}
-    >
-      <Download className={ICON_CLASS} />
-      {withLabel ? (
-        <span aria-live="polite">{label}</span>
-      ) : (
-        <span className="sr-only" role="status">
-          {pending ? 'Downloading image…' : failed ? 'Could not download the image' : ''}
-        </span>
-      )}
-    </button>
+    />
   );
 }

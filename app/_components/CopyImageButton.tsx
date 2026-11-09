@@ -4,30 +4,16 @@ import { ClipboardCheck, Image as ImageIcon } from 'lucide-react';
 
 import { useState } from 'react';
 
-import { ICON_BUTTON_CLASS, ICON_CLASS, MENU_ITEM_CLASS } from './actionStyles';
+import { ActionButton } from './ActionButton';
 import { useDelayedPending } from './useDelayedPending';
 
 type CopyStatus = 'idle' | 'copying' | 'copied' | 'failed';
 
-const COPY_LABEL: Record<CopyStatus, string> = {
-  idle: 'Copy image',
-  copying: 'Copying image…',
-  copied: 'Copied!',
-  failed: 'Copy failed',
-};
-
-const COPY_DESCRIPTION: Record<CopyStatus, string> = {
-  idle: 'Copy this countdown as an image to the clipboard',
-  copying: 'Copying image…',
-  copied: 'Copied!',
-  failed: 'Could not copy the image',
-};
-
-const COPY_ANNOUNCEMENT: Record<CopyStatus, string> = {
-  idle: '',
-  copying: 'Copying image…',
-  copied: 'Copied!',
-  failed: 'Could not copy the image',
+const COPY_STATE: Record<CopyStatus, { label: string; description: string; announcement: string }> = {
+  idle: { label: 'Copy image', description: 'Copy this countdown as an image to the clipboard', announcement: '' },
+  copying: { label: 'Copying image…', description: 'Copying image…', announcement: 'Copying image…' },
+  copied: { label: 'Copied!', description: 'Copied!', announcement: 'Copied!' },
+  failed: { label: 'Copy failed', description: 'Could not copy the image', announcement: 'Could not copy the image' },
 };
 
 function getCopyStatus(failed: boolean, pending: boolean, copied: boolean): CopyStatus {
@@ -60,7 +46,7 @@ function useCopyImage({ id, name, date }: { id: string; name: string; date: Date
     setCopied(false);
 
     try {
-      const { copyCountdownImage } = await import('@/_utils/copyCountdownImage');
+      const { copyCountdownImage } = await import('@/_utils/downloadCountdownImage');
       await copyCountdownImage({ id, name, date });
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
@@ -88,25 +74,17 @@ export function CopyImageButton({
   withLabel?: boolean;
 }) {
   const { pending, status, copy } = useCopyImage({ id, name, date });
-  const Icon = status === 'copied' ? ClipboardCheck : ImageIcon;
+  const { label, description, announcement } = COPY_STATE[status];
 
   return (
-    <button
-      className={withLabel ? MENU_ITEM_CLASS : ICON_BUTTON_CLASS}
-      title={COPY_DESCRIPTION[status]}
-      aria-label={COPY_DESCRIPTION[status]}
-      aria-busy={pending}
-      disabled={pending}
+    <ActionButton
+      icon={status === 'copied' ? ClipboardCheck : ImageIcon}
+      label={label}
+      description={description}
+      variant={withLabel ? 'menu' : 'icon'}
+      pending={pending}
+      status={announcement}
       onClick={copy}
-    >
-      <Icon className={ICON_CLASS} />
-      {withLabel ? (
-        <span aria-live="polite">{COPY_LABEL[status]}</span>
-      ) : (
-        <span className="sr-only" role="status">
-          {COPY_ANNOUNCEMENT[status]}
-        </span>
-      )}
-    </button>
+    />
   );
 }

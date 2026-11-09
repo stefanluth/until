@@ -3,15 +3,13 @@ import { renderCountdownImagePng, triggerPngDownload } from './countdownImageRen
 import type { CountdownImageTheme } from './countdownImageTypes.ts';
 import { splitRemaining } from './duration.ts';
 
-export async function renderCountdownImageBlob({
-  id,
-  name,
-  date,
-}: {
+type CountdownImageTarget = {
   id: string;
   name: string;
   date: Date;
-}): Promise<Blob> {
+};
+
+export async function renderCountdownImageBlob({ id, name, date }: CountdownImageTarget): Promise<Blob> {
   const remaining = splitRemaining(date.getTime() - Date.now());
   const content = buildCountdownImageContent({
     name,
@@ -26,15 +24,17 @@ export async function renderCountdownImageBlob({
   return await renderCountdownImagePng(content, theme);
 }
 
-export async function downloadCountdownImage({
-  id,
-  name,
-  date,
-}: {
-  id: string;
-  name: string;
-  date: Date;
-}): Promise<void> {
+export async function copyCountdownImage({ id, name, date }: CountdownImageTarget): Promise<void> {
+  if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+    throw new Error('Copying images to the clipboard is not supported in this browser');
+  }
+
+  const png = renderCountdownImageBlob({ id, name, date });
+
+  await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
+}
+
+export async function downloadCountdownImage({ id, name, date }: CountdownImageTarget): Promise<void> {
   const blob = await renderCountdownImageBlob({ id, name, date });
   triggerPngDownload(blob, buildCountdownImageFilename(name, date));
 }
