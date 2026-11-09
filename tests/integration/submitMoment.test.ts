@@ -144,59 +144,67 @@ describe('submitMoment guards', () => {
     expect(cookieWrites()).toEqual([]);
   });
 
-  it('reports a duplicate when the database insert does nothing', async () => {
+  it('reuses an existing moment and saves it to the list', async () => {
     grantConsent();
     runtime.createMoment.mockResolvedValue(false);
 
-    const result = await submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE }));
+    await expect(
+      submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE })),
+    ).rejects.toThrow(`REDIRECT:/${createMomentId('Party', new Date(DATE))}`);
 
-    expect(result).toEqual({ error: 'Moment already exists', location: 'name' });
+    const id = createMomentId('Party', new Date(DATE));
     expect(runtime.createMoment).toHaveBeenCalledTimes(1);
-    expect(cookieWrites()).toEqual([]);
+    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
+    expect(runtime.redirect).toHaveBeenCalledWith(`/${id}`);
   });
 
-  it('reports a duplicate when the id is already in the cookie', async () => {
+  it('does not duplicate the cookie entry when the id is already saved', async () => {
     grantConsent();
     const id = createMomentId('Party', new Date(DATE));
     runtime.values.set(MOMENT_LIST_COOKIE, id);
 
-    const result = await submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE }));
+    await expect(
+      submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE })),
+    ).rejects.toThrow(`REDIRECT:/${id}`);
 
-    expect(result).toEqual({ error: 'Moment already exists', location: 'name' });
     expect(runtime.createMoment).toHaveBeenCalledTimes(1);
-    expect(cookieWrites()).toEqual([]);
+    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
+    expect(runtime.redirect).toHaveBeenCalledWith(`/${id}`);
   });
 
-  it('creates the moment, appends the cookie, and redirects on success', async () => {
+  it('creates the moment, appends the cookie, and redirects to it on success', async () => {
     grantConsent();
-
-    await expect(
-      submitMomentAction(INITIAL_STATE, form({ name: '  Party  ', when: '1d', date: DATE })),
-    ).rejects.toThrow('REDIRECT:/moments');
 
     const id = createMomentId('Party', new Date(DATE));
 
+    await expect(
+      submitMomentAction(INITIAL_STATE, form({ name: '  Party  ', when: '1d', date: DATE })),
+    ).rejects.toThrow(`REDIRECT:/${id}`);
+
     expect(runtime.createMoment).toHaveBeenCalledWith({ id, name: 'Party', date: new Date(DATE) });
     expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
-    expect(runtime.redirect).toHaveBeenCalledWith('/moments');
+    expect(runtime.redirect).toHaveBeenCalledWith(`/${id}`);
   });
 
   it('prefers a valid client date over the parsed when value', async () => {
     grantConsent();
     const clientDate = '2031-02-03T04:05:06.000Z';
+    const id = createMomentId('Party', new Date(clientDate));
 
     await expect(
       submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '25-12-2026 18:00', date: clientDate })),
-    ).rejects.toThrow('REDIRECT:/moments');
+    ).rejects.toThrow(`REDIRECT:/${id}`);
 
     expect(runtime.createMoment).toHaveBeenCalledWith(expect.objectContaining({ date: new Date(clientDate) }));
   });
 
   it('falls back to the parsed when value when the client date is missing', async () => {
     grantConsent();
+    const date = new Date('2026-12-25T18:00:00.000Z');
+    const id = createMomentId('Party', date);
 
     await expect(submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '25-12-2026 18:00' }))).rejects.toThrow(
-      'REDIRECT:/moments',
+      `REDIRECT:/${id}`,
     );
 
     expect(runtime.createMoment).toHaveBeenCalledWith(
@@ -206,10 +214,12 @@ describe('submitMoment guards', () => {
 
   it('falls back to the parsed when value when the client date is invalid', async () => {
     grantConsent();
+    const date = new Date('2026-12-25T18:00:00.000Z');
+    const id = createMomentId('Party', date);
 
     await expect(
       submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '25-12-2026 18:00', date: 'not-a-date' })),
-    ).rejects.toThrow('REDIRECT:/moments');
+    ).rejects.toThrow(`REDIRECT:/${id}`);
 
     expect(runtime.createMoment).toHaveBeenCalledWith(
       expect.objectContaining({ date: new Date('2026-12-25T18:00:00.000Z') }),
@@ -219,12 +229,12 @@ describe('submitMoment guards', () => {
   it('filters malformed cookie entries when appending the new id', async () => {
     grantConsent();
     runtime.values.set(MOMENT_LIST_COOKIE, 'bad id,other-def67890');
+    const id = createMomentId('Party', new Date(DATE));
 
     await expect(submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE }))).rejects.toThrow(
-      'REDIRECT:/moments',
+      `REDIRECT:/${id}`,
     );
 
-    const id = createMomentId('Party', new Date(DATE));
     expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(`other-def67890,${id}`);
   });
 

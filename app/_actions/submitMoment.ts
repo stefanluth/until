@@ -53,17 +53,14 @@ export async function submitMomentAction(
   const date = clientDate ?? parsedWhen;
   const momentId = createMomentId(nameResult.value, date);
   const momentIds = getMomentList(cookieStore);
-  const created = await createMoment({
+
+  await createMoment({
     id: momentId,
     name: nameResult.value,
     date,
   });
 
-  if (!created || momentIds.includes(momentId)) {
-    return { error: 'Moment already exists', location: 'name' };
-  }
-
   setMomentList(cookieStore, addMomentId(momentIds, momentId));
 
-  redirect(`/moments`);
+  redirect(`/${momentId}`);
 }
