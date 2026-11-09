@@ -1,8 +1,9 @@
 'use client';
 
 import Cookies from 'js-cookie';
+import { CircleAlert } from 'lucide-react';
 
-import { type SubmitEvent, useActionState, useRef, useState } from 'react';
+import { type SubmitEvent, useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { type CountdownFormState, submitCountdownAction } from '@/_actions/submitCountdown';
@@ -15,12 +16,27 @@ import { useConsent } from './ConsentProvider';
 const INITIAL_STATE: CountdownFormState = { error: '', location: '' };
 
 export default function CountdownInput() {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const whenInputRef = useRef<HTMLInputElement>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [name, setName] = useState('');
   const [when, setWhen] = useState('');
   const { requestConsent } = useConsent();
   const [state, formAction] = useActionState(submitCountdownAction, INITIAL_STATE);
+
+  const nameError = state.location === 'name' ? state.error : '';
+  const whenError = state.location === 'when' ? state.error : '';
+  const formError = state.location === 'consent' || state.location === 'form' ? state.error : '';
+  const bottomError = whenError || formError;
+
+  useEffect(() => {
+    if (state.location === 'name') {
+      nameInputRef.current?.focus();
+    } else if (state.location === 'when') {
+      whenInputRef.current?.focus();
+    }
+  }, [state]);
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     if (!isConsentGranted(Cookies.get(CONSENT_COOKIE))) {
@@ -42,15 +58,13 @@ export default function CountdownInput() {
   }
 
   return (
-    <form ref={formRef} className="flex flex-col gap-4 sm:gap-5" action={formAction} onSubmit={handleSubmit}>
+    <form ref={formRef} className="flex flex-col gap-1 sm:gap-1.5" action={formAction} onSubmit={handleSubmit}>
       <div>
-        <div className="flex items-center">
-          <label className="text-base sm:text-lg" htmlFor="name">
-            Name of the event
-          </label>
-          <FieldError state={state} field="name" />
-        </div>
+        <label className="text-base sm:text-lg" htmlFor="name">
+          Name of the event
+        </label>
         <input
+          ref={nameInputRef}
           className="block w-full mt-1 text-base sm:text-lg p-2.5 sm:p-3"
           type="text"
           id="name"
@@ -60,17 +74,18 @@ export default function CountdownInput() {
           maxLength={MAX_COUNTDOWN_NAME_LENGTH}
           value={name}
           onChange={(event) => setName(event.target.value)}
+          aria-invalid={nameError ? true : undefined}
+          aria-describedby={nameError ? 'name-error' : undefined}
           required
         />
+        <FieldError field="name" message={nameError} />
       </div>
       <div>
-        <div className="flex items-center">
-          <label className="text-base sm:text-lg" htmlFor="when">
-            When
-          </label>
-          <FieldError state={state} field="when" />
-        </div>
+        <label className="text-base sm:text-lg" htmlFor="when">
+          When
+        </label>
         <input
+          ref={whenInputRef}
           className="block w-full mt-1 text-base sm:text-lg p-2.5 sm:p-3"
           type="text"
           id="when"
@@ -79,13 +94,13 @@ export default function CountdownInput() {
           autoComplete="off"
           value={when}
           onChange={(event) => setWhen(event.target.value)}
+          aria-invalid={whenError ? true : undefined}
+          aria-describedby={whenError ? 'when-error' : undefined}
           required
         />
         <input ref={dateInputRef} type="hidden" name="date" />
+        <FieldError field={whenError ? 'when' : 'form'} message={bottomError} />
       </div>
-      {(state.location === 'consent' || state.location === 'form') && (
-        <p className="text-base text-red-700 dark:text-red-300">{state.error}</p>
-      )}
       <SubmitButton />
     </form>
   );
@@ -105,17 +120,19 @@ function SubmitButton() {
   );
 }
 
-function FieldError({ state, field }: { state: CountdownFormState; field: 'name' | 'when' }) {
-  if (state.location !== field) {
-    return null;
-  }
-
+function FieldError({ field, message }: { field: 'name' | 'when' | 'form'; message: string }) {
   return (
-    <div
-      className="ml-auto mr-2 h-6 w-6 leading-5 text-white text-center align-middle bg-red-500 border-2 border-red-500 rounded-full cursor-pointer"
-      title={state.error}
-    >
-      !
+    <div className="mt-1 min-h-5 sm:min-h-6">
+      {message ? (
+        <p
+          id={`${field}-error`}
+          role="alert"
+          className="flex items-start gap-1.5 text-sm leading-5 text-red-700 sm:text-base sm:leading-6 dark:text-red-300"
+        >
+          <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <span>{message}</span>
+        </p>
+      ) : null}
     </div>
   );
 }
