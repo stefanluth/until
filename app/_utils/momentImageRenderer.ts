@@ -38,11 +38,11 @@ export function drawMomentImage(
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   ctx.globalAlpha = 0.9;
-  ctx.font = font(600, 44 * scale, fontFamily);
+  ctx.font = font(600, 52 * scale, fontFamily);
   ctx.fillText(WORDMARK, padding, 64 * scale);
 
   const title = fitTitle(ctx, content.name || ' ', maxWidth, scale, fontFamily);
-  const titleTop = 300 * scale;
+  const titleTop = 220 * scale;
   const titleLineHeight = title.size * 1.12;
 
   ctx.textAlign = 'center';
@@ -57,7 +57,7 @@ export function drawMomentImage(
 
   drawDateLine(ctx, content, centerX, dateY, maxWidth, fontFamily, scale, foreground);
 
-  const unitsY = 710 * scale;
+  const unitsY = 630 * scale;
 
   if (content.ended || content.units.length === 0) {
     ctx.globalAlpha = 1;
@@ -72,7 +72,7 @@ export function drawMomentImage(
     ctx.globalAlpha = 0.7;
     ctx.textBaseline = 'bottom';
     ctx.textAlign = 'center';
-    const url = fitLine(ctx, content.url, maxWidth, 28 * scale, 18 * scale, fontFamily, 400);
+    const url = fitLine(ctx, content.url, maxWidth, 34 * scale, 18 * scale, fontFamily, 400);
     ctx.font = font(400, url.size, fontFamily);
     ctx.fillText(url.text, centerX, size - 56 * scale);
   }
@@ -139,7 +139,7 @@ function drawDateLine(
     return { dateWidth, timeWidth, totalWidth };
   };
 
-  let size = Math.round(36 * scale);
+  let size = Math.round(38 * scale);
   let { dateWidth, timeWidth, totalWidth } = measureGroup(size);
 
   while (size > minSize && totalWidth > maxWidth) {
@@ -199,7 +199,7 @@ function drawUnits(
     numberSize *= (columnWidth * 0.92) / widest;
   }
 
-  const labelSize = Math.min(30 * scale, columnWidth * 0.35);
+  const labelSize = Math.min(34 * scale, columnWidth * 0.35);
 
   ctx.fillStyle = foreground;
   ctx.textAlign = 'center';
@@ -224,7 +224,7 @@ function fitTitle(
   scale: number,
   fontFamily: string,
 ): { size: number; lines: string[] } {
-  const maxSize = Math.round(88 * scale);
+  const maxSize = Math.round(96 * scale);
   const minSize = Math.round(44 * scale);
 
   for (let size = maxSize; size >= minSize; size -= 2) {
