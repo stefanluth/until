@@ -5,7 +5,6 @@ const SEPARATOR = '@';
 const MAX_MOMENT_ID_LENGTH = 512;
 const MAX_ENCODED_MOMENT_ID_LENGTH = MAX_MOMENT_ID_LENGTH * 4;
 const ISO_SECONDS_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
-const ISO_MILLIS_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const EXTRA_ESCAPED_RE = /[!'()*]/g;
 const NON_ASCII_PERCENT_RUN_RE = /(?:%[89A-Fa-f][0-9A-Fa-f])+/g;
 
@@ -77,25 +76,16 @@ function buildMoment(name: string, rawDate: string): Moment | null {
     return null;
   }
 
-  const hasSeconds = ISO_SECONDS_RE.test(rawDate);
-  const hasMilliseconds = ISO_MILLIS_RE.test(rawDate);
-
-  if (!hasSeconds && !hasMilliseconds) {
+  if (!ISO_SECONDS_RE.test(rawDate)) {
     return null;
   }
 
   const date = new Date(rawDate);
-  if (!Number.isFinite(date.getTime()) || date.getUTCFullYear() < 1) {
+  if (!Number.isFinite(date.getTime()) || formatMomentInstant(date) !== rawDate || date.getUTCFullYear() < 1) {
     return null;
   }
 
-  if (hasMilliseconds ? date.toISOString() !== rawDate : formatMomentInstant(date) !== rawDate) {
-    return null;
-  }
-
-  const normalizedDate = new Date(formatMomentInstant(date));
-
-  return { id: encodeMomentToken(name, normalizedDate), name, date: normalizedDate };
+  return { id: encodeMomentToken(name, date), name, date };
 }
 
 function encodeName(name: string): string {

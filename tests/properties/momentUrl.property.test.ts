@@ -51,21 +51,6 @@ describe('moment URL properties', () => {
     );
   });
 
-  it('canonicalizes legacy millisecond tokens', () => {
-    fc.assert(
-      fc.property(validMomentName, date, (name, when) => {
-        const token = encodeMomentToken(name, when);
-        const separatorIndex = token.lastIndexOf('@');
-        const legacy = `${token.slice(0, separatorIndex + 1)}${when.toISOString()}`;
-        const moment = decodeMomentToken(legacy);
-
-        assert.ok(moment);
-        assert.equal(moment.id, token);
-        assert.equal(moment.date.getTime(), floorToSecond(when));
-      }),
-    );
-  });
-
   it('always produces a canonical token with one raw delimiter', () => {
     fc.assert(
       fc.property(validMomentId, (token) => {

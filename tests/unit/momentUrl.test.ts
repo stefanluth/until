@@ -54,14 +54,6 @@ describe('decodeMomentToken', () => {
     }
   });
 
-  it('accepts legacy millisecond tokens and canonicalizes them', () => {
-    const moment = decodeMomentToken('Caf%C3%A9@2026-01-01T00:00:00.123Z');
-
-    assert.ok(moment);
-    assert.equal(moment.id, `Caf%C3%A9@${ISO}`);
-    assert.equal(moment.date.toISOString(), DATE_ISO);
-  });
-
   it('canonicalizes equivalent percent-encoding', () => {
     const token = `Caf%c3%a9@${ISO}`;
     const moment = decodeMomentToken(token);
@@ -91,6 +83,7 @@ describe('decodeMomentToken', () => {
       `Name@2026-01-01`,
       `Name@2026-01-01T00:00:00.1Z`,
       `Name@2026-01-01T00:00:00.12Z`,
+      `Name@2026-01-01T00:00:00.000Z`,
       `Name@2026-01-01T00:00:00.000Z `,
       `Bad%ZZ@${ISO}`,
       ` Bad@${ISO}`,
@@ -127,18 +120,10 @@ describe('decodeMomentParam', () => {
     assert.equal(moment.name, '100%');
   });
 
-  it('accepts a legacy millisecond route parameter and canonicalizes it', () => {
-    const token = encodeMomentToken('Café', DATE);
-    const moment = decodeMomentParam(encodeURIComponent('Café@2026-01-01T00:00:00.500Z'));
-
-    assert.ok(moment);
-    assert.equal(moment.id, token);
-    assert.equal(moment.date.toISOString(), DATE_ISO);
-  });
-
   it('rejects malformed route parameters', () => {
     assert.equal(decodeMomentParam(encodeURIComponent('not-a-moment')), null);
     assert.equal(decodeMomentParam(encodeURIComponent(`Name@not-a-date`)), null);
+    assert.equal(decodeMomentParam(encodeURIComponent('Café@2026-01-01T00:00:00.000Z')), null);
     assert.equal(decodeMomentParam('%E0%A4%A'), null);
     assert.equal(decodeMomentParam(null), null);
   });
