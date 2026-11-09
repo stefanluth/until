@@ -6,7 +6,7 @@ import { ConsentProvider } from '@/_components/ConsentProvider';
 import { CountdownMetaProvider } from '@/_components/CountdownMetaContext';
 import { Footer } from '@/_components/Footer';
 import { NavBar } from '@/_components/NavBar';
-import { DEFAULT_MODE, DEFAULT_THEME, MODES, MODE_STORAGE_KEY, THEMES, THEME_STORAGE_KEY } from '@/_utils/themes';
+import { ThemeBootScript } from '@/_components/ThemeBootScript';
 
 import './globals.css';
 
@@ -16,8 +16,6 @@ const inter = localFont({
   style: 'normal',
   display: 'swap',
 });
-
-const themeBootScript = `(function(){try{var d=document.documentElement;var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(${JSON.stringify(THEMES.map((theme) => theme.id))}.indexOf(t)>-1&&t!==${JSON.stringify(DEFAULT_THEME)}){d.dataset.theme=t}var m=localStorage.getItem(${JSON.stringify(MODE_STORAGE_KEY)});if(${JSON.stringify(MODES)}.indexOf(m)<0){m=${JSON.stringify(DEFAULT_MODE)}}d.dataset.mode=m;d.dataset.appearance=m==='light'||m==='dark'?m:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}})();`;
 
 export const metadata: Metadata = {
   title: 'until',
@@ -33,9 +31,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body className={`${inter.className} h-full min-h-dvh w-full flex flex-col`}>
+        {/* Server-injected into <head> before paint; renders null on the client. */}
+        <ThemeBootScript />
         <ConsentProvider>
           <CountdownMetaProvider>
             <div className="group relative flex flex-1 flex-col">
