@@ -86,12 +86,14 @@ function MomentMenu({
   name,
   date,
   momentInCookies,
+  onAdded,
   onRemoved,
 }: {
   id: string;
   name?: string;
   date?: Date;
   momentInCookies: boolean | null;
+  onAdded: () => void;
   onRemoved: () => void;
 }) {
   const close = useMenuClose();
@@ -107,6 +109,19 @@ function MomentMenu({
             withLabel
             onRemoved={() => {
               onRemoved();
+              close();
+            }}
+          />
+        </>
+      )}
+      {momentInCookies === false && (
+        <>
+          <div className="my-1 h-px bg-black/10 dark:bg-white/10" aria-hidden />
+          <AddButton
+            id={id}
+            showLabel
+            onAdded={() => {
+              onAdded();
               close();
             }}
           />
@@ -150,11 +165,6 @@ export function MomentCardActions({
     <div className="relative flex items-center gap-1 sm:gap-5">
       {compactOnMobile ? (
         <>
-          {momentInCookies === false && (
-            <div className="sm:hidden">
-              <AddButton id={id} showLabel onAdded={markAdded} />
-            </div>
-          )}
           <Menu
             label="Moment actions"
             placement="auto"
@@ -174,7 +184,14 @@ export function MomentCardActions({
               </button>
             )}
           >
-            <MomentMenu id={id} name={name} date={date} momentInCookies={momentInCookies} onRemoved={markRemoved} />
+            <MomentMenu
+              id={id}
+              name={name}
+              date={date}
+              momentInCookies={momentInCookies}
+              onAdded={markAdded}
+              onRemoved={markRemoved}
+            />
           </Menu>
           <InlineActions {...inline} className="hidden items-center gap-5 sm:flex" />
         </>
