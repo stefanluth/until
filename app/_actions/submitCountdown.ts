@@ -23,11 +23,11 @@ export async function submitCountdownAction(
   const cookieStore = await cookies();
 
   if (!isConsentGranted(cookieStore.get(CONSENT_COOKIE)?.value)) {
-    return { error: 'Please accept the cookie notice before creating a countdown.', location: 'consent' };
+    return { error: 'Accept cookies to create a countdown.', location: 'consent' };
   }
 
   if (!consumeRateLimit(getRateLimitKey(await headers()))) {
-    return { error: 'Too many countdowns created. Please try again later.', location: 'form' };
+    return { error: 'Too many countdowns. Try again later.', location: 'form' };
   }
 
   const nameResult = validateCountdownName(formData.get('name'));
@@ -45,7 +45,7 @@ export async function submitCountdownAction(
 
   if (!parsedWhen) {
     return {
-      error: 'Enter a duration like 1d 2h 3m or a date like 25-12-2026 18:00',
+      error: 'e.g. 1d 2h 3m or 25-12-2026 18:00',
       location: 'when',
     };
   }

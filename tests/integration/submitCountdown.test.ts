@@ -86,7 +86,7 @@ describe('submitCountdown guards', () => {
     const result = await submitCountdownAction(INITIAL_STATE, form({ name: 'Party', when: '1d' }));
 
     expect(result).toEqual({
-      error: 'Please accept the cookie notice before creating a countdown.',
+      error: 'Accept cookies to create a countdown.',
       location: 'consent',
     });
     expect(runtime.headers).not.toHaveBeenCalled();
@@ -102,7 +102,7 @@ describe('submitCountdown guards', () => {
     const result = await submitCountdownAction(INITIAL_STATE, form({ name: 'Party', when: '1d' }));
 
     expect(result).toEqual({
-      error: 'Too many countdowns created. Please try again later.',
+      error: 'Too many countdowns. Try again later.',
       location: 'form',
     });
     expect(runtime.getRateLimitKey).toHaveBeenCalledTimes(1);
@@ -137,7 +137,7 @@ describe('submitCountdown guards', () => {
     const result = await submitCountdownAction(INITIAL_STATE, form({ name: 'Party', when: 'not a date' }));
 
     expect(result).toEqual({
-      error: 'Enter a duration like 1d 2h 3m or a date like 25-12-2026 18:00',
+      error: 'e.g. 1d 2h 3m or 25-12-2026 18:00',
       location: 'when',
     });
     expect(runtime.createCountdown).not.toHaveBeenCalled();
