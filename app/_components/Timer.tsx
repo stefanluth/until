@@ -28,7 +28,7 @@ const CLASSES = {
   },
 } as const;
 
-export function MomentTimer({ parts, variant = 'card' }: { parts: RemainingParts; variant?: MomentVariant }) {
+export function Timer({ parts, variant = 'card' }: { parts: RemainingParts; variant?: MomentVariant }) {
   const visible = getVisibleUnits(parts);
   const classes = CLASSES[variant];
 

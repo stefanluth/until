@@ -10,7 +10,7 @@ import type { Moment, MomentVariant } from '@/types';
 
 import { MomentCardActions } from './MomentCardActions';
 import { MomentCardHeader } from './MomentCardHeader';
-import { MomentTimer } from './MomentTimer';
+import { Timer } from './Timer';
 
 export default function MomentCard({ variant = 'card', ...moment }: Moment & { variant?: MomentVariant }) {
   const [now, setNow] = useState(() => Date.now());
@@ -33,7 +33,7 @@ export default function MomentCard({ variant = 'card', ...moment }: Moment & { v
     return (
       <div className="flex flex-1 flex-col items-center justify-center w-full max-w-6xl px-4 mx-auto text-center">
         <MomentCardHeader name={moment.name} date={moment.date} variant="detail" />
-        <MomentTimer parts={remaining} variant="detail" />
+        <Timer parts={remaining} variant="detail" />
       </div>
     );
   }
@@ -52,7 +52,7 @@ export default function MomentCard({ variant = 'card', ...moment }: Moment & { v
       </div>
       <div className="pointer-events-none flex flex-1 flex-col">
         <MomentCardHeader name={moment.name} date={moment.date} variant="card" />
-        <MomentTimer parts={remaining} />
+        <Timer parts={remaining} />
       </div>
     </div>
   );
