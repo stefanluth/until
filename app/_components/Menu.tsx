@@ -14,8 +14,6 @@ import {
   useState,
 } from 'react';
 
-import { MENU_SURFACE_CLASS } from './actionStyles';
-
 type MenuPlacement = 'top' | 'bottom' | 'auto';
 type MenuWidthClass = 'w-40' | 'w-56';
 type MenuZClass = 'z-20' | 'z-30';
@@ -175,7 +173,7 @@ export function Menu({
           role="group"
           aria-label={label}
           style={panelStyle}
-          className={`absolute right-0 ${positionClass} ${zClass} flex ${widthClass} flex-col gap-1 ${MENU_SURFACE_CLASS}`}
+          className={`absolute right-0 ${positionClass} ${zClass} flex ${widthClass} flex-col gap-1 rounded-2xl border border-white/50 bg-white/50 p-2 shadow-xl backdrop-blur-sm dark:border-white/20 dark:bg-black/50`}
         >
           <MenuCloseContext.Provider value={close}>{children}</MenuCloseContext.Provider>
         </div>
