@@ -2,7 +2,7 @@
 
 import { BookmarkOff } from 'lucide-react';
 
-import { removeMoment } from '@/_actions/removeMoment';
+import { unsaveMoment } from '@/_utils/momentListClient';
 
 import { ActionButton } from './ActionButton';
 import { useConsentAction } from './useConsentAction';
@@ -16,7 +16,7 @@ export function RemoveButton({
   onRemoved?: () => void;
   withLabel?: boolean;
 }) {
-  const { pending, run } = useConsentAction(() => removeMoment(id), ['removed'], onRemoved);
+  const { pending, run } = useConsentAction(() => unsaveMoment(id), ['removed'], onRemoved);
 
   return (
     <ActionButton

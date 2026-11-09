@@ -13,10 +13,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "npm run test:unit && npm run test:property && npm run test:integration",
+    "test": "npm run test:unit && npm run test:property",
     "test:unit": "TZ=UTC node --test tests/unit",
     "test:property": "TZ=UTC node --test tests/properties",
-    "test:integration": "TZ=UTC vitest run",
     "test:coverage": "TZ=UTC node --test --experimental-test-coverage --test-coverage-include='app/_utils/**' tests/unit tests/properties",
     "typecheck": "tsc --noEmit"
   },
@@ -40,7 +39,6 @@
     "postcss": "8.5.32",
     "prettier": "3.9.10",
     "tailwindcss": "4.3.4",
-    "typescript": "5.9.3",
-    "vitest": "5.1.0"
+    "typescript": "5.9.3"
   }
 }

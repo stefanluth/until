@@ -68,12 +68,3 @@ export function validateMomentWhen(value: unknown): FieldResult<string> {
     location: 'when',
   });
 }
-
-export function parseClientDate(value: unknown): Date | null {
-  if (typeof value !== 'string' || !value || value.length > MAX_MOMENT_WHEN_LENGTH) {
-    return null;
-  }
-
-  const date = new Date(value);
-  return Number.isFinite(date.getTime()) ? date : null;
-}

@@ -2,13 +2,16 @@
 
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { useConsent } from './ConsentProvider';
 
 export function useConsentAction<T extends string>(
-  action: () => Promise<T>,
+  action: () => T | Promise<T>,
   successResults: readonly T[],
   onSuccess?: () => void,
 ) {
+  const router = useRouter();
   const { requestConsent } = useConsent();
   const [pending, setPending] = useState(false);
 
@@ -20,17 +23,11 @@ export function useConsentAction<T extends string>(
     setPending(true);
 
     try {
-      let result = await action();
-
-      if ((result as string) === 'consent') {
-        if (!(await requestConsent())) {
-          return;
-        }
-        result = await action();
-      }
+      const result = await action();
 
       if (successResults.includes(result)) {
         onSuccess?.();
+        router.refresh();
       }
     } finally {
       setPending(false);

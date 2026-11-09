@@ -2,7 +2,7 @@
 
 import { Bookmark } from 'lucide-react';
 
-import { addMoment } from '@/_actions/addMoment';
+import { saveMoment } from '@/_utils/momentListClient';
 
 import { ActionButton } from './ActionButton';
 import { useConsentAction } from './useConsentAction';
@@ -16,7 +16,7 @@ export function AddButton({
   onAdded?: () => void;
   showLabel?: boolean;
 }) {
-  const { pending, run } = useConsentAction(() => addMoment(id), ['added', 'exists'], onAdded);
+  const { pending, run } = useConsentAction(() => saveMoment(id), ['added', 'exists'], onAdded);
 
   return (
     <ActionButton

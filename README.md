@@ -20,12 +20,6 @@ npm install
 npm run dev
 ```
 
-## Configuration
-
-| Variable        | Required | Description                                                |
-| --------------- | -------- | ---------------------------------------------------------- |
-| `COOKIE_SECURE` | no       | Force secure cookies on or off. Defaults on in production. |
-
 ## Deployment
 
 until is a standard Next.js app. Build with `npm run build` and serve with

@@ -1,14 +1,16 @@
 import { COOKIE_OPTIONS, MOMENT_LIST_COOKIE } from './cookies.ts';
 import { decodeMomentToken } from './momentUrl.ts';
 
-type CookieReader = {
+export type CookieReader = {
   get(name: string): { value: string } | undefined;
 };
 
-type CookieWriter = {
+export type CookieWriter = {
   set(name: string, value: string, options: typeof COOKIE_OPTIONS): void;
   delete(options: { name: string; path: string }): void;
 };
+
+export type MomentCookieStore = CookieReader & CookieWriter;
 
 export function readMomentIds(raw: string | undefined): string[] {
   return (raw ?? '')

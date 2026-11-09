@@ -17,19 +17,10 @@ describe('isConsentGranted', () => {
 });
 
 describe('isSecureCookie', () => {
-  it('is insecure by default', () => {
-    assert.equal(isSecureCookie({}), false);
-  });
-
-  it('is secure by default in production', () => {
-    assert.equal(isSecureCookie({ NODE_ENV: 'production' }), true);
-    assert.equal(isSecureCookie({ NODE_ENV: 'production', COOKIE_SECURE: '' }), true);
-  });
-
-  it('honours an explicit COOKIE_SECURE override', () => {
-    assert.equal(isSecureCookie({ COOKIE_SECURE: 'true' }), true);
-    assert.equal(isSecureCookie({ COOKIE_SECURE: 'true', NODE_ENV: 'development' }), true);
-    assert.equal(isSecureCookie({ COOKIE_SECURE: 'false', NODE_ENV: 'production' }), false);
+  it('only marks cookies secure over https', () => {
+    assert.equal(isSecureCookie('https:'), true);
+    assert.equal(isSecureCookie('http:'), false);
+    assert.equal(isSecureCookie(''), false);
   });
 });
 

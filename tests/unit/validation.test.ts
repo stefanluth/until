@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { parseClientDate, validateMomentName, validateMomentWhen } from '../../app/_utils/validation.ts';
+import { validateMomentName, validateMomentWhen } from '../../app/_utils/validation.ts';
 
 describe('validateMomentName', () => {
   it('trims valid names', () => {
@@ -36,17 +36,5 @@ describe('validateMomentWhen', () => {
 
   it('rejects overlong values', () => {
     assert.equal(validateMomentWhen('a'.repeat(65)).ok, false);
-  });
-});
-
-describe('parseClientDate', () => {
-  it('parses ISO dates', () => {
-    assert.equal(parseClientDate('2026-01-01T00:00:00.000Z')?.toISOString(), '2026-01-01T00:00:00.000Z');
-  });
-
-  it('rejects invalid and non-string values', () => {
-    assert.equal(parseClientDate('not-a-date'), null);
-    assert.equal(parseClientDate(123), null);
-    assert.equal(parseClientDate(''), null);
   });
 });

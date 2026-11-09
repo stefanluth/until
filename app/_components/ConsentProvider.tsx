@@ -2,11 +2,9 @@
 
 import Cookies from 'js-cookie';
 
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
-import { usePathname } from 'next/navigation';
-
-import { CONSENT_COOKIE, COOKIE_OPTIONS, isConsentGranted } from '@/_utils/cookies';
+import { CONSENT_COOKIE, COOKIE_OPTIONS, isConsentGranted, isSecureCookie } from '@/_utils/cookies';
 
 import { ConsentDialog } from './ConsentDialog';
 
@@ -27,7 +25,6 @@ export function useConsent(): ConsentContextValue {
 }
 
 export function ConsentProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const resolverRef = useRef<((granted: boolean) => void) | null>(null);
 
@@ -59,19 +56,12 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
       expires: COOKIE_OPTIONS.maxAge / (60 * 60 * 24),
       path: COOKIE_OPTIONS.path,
       sameSite: COOKIE_OPTIONS.sameSite,
-      secure: window.location.protocol === 'https:',
+      secure: isSecureCookie(window.location.protocol),
     });
     finish(true);
   }, [finish]);
 
   const cancel = useCallback(() => finish(false), [finish]);
-
-  useEffect(() => {
-    if (pathname === '/' && !isGranted()) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setOpen(true);
-    }
-  }, [pathname, isGranted]);
 
   const value = useMemo(() => ({ requestConsent }), [requestConsent]);
 

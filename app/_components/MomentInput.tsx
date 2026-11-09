@@ -1,64 +1,51 @@
 'use client';
 
-import Cookies from 'js-cookie';
 import { CircleAlert } from 'lucide-react';
 
-import { type SubmitEvent, useActionState, useEffect, useRef, useState } from 'react';
-import { useFormStatus } from 'react-dom';
+import { type SubmitEvent, useEffect, useRef, useState, useTransition } from 'react';
 
-import { type MomentFormState, submitMomentAction } from '@/_actions/submitMoment';
-import { CONSENT_COOKIE, isConsentGranted } from '@/_utils/cookies';
-import { parseWhen } from '@/_utils/parseWhen';
+import { useRouter } from 'next/navigation';
+
+import { type MomentInputResult, momentFromInput } from '@/_utils/momentForm';
 import { MAX_MOMENT_NAME_LENGTH } from '@/_utils/validation';
 
-import { useConsent } from './ConsentProvider';
-
-const INITIAL_STATE: MomentFormState = { error: '', location: '' };
-
 export default function MomentInput() {
+  const router = useRouter();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const whenInputRef = useRef<HTMLInputElement>(null);
-  const dateInputRef = useRef<HTMLInputElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const [name, setName] = useState('');
   const [when, setWhen] = useState('');
-  const { requestConsent } = useConsent();
-  const [state, formAction] = useActionState(submitMomentAction, INITIAL_STATE);
+  const [error, setError] = useState<Extract<MomentInputResult, { ok: false }> | null>(null);
+  const [pending, startTransition] = useTransition();
 
-  const nameError = state.location === 'name' ? state.error : '';
-  const whenError = state.location === 'when' ? state.error : '';
-  const formError = state.location === 'consent' || state.location === 'form' ? state.error : '';
-  const bottomError = whenError || formError;
+  const nameError = error?.location === 'name' ? error.error : '';
+  const whenError = error?.location === 'when' ? error.error : '';
 
   useEffect(() => {
-    if (state.location === 'name') {
+    if (error?.location === 'name') {
       nameInputRef.current?.focus();
-    } else if (state.location === 'when') {
+    } else if (error?.location === 'when') {
       whenInputRef.current?.focus();
     }
-  }, [state]);
+  }, [error]);
 
-  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-    if (!isConsentGranted(Cookies.get(CONSENT_COOKIE))) {
-      event.preventDefault();
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-      if (await requestConsent()) {
-        formRef.current?.requestSubmit();
-      }
+    const data = new FormData(event.currentTarget);
+    const result = momentFromInput(data.get('name'), data.get('when'));
 
+    if (!result.ok) {
+      setError(result);
       return;
     }
 
-    const whenText = String(new FormData(event.currentTarget).get('when') ?? '');
-    const parsed = parseWhen(whenText);
-
-    if (dateInputRef.current) {
-      dateInputRef.current.value = parsed?.toISOString() ?? '';
-    }
+    setError(null);
+    startTransition(() => router.push(`/${result.id}`));
   }
 
   return (
-    <form ref={formRef} className="flex flex-col gap-1 sm:gap-1.5" action={formAction} onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-1 sm:gap-1.5" onSubmit={handleSubmit}>
       <div>
         <label className="text-base sm:text-lg" htmlFor="name">
           Moment name
@@ -98,17 +85,14 @@ export default function MomentInput() {
           aria-describedby={whenError ? 'when-error' : undefined}
           required
         />
-        <input ref={dateInputRef} type="hidden" name="date" />
-        <FieldError field={whenError ? 'when' : 'form'} message={bottomError} />
+        <FieldError field="when" message={whenError} />
       </div>
-      <SubmitButton />
+      <SubmitButton pending={pending} />
     </form>
   );
 }
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
+function SubmitButton({ pending }: { pending: boolean }) {
   return (
     <button
       className="text-lg sm:text-xl text-brand-foreground py-2.5 sm:py-3 px-5 sm:px-6 rounded-xl bg-brand disabled:cursor-not-allowed disabled:bg-brand-muted"
@@ -120,7 +104,7 @@ function SubmitButton() {
   );
 }
 
-function FieldError({ field, message }: { field: 'name' | 'when' | 'form'; message: string }) {
+function FieldError({ field, message }: { field: 'name' | 'when'; message: string }) {
   return (
     <div className="mt-1 min-h-5 sm:min-h-6">
       {message ? (

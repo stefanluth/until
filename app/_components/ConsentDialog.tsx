@@ -50,13 +50,12 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
         </ul>
         <p>Both last for one year.</p>
         <p>
-          When you create a moment, its name and date are saved in our database so you can share it with a link. Anyone
-          with the link can see it, so please don&apos;t put private details in the name.
+          A moment&apos;s name and date are part of its link. Anyone with the link can see them, so please don&apos;t
+          put private details in the name.
         </p>
-        <p>Removing a moment only removes it from your saved list. The shared link still works.</p>
         <p>
-          To stop spam, we look at your IP address when you create a moment. It stays in memory for up to 10 minutes and
-          is never saved to our database.
+          The saved-moments cookie is only set when you save a moment. Removing a moment only removes it from your saved
+          list. The shared link still works.
         </p>
         <p>That&apos;s everything. We don&apos;t collect any other data about you.</p>
         <p>By clicking &quot;Accept&quot;, you agree to the use of cookies.</p>
