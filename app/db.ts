@@ -11,7 +11,7 @@ const globalForPg = globalThis as unknown as {
   countdownPool: Pool | undefined;
 };
 
-export const COUNTDOWN_SQL = {
+const COUNTDOWN_SQL = {
   findMany: 'SELECT id, name, "date" FROM countdowns WHERE id = ANY($1::text[]) ORDER BY "date" ASC',
   findOne: 'SELECT id, name, "date" FROM countdowns WHERE id = $1 LIMIT 1',
   create: 'INSERT INTO countdowns (id, name, "date") VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',

@@ -1,6 +1,6 @@
 import type { CountdownUnit } from './duration.ts';
 
-export const SINGULAR_LABELS: Record<CountdownUnit, string> = {
+const SINGULAR_LABELS: Record<CountdownUnit, string> = {
   days: 'day',
   hours: 'hour',
   minutes: 'minute',
@@ -11,7 +11,7 @@ export function unitLabel(unit: CountdownUnit, value: number): string {
   return value === 1 ? SINGULAR_LABELS[unit] : unit;
 }
 
-export type CountdownDateParts = {
+type CountdownDateParts = {
   date: string;
   time: string | null;
 };

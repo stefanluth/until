@@ -8,7 +8,7 @@ type RateLimitState = {
   globalBucket: number[];
 };
 
-export type RateLimiter = {
+type RateLimiter = {
   consume(key: string, now?: number): boolean;
 };
 

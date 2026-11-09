@@ -9,7 +9,7 @@ const UNITS = ['days', 'hours', 'minutes', 'seconds'] as const;
 
 export type CountdownUnit = (typeof UNITS)[number];
 
-export const DAYS_ONLY_THRESHOLD = 7;
+const DAYS_ONLY_THRESHOLD = 7;
 
 export function getVisibleUnits(parts: CountdownParts): CountdownUnit[] {
   const first = UNITS.findIndex((unit) => parts[unit] > 0);

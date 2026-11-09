@@ -2,27 +2,23 @@
 
 import { type ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-export type CountdownMeta = {
-  id: string;
-  name: string;
-  date: Date;
-};
+import type { Countdown } from '@/types';
 
 type CountdownMetaContextValue = {
-  meta: CountdownMeta | null;
-  setMeta: (meta: CountdownMeta | null) => void;
+  meta: Countdown | null;
+  setMeta: (meta: Countdown | null) => void;
 };
 
 const CountdownMetaContext = createContext<CountdownMetaContextValue | null>(null);
 
 export function CountdownMetaProvider({ children }: { children: ReactNode }) {
-  const [meta, setMeta] = useState<CountdownMeta | null>(null);
+  const [meta, setMeta] = useState<Countdown | null>(null);
   const value = useMemo(() => ({ meta, setMeta }), [meta]);
 
   return <CountdownMetaContext.Provider value={value}>{children}</CountdownMetaContext.Provider>;
 }
 
-export function useCountdownMeta(): CountdownMeta | null {
+export function useCountdownMeta(): Countdown | null {
   return useCountdownMetaContext().meta;
 }
 

@@ -1,6 +1,6 @@
 export const MAX_COUNTDOWN_NAME_LENGTH = 48;
-export const MAX_COUNTDOWN_WHEN_LENGTH = 64;
-export const MAX_COUNTDOWN_ID_LENGTH = 512;
+const MAX_COUNTDOWN_WHEN_LENGTH = 64;
+const MAX_COUNTDOWN_ID_LENGTH = 512;
 
 const COUNTDOWN_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}$/;
 

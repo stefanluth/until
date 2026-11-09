@@ -1,6 +1,6 @@
 import type { CountdownUnit } from './duration';
 
-export type CountdownImageUnit = {
+type CountdownImageUnit = {
   unit: CountdownUnit;
   value: number;
   label: string;

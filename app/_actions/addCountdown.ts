@@ -6,7 +6,7 @@ import { CONSENT_COOKIE, isConsentGranted } from '@/_utils/cookies';
 import { addCountdownId, getCountdownList, setCountdownList } from '@/_utils/countdownList';
 import { isValidCountdownId } from '@/_utils/validation';
 
-export type AddCountdownResult = 'added' | 'exists' | 'consent' | 'invalid';
+type AddCountdownResult = 'added' | 'exists' | 'consent' | 'invalid';
 
 export async function addCountdown(countdownId: string): Promise<AddCountdownResult> {
   if (!isValidCountdownId(countdownId)) {
