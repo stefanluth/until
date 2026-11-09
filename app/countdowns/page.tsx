@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 
-import CountdownCard from '@/_components/Countdown';
+import CountdownCard from '@/_components/CountdownCard';
 import { getCountdownList } from '@/_utils/countdownList';
 import { findCountdownsByIds } from '@/db';
 

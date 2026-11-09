@@ -4,7 +4,7 @@ import { cache } from 'react';
 
 import { notFound } from 'next/navigation';
 
-import CountdownCard from '@/_components/Countdown';
+import CountdownCard from '@/_components/CountdownCard';
 import { CountdownDetailMeta } from '@/_components/CountdownDetailMeta';
 import { findCountdownById } from '@/db';
 
