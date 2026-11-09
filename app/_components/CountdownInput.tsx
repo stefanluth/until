@@ -78,7 +78,7 @@ export default function CountdownInput() {
         <input ref={dateInputRef} type="hidden" name="date" />
       </div>
       {(state.location === 'consent' || state.location === 'form') && (
-        <p className="text-base text-red-600">{state.error}</p>
+        <p className="text-base text-red-700 dark:text-red-300">{state.error}</p>
       )}
       <SubmitButton />
     </form>

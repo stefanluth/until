@@ -39,7 +39,7 @@ export function ConsentDialog({ onAccept, onCancel }: { onAccept: () => void | P
       data-consent-gate="true"
       onCancel={handleCancel}
     >
-      <div className="flex flex-col w-full max-w-3xl max-h-[calc(100vh-2rem)] gap-2 p-4 overflow-y-auto text-sm sm:text-base text-justify border border-gray-300 bg-white text-gray-800 rounded-2xl shadow-xl">
+      <div className="flex flex-col w-full max-w-3xl max-h-[calc(100vh-2rem)] gap-2 p-4 overflow-y-auto text-sm sm:text-base text-justify border border-gray-300 bg-white text-gray-800 rounded-2xl shadow-xl dark:border-white/20 dark:bg-zinc-900 dark:text-zinc-100">
         <h2 id="cookie-consent-title" className="text-lg sm:text-xl font-semibold">
           Cookie consent
         </h2>
