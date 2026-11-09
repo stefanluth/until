@@ -18,6 +18,7 @@ const BACKGROUND = 'linear-gradient(180deg, #f8f3ff 0%, #d8b4fe 100%)';
 const FOREGROUND = '#28143c';
 const MUTED = 'rgba(40, 20, 60, 0.78)';
 const MAX_URL_LENGTH = 96;
+const UNIT_GAP = 64;
 
 type ImageFont = {
   name: string;
@@ -48,6 +49,8 @@ export default async function OpenGraphImage({ params }: { params: Promise<{ id:
 
 function MomentCard({ content }: { content: MomentImageContent }) {
   const titleSize = content.name.length <= 16 ? 84 : content.name.length <= 26 ? 72 : 60;
+  const unitCount = content.units.length;
+  const numberSize = unitCount === 4 ? 88 : unitCount === 1 ? 132 : 96;
   const url =
     content.url && content.url.length > MAX_URL_LENGTH ? `${content.url.slice(0, MAX_URL_LENGTH - 1)}…` : content.url;
 
@@ -58,7 +61,7 @@ function MomentCard({ content }: { content: MomentImageContent }) {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        padding: '56px 72px 48px',
+        padding: 64,
         background: BACKGROUND,
         color: FOREGROUND,
         fontFamily: 'Inter',
@@ -107,21 +110,12 @@ function MomentCard({ content }: { content: MomentImageContent }) {
         </div>
         <div style={{ display: 'flex', marginTop: 44 }}>
           {content.units.length > 0 ? (
-            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-              {content.units.map(({ unit, value, label }, index) => (
-                <div
-                  key={unit}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    minWidth: 110,
-                    marginLeft: index === 0 ? 0 : 48,
-                  }}
-                >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: UNIT_GAP }}>
+              {content.units.map(({ unit, value, label }) => (
+                <div key={unit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <span
                     style={{
-                      fontSize: content.units.length === 1 ? 132 : 96,
+                      fontSize: numberSize,
                       fontWeight: 700,
                       lineHeight: 1,
                       letterSpacing: -2,
@@ -129,7 +123,7 @@ function MomentCard({ content }: { content: MomentImageContent }) {
                   >
                     {value}
                   </span>
-                  <span style={{ marginTop: 8, fontSize: 22, fontWeight: 400, letterSpacing: 3, color: MUTED }}>
+                  <span style={{ marginTop: 4, fontSize: 32, fontWeight: 400, letterSpacing: 3, color: MUTED }}>
                     {label.toUpperCase()}
                   </span>
                 </div>
