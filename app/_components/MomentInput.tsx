@@ -48,7 +48,7 @@ export default function MomentInput() {
     <form className="flex flex-col gap-1 sm:gap-1.5" onSubmit={handleSubmit}>
       <div>
         <label className="text-base sm:text-lg" htmlFor="name">
-          Moment name
+          Name <span className="sr-only">of the moment you are counting down to</span>
         </label>
         <input
           ref={nameInputRef}
