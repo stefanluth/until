@@ -2,12 +2,7 @@ import fc from 'fast-check';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import {
-  decodeMomentParam,
-  decodeMomentToken,
-  encodeMomentToken,
-  isValidMomentId,
-} from '../../app/_utils/momentUrl.ts';
+import { decodeMomentParam, decodeMomentToken, encodeMomentToken } from '../../app/_utils/momentUrl.ts';
 import { validMomentId, validMomentName } from '../support/arbitraries.ts';
 
 const date = fc
@@ -29,7 +24,6 @@ describe('moment URL properties', () => {
         assert.equal(moment.name, name);
         assert.equal(moment.date.getTime(), floorToSecond(when));
         assert.equal(moment.id, token);
-        assert.equal(isValidMomentId(token), true);
         assert.match(token, /[+-]\d{2}:\d{2}$/);
         assert.doesNotMatch(token, /Z$/);
       }),

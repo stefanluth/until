@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { COOKIE_OPTIONS, isConsentGranted, isSecureCookie } from '../../app/_utils/cookies.ts';
+import { COOKIE_OPTIONS, browserCookieOptions, isConsentGranted } from '../../app/_utils/cookies.ts';
 
 describe('isConsentGranted', () => {
   it('accepts only the exact true marker', () => {
@@ -16,11 +16,27 @@ describe('isConsentGranted', () => {
   });
 });
 
-describe('isSecureCookie', () => {
-  it('only marks cookies secure over https', () => {
-    assert.equal(isSecureCookie('https:'), true);
-    assert.equal(isSecureCookie('http:'), false);
-    assert.equal(isSecureCookie(''), false);
+describe('browserCookieOptions', () => {
+  it('maps the shared options and only marks cookies secure over https', () => {
+    assert.deepEqual(browserCookieOptions('https:'), {
+      expires: 365,
+      path: '/',
+      sameSite: 'lax',
+      secure: true,
+    });
+    assert.equal(browserCookieOptions('http:').secure, false);
+    assert.equal(browserCookieOptions('').secure, false);
+  });
+
+  it('keeps a supplied option set', () => {
+    const options = { maxAge: 60 * 60 * 24 * 30, path: '/moments', sameSite: 'strict' } as const;
+
+    assert.deepEqual(browserCookieOptions('https:', options), {
+      expires: 30,
+      path: '/moments',
+      sameSite: 'strict',
+      secure: true,
+    });
   });
 });
 

@@ -7,8 +7,19 @@ export const COOKIE_OPTIONS = {
   sameSite: 'lax',
 } as const;
 
-export function isSecureCookie(protocol: string): boolean {
-  return protocol === 'https:';
+type CookieOptions = {
+  maxAge: number;
+  path: string;
+  sameSite: 'lax' | 'strict' | 'none';
+};
+
+export function browserCookieOptions(protocol: string, options: CookieOptions = COOKIE_OPTIONS) {
+  return {
+    expires: options.maxAge / (60 * 60 * 24),
+    path: options.path,
+    sameSite: options.sameSite,
+    secure: protocol === 'https:',
+  };
 }
 
 export function isConsentGranted(value: string | undefined): boolean {

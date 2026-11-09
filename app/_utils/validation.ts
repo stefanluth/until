@@ -2,14 +2,16 @@ export const MAX_MOMENT_NAME_LENGTH = 32;
 const MAX_MOMENT_WHEN_LENGTH = 64;
 const CONTROL_CHARACTER_RE = /[\u0000-\u001f\u007f]/;
 
-type FieldResult<T> = { ok: true; value: T } | { ok: false; error: string; location: 'name' | 'when' };
+export type MomentField = 'name' | 'when';
+
+type FieldResult<T> = { ok: true; value: T } | { ok: false; error: string; location: MomentField };
 
 type TextValidation = {
   value: unknown;
   required: string;
   tooLong: string;
   maxLength: number;
-  location: 'name' | 'when';
+  location: MomentField;
 };
 
 function validateText({ value, required, tooLong, maxLength, location }: TextValidation): FieldResult<string> {

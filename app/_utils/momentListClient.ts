@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-import { isSecureCookie } from './cookies.ts';
+import { browserCookieOptions } from './cookies.ts';
 import type { MomentCookieStore } from './momentList.ts';
 import {
   type AddMomentResult,
@@ -17,12 +17,7 @@ export function createBrowserMomentStore(): MomentCookieStore {
       return value === undefined ? undefined : { value };
     },
     set(name, value, options) {
-      Cookies.set(name, value, {
-        expires: options.maxAge / (60 * 60 * 24),
-        path: options.path,
-        sameSite: options.sameSite,
-        secure: isSecureCookie(window.location.protocol),
-      });
+      Cookies.set(name, value, browserCookieOptions(window.location.protocol, options));
     },
     delete({ name, path }) {
       Cookies.remove(name, { path });

@@ -57,20 +57,20 @@ export function readStoredTheme(storage: StorageLike | null = getStorage()): The
   }
 }
 
-export function storeTheme(id: ThemeId, storage: StorageLike | null = getStorage()): void {
+function storeValue(key: string, value: string, storage: StorageLike | null): void {
   try {
-    storage?.setItem(THEME_STORAGE_KEY, id);
+    storage?.setItem(key, value);
   } catch {
     return;
   }
 }
 
+export function storeTheme(id: ThemeId, storage: StorageLike | null = getStorage()): void {
+  storeValue(THEME_STORAGE_KEY, id, storage);
+}
+
 export function storeMode(mode: Mode, storage: StorageLike | null = getStorage()): void {
-  try {
-    storage?.setItem(MODE_STORAGE_KEY, mode);
-  } catch {
-    return;
-  }
+  storeValue(MODE_STORAGE_KEY, mode, storage);
 }
 
 export function resolveAppearance(mode: Mode, prefersDark: boolean): Appearance {

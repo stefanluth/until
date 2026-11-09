@@ -5,7 +5,6 @@ import {
   decodeMomentParam,
   decodeMomentToken,
   encodeMomentToken,
-  isValidMomentId,
   momentDisplayPath,
   momentPath,
 } from '../../app/_utils/momentUrl.ts';
@@ -173,14 +172,7 @@ describe('decodeMomentParam', () => {
   });
 });
 
-describe('isValidMomentId and momentPath', () => {
-  it('accepts canonical tokens only', () => {
-    assert.equal(isValidMomentId(encodeMomentToken('Café', DATE)), true);
-    assert.equal(isValidMomentId('birthday-abc12345'), false);
-    assert.equal(isValidMomentId('My%20Event-abc12345'), false);
-    assert.equal(isValidMomentId(''), false);
-  });
-
+describe('momentPath', () => {
   it('builds an absolute site-relative path', () => {
     assert.equal(momentPath(`a%40b@${ISO}`), `/a%40b@${ISO}`);
   });

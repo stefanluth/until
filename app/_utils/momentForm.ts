@@ -1,8 +1,8 @@
 import { encodeMomentToken } from './momentUrl.ts';
 import { parseWhen } from './parseWhen.ts';
-import { validateMomentName, validateMomentWhen } from './validation.ts';
+import { type MomentField, validateMomentName, validateMomentWhen } from './validation.ts';
 
-export type MomentInputResult = { ok: true; id: string } | { ok: false; error: string; location: 'name' | 'when' };
+export type MomentInputResult = { ok: true; id: string } | { ok: false; error: string; location: MomentField };
 
 export function momentFromInput(name: unknown, when: unknown, now = new Date()): MomentInputResult {
   const nameResult = validateMomentName(name);

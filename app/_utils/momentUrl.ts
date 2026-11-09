@@ -13,37 +13,26 @@ export function encodeMomentToken(name: string, date: Date, offsetMinutes = -dat
 }
 
 export function decodeMomentToken(value: unknown): Moment | null {
-  if (typeof value !== 'string' || value.length === 0 || value.length > MAX_MOMENT_ID_LENGTH) {
-    return null;
-  }
-
-  const separatorIndex = value.lastIndexOf(SEPARATOR);
-  if (separatorIndex <= 0) {
-    return null;
-  }
-
-  let name: string;
-
-  try {
-    name = decodeURIComponent(value.slice(0, separatorIndex));
-  } catch {
-    return null;
-  }
-
-  return buildMoment(name, value.slice(separatorIndex + 1).replace(/%2B/gi, '+'));
+  return parseMomentValue(value, MAX_MOMENT_ID_LENGTH, false);
 }
 
 export function decodeMomentParam(value: unknown): Moment | null {
-  if (typeof value !== 'string' || value.length === 0 || value.length > MAX_ENCODED_MOMENT_ID_LENGTH) {
+  return parseMomentValue(value, MAX_ENCODED_MOMENT_ID_LENGTH, true);
+}
+
+function parseMomentValue(value: unknown, maxLength: number, decodeWhole: boolean): Moment | null {
+  if (typeof value !== 'string' || value.length === 0 || value.length > maxLength) {
     return null;
   }
 
-  let decoded: string;
+  let decoded = value;
 
-  try {
-    decoded = decodeURIComponent(value);
-  } catch {
-    return null;
+  if (decodeWhole) {
+    try {
+      decoded = decodeURIComponent(value);
+    } catch {
+      return null;
+    }
   }
 
   if (decoded.length === 0 || decoded.length > MAX_MOMENT_ID_LENGTH) {
@@ -55,11 +44,19 @@ export function decodeMomentParam(value: unknown): Moment | null {
     return null;
   }
 
-  return buildMoment(decoded.slice(0, separatorIndex), decoded.slice(separatorIndex + 1));
-}
+  let name = decoded.slice(0, separatorIndex);
 
-export function isValidMomentId(value: unknown): value is string {
-  return decodeMomentToken(value) !== null;
+  if (!decodeWhole) {
+    try {
+      name = decodeURIComponent(name);
+    } catch {
+      return null;
+    }
+  }
+
+  const rawDate = decoded.slice(separatorIndex + 1);
+
+  return buildMoment(name, decodeWhole ? rawDate : rawDate.replace(/%2B/gi, '+'));
 }
 
 export function momentPath(id: string): string {

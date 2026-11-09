@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 
 import { type ReactNode, createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
-import { CONSENT_COOKIE, COOKIE_OPTIONS, isConsentGranted, isSecureCookie } from '@/_utils/cookies';
+import { CONSENT_COOKIE, browserCookieOptions, isConsentGranted } from '@/_utils/cookies';
 
 import { ConsentDialog } from './ConsentDialog';
 
@@ -52,12 +52,7 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const accept = useCallback(() => {
-    Cookies.set(CONSENT_COOKIE, 'true', {
-      expires: COOKIE_OPTIONS.maxAge / (60 * 60 * 24),
-      path: COOKIE_OPTIONS.path,
-      sameSite: COOKIE_OPTIONS.sameSite,
-      secure: isSecureCookie(window.location.protocol),
-    });
+    Cookies.set(CONSENT_COOKIE, 'true', browserCookieOptions(window.location.protocol));
     finish(true);
   }, [finish]);
 
