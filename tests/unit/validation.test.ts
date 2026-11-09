@@ -1,12 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import {
-  isValidMomentId,
-  parseClientDate,
-  validateMomentName,
-  validateMomentWhen,
-} from '../../app/_utils/validation.ts';
+import { parseClientDate, validateMomentName, validateMomentWhen } from '../../app/_utils/validation.ts';
 
 describe('validateMomentName', () => {
   it('trims valid names', () => {
@@ -14,7 +9,7 @@ describe('validateMomentName', () => {
   });
 
   it('accepts names at the maximum length', () => {
-    assert.deepEqual(validateMomentName('a'.repeat(48)), { ok: true, value: 'a'.repeat(48) });
+    assert.deepEqual(validateMomentName('a'.repeat(32)), { ok: true, value: 'a'.repeat(32) });
   });
 
   it('rejects empty, whitespace, and non-string names', () => {
@@ -24,7 +19,13 @@ describe('validateMomentName', () => {
   });
 
   it('rejects names over the maximum length', () => {
-    assert.equal(validateMomentName('a'.repeat(49)).ok, false);
+    assert.equal(validateMomentName('a'.repeat(33)).ok, false);
+  });
+
+  it('rejects control characters and lone surrogates', () => {
+    assert.equal(validateMomentName('a\u0000b').ok, false);
+    assert.equal(validateMomentName('a\nb').ok, false);
+    assert.equal(validateMomentName('a\uD800b').ok, false);
   });
 });
 
@@ -47,26 +48,5 @@ describe('parseClientDate', () => {
     assert.equal(parseClientDate('not-a-date'), null);
     assert.equal(parseClientDate(123), null);
     assert.equal(parseClientDate(''), null);
-  });
-});
-
-describe('isValidMomentId', () => {
-  it('accepts slug moment IDs', () => {
-    assert.equal(isValidMomentId('birthday-abc12345'), true);
-    assert.equal(isValidMomentId('my-event-abc12345'), true);
-    assert.equal(isValidMomentId('3-tage-abc12345'), true);
-    assert.equal(isValidMomentId('moment-abc12345'), true);
-  });
-
-  it('rejects malformed IDs', () => {
-    assert.equal(isValidMomentId('Birthday-abc12345'), false);
-    assert.equal(isValidMomentId('My%20Event-abc12345'), false);
-    assert.equal(isValidMomentId('my event-abc12345'), false);
-    assert.equal(isValidMomentId('my--event-abc12345'), false);
-    assert.equal(isValidMomentId('bad,id'), false);
-    assert.equal(isValidMomentId('bad\nid'), false);
-    assert.equal(isValidMomentId(''), false);
-    assert.equal(isValidMomentId('a'.repeat(513)), false);
-    assert.equal(isValidMomentId(null), false);
   });
 });

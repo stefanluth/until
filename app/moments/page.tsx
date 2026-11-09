@@ -3,11 +3,16 @@ import Link from 'next/link';
 
 import MomentCard from '@/_components/MomentCard';
 import { getMomentList } from '@/_utils/momentList';
-import { findMomentsByIds } from '@/db';
+import { decodeMomentToken } from '@/_utils/momentUrl';
+import type { Moment } from '@/types';
 
 export default async function MomentsPage() {
   const cookieStore = await cookies();
-  const moments = await findMomentsByIds(getMomentList(cookieStore));
+  const momentIds = [...new Set(getMomentList(cookieStore))];
+  const moments = momentIds
+    .map(decodeMomentToken)
+    .filter((moment): moment is Moment => moment !== null)
+    .sort((first, second) => first.date.getTime() - second.date.getTime());
 
   if (moments.length === 0) {
     return (

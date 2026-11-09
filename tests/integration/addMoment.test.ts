@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { addMoment } from '@/_actions/addMoment';
 import { CONSENT_COOKIE, COOKIE_OPTIONS, MOMENT_LIST_COOKIE } from '@/_utils/cookies';
+import { encodeMomentToken } from '@/_utils/momentUrl';
 
 type CookieCall =
   | { type: 'get'; name: string }
@@ -32,8 +33,8 @@ const runtime = vi.hoisted(() => {
 
 vi.mock('next/headers', () => ({ cookies: runtime.cookies }));
 
-const VALID_ID = 'birthday-abc12345';
-const OTHER_ID = 'other-def67890';
+const VALID_ID = encodeMomentToken('Birthday', new Date('2026-01-01T00:00:00.000Z'));
+const OTHER_ID = encodeMomentToken('Party', new Date('2027-06-15T18:30:00.000Z'));
 
 function cookieWrites() {
   return runtime.calls.filter((call) => call.type === 'set' || call.type === 'delete');

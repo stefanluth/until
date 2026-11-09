@@ -1,5 +1,5 @@
 import { COOKIE_OPTIONS, MOMENT_LIST_COOKIE } from './cookies.ts';
-import { isValidMomentId } from './validation.ts';
+import { decodeMomentToken } from './momentUrl.ts';
 
 type CookieReader = {
   get(name: string): { value: string } | undefined;
@@ -11,7 +11,10 @@ type CookieWriter = {
 };
 
 export function readMomentIds(raw: string | undefined): string[] {
-  return (raw ?? '').split(',').filter(isValidMomentId);
+  return (raw ?? '')
+    .split(',')
+    .map((value) => decodeMomentToken(value)?.id)
+    .filter((id): id is string => id !== undefined);
 }
 
 export function hasMomentId(raw: string | undefined, momentId: string): boolean {

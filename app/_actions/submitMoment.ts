@@ -4,12 +4,11 @@ import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { CONSENT_COOKIE, isConsentGranted } from '@/_utils/cookies';
-import { createMomentId } from '@/_utils/momentId';
 import { addMomentId, getMomentList, setMomentList } from '@/_utils/momentList';
+import { encodeMomentToken } from '@/_utils/momentUrl';
 import { parseWhen } from '@/_utils/parseWhen';
 import { consumeRateLimit, getRateLimitKey } from '@/_utils/rateLimit';
 import { parseClientDate, validateMomentName, validateMomentWhen } from '@/_utils/validation';
-import { createMoment } from '@/db';
 
 export type MomentFormState = {
   error: string;
@@ -51,14 +50,8 @@ export async function submitMomentAction(
   }
 
   const date = clientDate ?? parsedWhen;
-  const momentId = createMomentId(nameResult.value, date);
+  const momentId = encodeMomentToken(nameResult.value, date);
   const momentIds = getMomentList(cookieStore);
-
-  await createMoment({
-    id: momentId,
-    name: nameResult.value,
-    date,
-  });
 
   setMomentList(cookieStore, addMomentId(momentIds, momentId));
 

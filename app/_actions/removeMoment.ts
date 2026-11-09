@@ -4,12 +4,14 @@ import { cookies } from 'next/headers';
 
 import { CONSENT_COOKIE, isConsentGranted } from '@/_utils/cookies';
 import { getMomentList, removeMomentId, setMomentList } from '@/_utils/momentList';
-import { isValidMomentId } from '@/_utils/validation';
+import { decodeMomentToken } from '@/_utils/momentUrl';
 
 type RemoveMomentResult = 'removed' | 'consent' | 'invalid';
 
 export async function removeMoment(momentId: string): Promise<RemoveMomentResult> {
-  if (!isValidMomentId(momentId)) {
+  const moment = decodeMomentToken(momentId);
+
+  if (!moment) {
     return 'invalid';
   }
 
@@ -19,7 +21,7 @@ export async function removeMoment(momentId: string): Promise<RemoveMomentResult
     return 'consent';
   }
 
-  setMomentList(cookieStore, removeMomentId(getMomentList(cookieStore), momentId));
+  setMomentList(cookieStore, removeMomentId(getMomentList(cookieStore), moment.id));
 
   return 'removed';
 }

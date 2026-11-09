@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type MomentFormState, submitMomentAction } from '@/_actions/submitMoment';
 import { CONSENT_COOKIE, MOMENT_LIST_COOKIE } from '@/_utils/cookies';
-import { createMomentId } from '@/_utils/momentId';
+import { encodeMomentToken } from '@/_utils/momentUrl';
 
 type CookieCall =
   | { type: 'get'; name: string }
@@ -33,19 +33,17 @@ const runtime = vi.hoisted(() => {
       return values[name] ?? null;
     },
   }));
-  const createMoment = vi.fn(async () => true);
   const consumeRateLimit = vi.fn(() => true);
   const getRateLimitKey = vi.fn(() => 'rate-key');
   const redirect = vi.fn((url: string) => {
     throw new Error(`REDIRECT:${url}`);
   });
 
-  return { calls, cookies, createMoment, consumeRateLimit, getRateLimitKey, headers, redirect, values };
+  return { calls, cookies, consumeRateLimit, getRateLimitKey, headers, redirect, values };
 });
 
 vi.mock('next/headers', () => ({ cookies: runtime.cookies, headers: runtime.headers }));
 vi.mock('next/navigation', () => ({ redirect: runtime.redirect }));
-vi.mock('@/db', () => ({ createMoment: runtime.createMoment }));
 vi.mock('@/_utils/rateLimit', () => ({
   consumeRateLimit: runtime.consumeRateLimit,
   getRateLimitKey: runtime.getRateLimitKey,
@@ -75,14 +73,13 @@ function grantConsent(value = 'true') {
 beforeEach(() => {
   runtime.calls.length = 0;
   runtime.values.clear();
-  runtime.createMoment.mockReset().mockResolvedValue(true);
   runtime.consumeRateLimit.mockReset().mockReturnValue(true);
   runtime.getRateLimitKey.mockReset().mockReturnValue('rate-key');
   runtime.redirect.mockClear();
 });
 
 describe('submitMoment guards', () => {
-  it('requires consent before reading headers or creating anything', async () => {
+  it('requires consent before reading headers or checking the rate limit', async () => {
     const result = await submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d' }));
 
     expect(result).toEqual({
@@ -91,11 +88,10 @@ describe('submitMoment guards', () => {
     });
     expect(runtime.headers).not.toHaveBeenCalled();
     expect(runtime.consumeRateLimit).not.toHaveBeenCalled();
-    expect(runtime.createMoment).not.toHaveBeenCalled();
     expect(cookieWrites()).toEqual([]);
   });
 
-  it('stops at the rate-limit guard before validation or the database', async () => {
+  it('stops at the rate-limit guard before validation', async () => {
     grantConsent();
     runtime.consumeRateLimit.mockReturnValue(false);
 
@@ -107,31 +103,30 @@ describe('submitMoment guards', () => {
     });
     expect(runtime.getRateLimitKey).toHaveBeenCalledTimes(1);
     expect(runtime.consumeRateLimit).toHaveBeenCalledWith('rate-key');
-    expect(runtime.createMoment).not.toHaveBeenCalled();
     expect(cookieWrites()).toEqual([]);
   });
 
-  it('validates the name before reaching the database', async () => {
+  it('validates the name before redirecting', async () => {
     grantConsent();
 
     const result = await submitMomentAction(INITIAL_STATE, form({ when: '1d' }));
 
     expect(result).toMatchObject({ error: 'Name is required', location: 'name' });
-    expect(runtime.createMoment).not.toHaveBeenCalled();
+    expect(runtime.redirect).not.toHaveBeenCalled();
     expect(cookieWrites()).toEqual([]);
   });
 
-  it('validates the when value before reaching the database', async () => {
+  it('validates the when value before redirecting', async () => {
     grantConsent();
 
     const result = await submitMomentAction(INITIAL_STATE, form({ name: 'Party' }));
 
     expect(result).toMatchObject({ error: 'Duration or date is required', location: 'when' });
-    expect(runtime.createMoment).not.toHaveBeenCalled();
+    expect(runtime.redirect).not.toHaveBeenCalled();
     expect(cookieWrites()).toEqual([]);
   });
 
-  it('rejects an unparseable when value before reaching the database', async () => {
+  it('rejects an unparseable when value before redirecting', async () => {
     grantConsent();
 
     const result = await submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: 'not a date' }));
@@ -140,112 +135,102 @@ describe('submitMoment guards', () => {
       error: 'e.g. 1d 2h 3m or 25-12-2026 18:00',
       location: 'when',
     });
-    expect(runtime.createMoment).not.toHaveBeenCalled();
+    expect(runtime.redirect).not.toHaveBeenCalled();
     expect(cookieWrites()).toEqual([]);
   });
 
-  it('reuses an existing moment and saves it to the list', async () => {
+  it('rejects names longer than 32 characters', async () => {
     grantConsent();
-    runtime.createMoment.mockResolvedValue(false);
 
-    await expect(
-      submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE })),
-    ).rejects.toThrow(`REDIRECT:/${createMomentId('Party', new Date(DATE))}`);
+    const result = await submitMomentAction(INITIAL_STATE, form({ name: 'a'.repeat(33), when: '1d' }));
 
-    const id = createMomentId('Party', new Date(DATE));
-    expect(runtime.createMoment).toHaveBeenCalledTimes(1);
-    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
-    expect(runtime.redirect).toHaveBeenCalledWith(`/${id}`);
+    expect(result).toMatchObject({ error: 'Name must be 32 characters or fewer', location: 'name' });
+    expect(runtime.redirect).not.toHaveBeenCalled();
   });
+});
 
-  it('does not duplicate the cookie entry when the id is already saved', async () => {
+describe('submitMoment URL creation', () => {
+  it('creates the token, appends the cookie, and redirects to it', async () => {
     grantConsent();
-    const id = createMomentId('Party', new Date(DATE));
-    runtime.values.set(MOMENT_LIST_COOKIE, id);
-
-    await expect(
-      submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE })),
-    ).rejects.toThrow(`REDIRECT:/${id}`);
-
-    expect(runtime.createMoment).toHaveBeenCalledTimes(1);
-    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
-    expect(runtime.redirect).toHaveBeenCalledWith(`/${id}`);
-  });
-
-  it('creates the moment, appends the cookie, and redirects to it on success', async () => {
-    grantConsent();
-
-    const id = createMomentId('Party', new Date(DATE));
+    const id = encodeMomentToken('Party', new Date(DATE));
 
     await expect(
       submitMomentAction(INITIAL_STATE, form({ name: '  Party  ', when: '1d', date: DATE })),
     ).rejects.toThrow(`REDIRECT:/${id}`);
 
-    expect(runtime.createMoment).toHaveBeenCalledWith({ id, name: 'Party', date: new Date(DATE) });
     expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
+    expect(runtime.redirect).toHaveBeenCalledWith(`/${id}`);
+  });
+
+  it('does not duplicate the cookie entry when the token is already saved', async () => {
+    grantConsent();
+    const id = encodeMomentToken('Party', new Date(DATE));
+    runtime.values.set(MOMENT_LIST_COOKIE, id);
+
+    await expect(submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE }))).rejects.toThrow(
+      `REDIRECT:/${id}`,
+    );
+
+    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
+    expect(runtime.redirect).toHaveBeenCalledWith(`/${id}`);
+  });
+
+  it('preserves the exact case and accents in the URL', async () => {
+    grantConsent();
+    const id = encodeMomentToken('Café', new Date(DATE));
+
+    await expect(submitMomentAction(INITIAL_STATE, form({ name: 'Café', when: '1d', date: DATE }))).rejects.toThrow(
+      `REDIRECT:/${id}`,
+    );
+
+    expect(id).toMatch(/^Caf%C3%A9@/);
     expect(runtime.redirect).toHaveBeenCalledWith(`/${id}`);
   });
 
   it('prefers a valid client date over the parsed when value', async () => {
     grantConsent();
     const clientDate = '2031-02-03T04:05:06.000Z';
-    const id = createMomentId('Party', new Date(clientDate));
+    const id = encodeMomentToken('Party', new Date(clientDate));
 
     await expect(
       submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '25-12-2026 18:00', date: clientDate })),
     ).rejects.toThrow(`REDIRECT:/${id}`);
 
-    expect(runtime.createMoment).toHaveBeenCalledWith(expect.objectContaining({ date: new Date(clientDate) }));
+    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
   });
 
   it('falls back to the parsed when value when the client date is missing', async () => {
     grantConsent();
-    const date = new Date('2026-12-25T18:00:00.000Z');
-    const id = createMomentId('Party', date);
+    const id = encodeMomentToken('Party', new Date('2026-12-25T18:00:00.000Z'));
 
     await expect(submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '25-12-2026 18:00' }))).rejects.toThrow(
       `REDIRECT:/${id}`,
     );
 
-    expect(runtime.createMoment).toHaveBeenCalledWith(
-      expect.objectContaining({ date: new Date('2026-12-25T18:00:00.000Z') }),
-    );
+    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
   });
 
   it('falls back to the parsed when value when the client date is invalid', async () => {
     grantConsent();
-    const date = new Date('2026-12-25T18:00:00.000Z');
-    const id = createMomentId('Party', date);
+    const id = encodeMomentToken('Party', new Date('2026-12-25T18:00:00.000Z'));
 
     await expect(
       submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '25-12-2026 18:00', date: 'not-a-date' })),
     ).rejects.toThrow(`REDIRECT:/${id}`);
 
-    expect(runtime.createMoment).toHaveBeenCalledWith(
-      expect.objectContaining({ date: new Date('2026-12-25T18:00:00.000Z') }),
-    );
+    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(id);
   });
 
-  it('filters malformed cookie entries when appending the new id', async () => {
+  it('filters malformed and legacy cookie entries when appending the new token', async () => {
     grantConsent();
-    runtime.values.set(MOMENT_LIST_COOKIE, 'bad id,other-def67890');
-    const id = createMomentId('Party', new Date(DATE));
+    const other = encodeMomentToken('Existing', new Date('2027-01-01T00:00:00.000Z'));
+    const id = encodeMomentToken('Party', new Date(DATE));
+    runtime.values.set(MOMENT_LIST_COOKIE, `bad id,birthday-abc12345,${other}`);
 
     await expect(submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE }))).rejects.toThrow(
       `REDIRECT:/${id}`,
     );
 
-    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(`other-def67890,${id}`);
-  });
-
-  it('does not write a cookie when the database rejects', async () => {
-    grantConsent();
-    runtime.createMoment.mockRejectedValue(new Error('db down'));
-
-    await expect(submitMomentAction(INITIAL_STATE, form({ name: 'Party', when: '1d', date: DATE }))).rejects.toThrow(
-      'db down',
-    );
-
-    expect(cookieWrites()).toEqual([]);
+    expect(runtime.values.get(MOMENT_LIST_COOKIE)).toBe(`${other},${id}`);
   });
 });

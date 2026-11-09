@@ -5,7 +5,7 @@ import { ArrowLeft, House, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { isValidMomentId } from '@/_utils/validation';
+import { decodeMomentToken } from '@/_utils/momentUrl';
 
 import { MomentCardActions } from './MomentCardActions';
 import { useMomentMeta } from './MomentMetaContext';
@@ -16,16 +16,14 @@ const LINKS = [
   { href: '/moments', label: 'View your saved moments', Icon: House },
 ];
 
-const RESERVED_PATHS = new Set(['', 'moments', '_not-found']);
-
 function getMomentId(pathname: string): string | null {
   const segments = pathname.split('/').filter(Boolean);
 
-  if (segments.length !== 1 || RESERVED_PATHS.has(segments[0])) {
+  if (segments.length !== 1) {
     return null;
   }
 
-  return isValidMomentId(segments[0]) ? segments[0] : null;
+  return decodeMomentToken(segments[0])?.id ?? null;
 }
 
 export function NavBar() {

@@ -1,18 +1,14 @@
 import type { Metadata } from 'next';
 
-import { cache } from 'react';
-
 import { notFound } from 'next/navigation';
 
 import MomentCard from '@/_components/MomentCard';
 import { MomentDetailMeta } from '@/_components/MomentDetailMeta';
-import { findMomentById } from '@/db';
-
-const getMoment = cache(findMomentById);
+import { decodeMomentParam } from '@/_utils/momentUrl';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const moment = await getMoment(id);
+  const moment = decodeMomentParam(id);
 
   return {
     title: moment?.name ? `${moment.name} - until` : 'until',
@@ -22,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function MomentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const moment = await getMoment(id);
+  const moment = decodeMomentParam(id);
 
   if (!moment) {
     notFound();

@@ -4,6 +4,8 @@ import { ClipboardCheck, Link } from 'lucide-react';
 
 import { useState } from 'react';
 
+import { momentPath } from '@/_utils/momentUrl';
+
 import { ActionButton } from './ActionButton';
 
 const LINK_STATE = {
@@ -23,7 +25,7 @@ export function LinkButton({ id, withLabel = false }: { id: string; withLabel?: 
       variant={withLabel ? 'menu' : 'icon'}
       status={announcement}
       onClick={() => {
-        navigator.clipboard.writeText(`${location.origin}/${id}`);
+        navigator.clipboard.writeText(`${location.origin}${momentPath(id)}`);
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}

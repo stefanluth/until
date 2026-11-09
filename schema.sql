@@ -1,5 +1,0 @@
-CREATE TABLE IF NOT EXISTS moments (
-  id   TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  "date" TIMESTAMPTZ NOT NULL
-);
