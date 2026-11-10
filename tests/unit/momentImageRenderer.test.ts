@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import type { MomentImageContent, MomentImageTheme } from '../../app/_utils/momentImage.ts';
-import { MOMENT_IMAGE_WIDTH, drawMomentImage } from '../../app/_utils/momentImageRenderer.ts';
+import { MOMENT_IMAGE_WIDTH, drawMomentImage, layoutMomentImage } from '../../app/_utils/momentImageRenderer.ts';
 
 class FakeContext {
   font = '10px sans-serif';
@@ -66,6 +66,64 @@ function draw(content: MomentImageContent = CONTENT): { ctx: FakeContext; height
   const ctx = new FakeContext();
   const height = drawMomentImage(ctx as unknown as CanvasRenderingContext2D, content, THEME, MOMENT_IMAGE_WIDTH);
   return { ctx, height };
+}
+
+const TWO_UNITS: MomentImageContent = {
+  ...CONTENT,
+  units: [
+    { unit: 'minutes', value: 42, label: 'minutes' },
+    { unit: 'seconds', value: 17, label: 'seconds' },
+  ],
+};
+
+const THREE_UNITS: MomentImageContent = {
+  ...CONTENT,
+  units: [
+    { unit: 'hours', value: 10, label: 'hours' },
+    { unit: 'minutes', value: 10, label: 'minutes' },
+    { unit: 'seconds', value: 14, label: 'seconds' },
+  ],
+};
+
+const FOUR_UNITS: MomentImageContent = {
+  ...CONTENT,
+  units: [
+    { unit: 'days', value: 6, label: 'days' },
+    { unit: 'hours', value: 23, label: 'hours' },
+    { unit: 'minutes', value: 59, label: 'minutes' },
+    { unit: 'seconds', value: 42, label: 'seconds' },
+  ],
+};
+
+function unitSpacing(content: MomentImageContent) {
+  const ctx = new FakeContext();
+  const layout = layoutMomentImage(ctx as unknown as CanvasRenderingContext2D, content, THEME, MOMENT_IMAGE_WIDTH);
+  const units = layout.units;
+
+  assert.ok(units);
+
+  const labelWidths = content.units.map((entry) => {
+    ctx.font = `400 ${units.labelSize}px ${THEME.fontFamily}`;
+    return ctx.measureText(entry.label.toUpperCase()).width;
+  });
+  const numberWidths = content.units.map((entry) => {
+    ctx.font = `700 ${units.numberSize}px ${THEME.fontFamily}`;
+    return ctx.measureText(String(entry.value)).width;
+  });
+  const labelGaps = units.centers
+    .slice(1)
+    .map((center, index) => center - units.centers[index] - (labelWidths[index] + labelWidths[index + 1]) / 2);
+  const numberGaps = units.centers
+    .slice(1)
+    .map((center, index) => center - units.centers[index] - (numberWidths[index] + numberWidths[index + 1]) / 2);
+  const left = Math.min(
+    ...units.centers.map((center, index) => center - Math.max(labelWidths[index], numberWidths[index]) / 2),
+  );
+  const right = Math.max(
+    ...units.centers.map((center, index) => center + Math.max(labelWidths[index], numberWidths[index]) / 2),
+  );
+
+  return { layout, units, labelGaps, numberGaps, left, right };
 }
 
 describe('drawMomentImage', () => {
@@ -145,5 +203,47 @@ describe('drawMomentImage', () => {
       { offset: 0, color: THEME.backgroundStart },
       { offset: 1, color: THEME.backgroundEnd },
     ]);
+  });
+});
+
+describe('layoutUnits', () => {
+  it('uses the wide label gap for two and three units and keeps four units fitted', () => {
+    for (const content of [TWO_UNITS, THREE_UNITS, FOUR_UNITS]) {
+      const { labelGaps } = unitSpacing(content);
+      const expectedGap = content.units.length === 4 ? 30 : 48;
+
+      assert.ok(labelGaps.length > 0);
+
+      for (const gap of labelGaps) {
+        assert.ok(Math.abs(gap - expectedGap) < 0.001, `label gap was ${gap}`);
+      }
+    }
+  });
+
+  it('keeps adjacent numbers apart and the unit row inside the canvas', () => {
+    for (const content of [TWO_UNITS, THREE_UNITS, FOUR_UNITS]) {
+      const { numberGaps, left, right, units } = unitSpacing(content);
+      const minMargin = content.units.length === 4 ? 64 : 24;
+
+      for (const gap of numberGaps) {
+        assert.ok(gap >= 23.999, `number gap was ${gap}`);
+      }
+
+      assert.ok(left >= minMargin - 0.001, `row started at ${left}`);
+      assert.ok(right <= MOMENT_IMAGE_WIDTH - minMargin + 0.001, `row ended at ${right}`);
+      assert.ok(units.labelSize >= 24, `label size was ${units.labelSize}`);
+    }
+  });
+
+  it('shrinks a single-unit number that would overflow the canvas', () => {
+    const content: MomentImageContent = {
+      ...CONTENT,
+      units: [{ unit: 'days', value: 1_234_567, label: 'days' }],
+    };
+    const { left, right, units } = unitSpacing(content);
+
+    assert.ok(left >= -0.001, `row started at ${left}`);
+    assert.ok(right <= MOMENT_IMAGE_WIDTH + 0.001, `row ended at ${right}`);
+    assert.ok(units.numberSize < 240);
   });
 });

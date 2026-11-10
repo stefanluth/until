@@ -8,6 +8,10 @@ const MAX_TITLE_HEIGHT = 200;
 const UNIT_SIZES: Record<number, number> = { 1: 240, 2: 214, 3: 188, 4: 104 };
 const PADDING = 64;
 const GAP = 64;
+const LABEL_GAP = 30;
+const WIDE_LABEL_GAP = 48;
+const MIN_NUMBER_GAP = 24;
+const MIN_UNIT_SIDE_MARGIN = 24;
 
 type FontWeight = 400 | 600 | 700;
 
@@ -290,8 +294,11 @@ function layoutUnits(
   scale: number,
 ): UnitsLayout {
   const count = content.units.length;
-  const available = width - padding * 2;
-  const minGap = 24 * scale;
+  const wideGap = count === 2 || count === 3;
+  const unitPadding = wideGap ? Math.min(padding, MIN_UNIT_SIDE_MARGIN * scale) : padding;
+  const available = width - unitPadding * 2;
+  const labelGap = (wideGap ? WIDE_LABEL_GAP : LABEL_GAP) * scale;
+  const minNumberGap = MIN_NUMBER_GAP * scale;
 
   const measureNumbers = (fontSize: number) =>
     content.units.map((entry) => {
@@ -304,36 +311,22 @@ function layoutUnits(
     return content.units.map((entry) => ctx.measureText(entry.label.toUpperCase()).width);
   };
 
-  let numberSize = (UNIT_SIZES[count] ?? 104) * scale;
-  let numberWidths = measureNumbers(numberSize);
-  const totalNumberWidth = numberWidths.reduce((sum, entry) => sum + entry, 0);
-  const boxWidthsFor = (labelWidths: number[]) =>
-    numberWidths.map((numberWidth, index) => Math.max(numberWidth, labelWidths[index]));
+  const labelsFit = (fontSize: number) => {
+    const labelWidths = measureLabels(fontSize);
 
-  if (count > 1 && totalNumberWidth + minGap * (count - 1) > available) {
-    numberSize *= (available - minGap * (count - 1)) / totalNumberWidth;
-    numberWidths = measureNumbers(numberSize);
-  }
-
-  numberSize = Math.max(1, Math.round(numberSize));
-  numberWidths = measureNumbers(numberSize);
-
-  const fits = (labelSize: number) => {
-    const boxWidths = boxWidthsFor(measureLabels(labelSize));
-
-    return boxWidths.reduce((sum, box) => sum + box, 0) + minGap * (count - 1) <= available;
+    return labelWidths.reduce((sum, entry) => sum + entry, 0) + labelGap * (count - 1) <= available;
   };
 
   let labelSize = 40 * scale;
 
-  if (count > 1 && !fits(labelSize)) {
+  if (count > 1 && !labelsFit(labelSize)) {
     let low = 1;
     let high = labelSize;
 
     for (let attempt = 0; attempt < 30; attempt += 1) {
       const middle = (low + high) / 2;
 
-      if (fits(middle)) {
+      if (labelsFit(middle)) {
         low = middle;
       } else {
         high = middle;
@@ -343,19 +336,63 @@ function layoutUnits(
     labelSize = low;
   }
 
-  labelSize = Math.max(1, Math.round(labelSize));
+  labelSize = Math.max(1, Math.floor(labelSize));
 
   const labelWidths = measureLabels(labelSize);
-  const boxWidths = boxWidthsFor(labelWidths);
-  const totalBoxWidth = boxWidths.reduce((sum, box) => sum + box, 0);
-  const gap = count > 1 ? (available - totalBoxWidth) / (count - 1) : 0;
-  const centers: number[] = [];
-  let cursor = padding + (count === 1 ? (available - totalBoxWidth) / 2 : 0);
+  const distances: number[] = [];
 
-  for (const boxWidth of boxWidths) {
-    centers.push(cursor + boxWidth / 2);
-    cursor += boxWidth + gap;
+  for (let index = 1; index < count; index += 1) {
+    distances.push(labelGap + (labelWidths[index - 1] + labelWidths[index]) / 2);
   }
+
+  const offsets = [0];
+
+  for (const distance of distances) {
+    offsets.push(offsets[offsets.length - 1] + distance);
+  }
+
+  const rowSpan = (numberWidths: number[]) =>
+    Math.max(labelWidths[0], numberWidths[0]) / 2 +
+    offsets[offsets.length - 1] +
+    Math.max(labelWidths[count - 1], numberWidths[count - 1]) / 2;
+
+  let numberSize = Math.max(1, Math.round((UNIT_SIZES[count] ?? 104) * scale));
+
+  const numbersFit = (fontSize: number) => {
+    const numberWidths = measureNumbers(fontSize);
+
+    for (let index = 1; index < count; index += 1) {
+      const gap = distances[index - 1] - (numberWidths[index - 1] + numberWidths[index]) / 2;
+
+      if (gap < minNumberGap) {
+        return false;
+      }
+    }
+
+    return rowSpan(numberWidths) <= (count === 1 ? width : available);
+  };
+
+  if (!numbersFit(numberSize)) {
+    let low = 1;
+    let high = numberSize;
+
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      const middle = Math.floor((low + high) / 2);
+
+      if (numbersFit(middle)) {
+        low = middle;
+      } else {
+        high = middle;
+      }
+    }
+
+    numberSize = Math.max(1, low);
+  }
+
+  const numberWidths = measureNumbers(numberSize);
+  const span = rowSpan(numberWidths);
+  const shift = unitPadding + (available - span) / 2 + Math.max(labelWidths[0], numberWidths[0]) / 2;
+  const centers = offsets.map((offset) => offset + shift);
 
   const labelOffset = numberSize * 0.6;
 
